@@ -1,0 +1,106 @@
+{
+  "timestamp": "2025-07-26T12:18:13.994539",
+  "total_tests": 19,
+  "passed_tests": 19,
+  "failed_tests": 0,
+  "success_rate": 100.0,
+  "all_passed": true,
+  "test_results": {
+    "Data Collection": {
+      "status": true,
+      "message": "Collected 1725 players",
+      "timestamp": "12:12:20"
+    },
+    "Data Validation": {
+      "status": true,
+      "message": "All required columns present",
+      "timestamp": "12:12:20"
+    },
+    "Data Quality": {
+      "status": true,
+      "message": "No null values in required fields",
+      "timestamp": "12:12:20"
+    },
+    "File Output": {
+      "status": true,
+      "message": "Data saved to /Users/noctis/GitHub/nfl-fantasy-draft-forecast-cli/data/test_player_stats.csv",
+      "timestamp": "12:12:20"
+    },
+    "Headline Fetching": {
+      "status": true,
+      "message": "Fetched 16 headlines",
+      "timestamp": "12:12:25"
+    },
+    "Headline Structure": {
+      "status": true,
+      "message": "All required fields present",
+      "timestamp": "12:12:25"
+    },
+    "News File Output": {
+      "status": true,
+      "message": "Headlines saved to /Users/noctis/GitHub/nfl-fantasy-draft-forecast-cli/news/test_raw_headlines.json",
+      "timestamp": "12:12:25"
+    },
+    "Headline Analysis": {
+      "status": true,
+      "message": "Analyzed 2 players",
+      "timestamp": "12:12:27"
+    },
+    "Feature Structure": {
+      "status": true,
+      "message": "All required fields present",
+      "timestamp": "12:12:27"
+    },
+    "Data Loading": {
+      "status": true,
+      "message": "Loaded 1725 players",
+      "timestamp": "12:12:33"
+    },
+    "Ranking Algorithm": {
+      "status": true,
+      "message": "Ranked 20 players",
+      "timestamp": "12:12:33"
+    },
+    "Ranking Structure": {
+      "status": true,
+      "message": "All required columns present",
+      "timestamp": "12:12:33"
+    },
+    "Rankings File Output": {
+      "status": true,
+      "message": "Rankings saved to /Users/noctis/GitHub/nfl-fantasy-draft-forecast-cli/outputs/test_rankings.json",
+      "timestamp": "12:12:33"
+    },
+    "CLI Help": {
+      "status": true,
+      "message": "Help command works correctly",
+      "timestamp": "12:12:36"
+    },
+    "CLI Position Filter": {
+      "status": true,
+      "message": "Position filtering works",
+      "timestamp": "12:12:38"
+    },
+    "CLI Player Search": {
+      "status": true,
+      "message": "Player search works",
+      "timestamp": "12:12:39"
+    },
+    "Full Pipeline": {
+      "status": true,
+      "message": "Complete pipeline executed successfully",
+      "timestamp": "12:18:11"
+    },
+    "Pipeline Outputs": {
+      "status": true,
+      "message": "All expected output files created",
+      "timestamp": "12:18:11"
+    },
+    "CLI with Pipeline Data": {
+      "status": true,
+      "message": "CLI works with pipeline data",
+      "timestamp": "12:18:13"
+    }
+  },
+  "execution_time": 361.23103618621826
+}

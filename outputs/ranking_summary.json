@@ -1,0 +1,144 @@
+{
+  "total_players": 20,
+  "positions": {
+    "QB": 5,
+    "RB": 5,
+    "TE": 5,
+    "WR": 5
+  },
+  "tiers": {
+    "1.0": 16,
+    "5.0": 4
+  },
+  "top_players_by_position": {
+    "QB": [
+      {
+        "player": "Patrick Mahomes",
+        "team": "KC",
+        "total_score": 74.26725525061325,
+        "tier": 1.0
+      },
+      {
+        "player": "Josh Allen",
+        "team": "BUF",
+        "total_score": 73.1620624800877,
+        "tier": 1.0
+      },
+      {
+        "player": "Dak Prescott",
+        "team": "DAL",
+        "total_score": 70.09160399584457,
+        "tier": 1.0
+      },
+      {
+        "player": "Jalen Hurts",
+        "team": "PHI",
+        "total_score": 69.46805925581899,
+        "tier": 1.0
+      },
+      {
+        "player": "Lamar Jackson",
+        "team": "BAL",
+        "total_score": 68.59010311630645,
+        "tier": 5.0
+      }
+    ],
+    "RB": [
+      {
+        "player": "Christian McCaffrey",
+        "team": "SF",
+        "total_score": 61.12164730980301,
+        "tier": 1.0
+      },
+      {
+        "player": "Bijan Robinson",
+        "team": "ATL",
+        "total_score": 56.22967445901491,
+        "tier": 1.0
+      },
+      {
+        "player": "Saquon Barkley",
+        "team": "PHI",
+        "total_score": 55.73750460879945,
+        "tier": 1.0
+      },
+      {
+        "player": "Breece Hall",
+        "team": "NYJ",
+        "total_score": 53.739555786267616,
+        "tier": 1.0
+      },
+      {
+        "player": "Jonathan Taylor",
+        "team": "IND",
+        "total_score": 49.490080643822516,
+        "tier": 5.0
+      }
+    ],
+    "TE": [
+      {
+        "player": "Travis Kelce",
+        "team": "KC",
+        "total_score": 57.736425123999005,
+        "tier": 1.0
+      },
+      {
+        "player": "Evan Engram",
+        "team": "JAX",
+        "total_score": 50.9233961908452,
+        "tier": 1.0
+      },
+      {
+        "player": "T.J. Hockenson",
+        "team": "MIN",
+        "total_score": 50.87055590460457,
+        "tier": 1.0
+      },
+      {
+        "player": "Sam LaPorta",
+        "team": "DET",
+        "total_score": 50.48494879173896,
+        "tier": 1.0
+      },
+      {
+        "player": "George Kittle",
+        "team": "SF",
+        "total_score": 49.49080607714714,
+        "tier": 5.0
+      }
+    ],
+    "WR": [
+      {
+        "player": "Tyreek Hill",
+        "team": "MIA",
+        "total_score": 65.7479623819127,
+        "tier": 1.0
+      },
+      {
+        "player": "CeeDee Lamb",
+        "team": "DAL",
+        "total_score": 65.1138850394888,
+        "tier": 1.0
+      },
+      {
+        "player": "Amon-Ra St. Brown",
+        "team": "DET",
+        "total_score": 61.61526564501204,
+        "tier": 1.0
+      },
+      {
+        "player": "AJ Brown",
+        "team": "PHI",
+        "total_score": 60.17716746179895,
+        "tier": 1.0
+      },
+      {
+        "player": "Garrett Wilson",
+        "team": "NYJ",
+        "total_score": 55.7310408338148,
+        "tier": 5.0
+      }
+    ]
+  },
+  "ranked_at": "2025-07-26T12:49:58.639557"
+}
