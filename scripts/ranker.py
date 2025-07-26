@@ -28,29 +28,31 @@ logger = logging.getLogger(__name__)
 class PlayerRanker:
     """Comprehensive player ranking system for fantasy football"""
     
-    def __init__(self, data_dir: str = "data", news_dir: str = "news", outputs_dir: str = "outputs"):
+    def __init__(self, data_dir: str = "data", news_dir: str = "news", outputs_dir: str = "outputs", max_players: int = 50):
         self.data_dir = Path(data_dir)
         self.news_dir = Path(news_dir)
         self.outputs_dir = Path(outputs_dir)
+        self.max_players = max_players
         self.outputs_dir.mkdir(exist_ok=True)
         
         # Scoring weights (can be adjusted)
         self.weights = {
-            'historical_performance': 0.35,  # Historical fantasy points
+            'historical_performance': 0.30,  # Historical fantasy points (reduced from 0.35)
             'current_form': 0.25,            # Recent performance trend
             'injury_risk': -0.15,            # Injury proneness (negative)
             'experience_bonus': 0.10,        # Rookie/veteran considerations
             'team_context': 0.10,            # Team performance influence
             'news_sentiment': 0.10,          # Recent buzz and sentiment
-            'consistency': 0.05              # Weekly performance stability
+            'consistency': 0.05,             # Weekly performance stability
+            'ceiling_potential': 0.05        # NEW: High-ceiling upside potential
         }
         
         # Position-specific adjustments
         self.position_weights = {
-            'QB': {'experience_bonus': 0.15, 'consistency': 0.10},  # QBs benefit from experience
-            'RB': {'injury_risk': -0.20, 'current_form': 0.30},     # RBs more injury-prone, form matters more
-            'WR': {'news_sentiment': 0.15, 'team_context': 0.15},   # WRs affected by team/QB changes
-            'TE': {'experience_bonus': 0.05, 'consistency': 0.10},  # TEs benefit from consistency
+            'QB': {'experience_bonus': 0.15, 'consistency': 0.10, 'ceiling_potential': 0.10},  # QBs benefit from experience and ceiling
+            'RB': {'injury_risk': -0.20, 'current_form': 0.30, 'ceiling_potential': 0.15},     # RBs more injury-prone, form matters more, high ceiling
+            'WR': {'news_sentiment': 0.15, 'team_context': 0.15, 'ceiling_potential': 0.10},   # WRs affected by team/QB changes
+            'TE': {'experience_bonus': 0.05, 'consistency': 0.10, 'ceiling_potential': 0.05},  # TEs benefit from consistency
             'K': {'consistency': 0.20, 'team_context': 0.20},       # Kickers need consistency and good team
             'DST': {'team_context': 0.30, 'consistency': 0.15}      # Defense heavily team-dependent
         }
@@ -72,13 +74,37 @@ class PlayerRanker:
     def load_data(self) -> Tuple[pd.DataFrame, Dict]:
         """Load player stats and news features"""
         try:
-            # Load enhanced player stats
+            # Try to load enhanced player stats first
             stats_file = self.data_dir / "enhanced_player_stats.csv"
             if not stats_file.exists():
+                # Fallback to base player stats
                 stats_file = self.data_dir / "base_player_stats.csv"
+                if not stats_file.exists():
+                    # Fallback to raw NFL data
+                    stats_file = self.data_dir / "nfl_player_data.csv"
             
-            stats_df = pd.read_csv(stats_file)
-            logger.info(f"Loaded {len(stats_df)} players from stats file")
+            if stats_file.exists():
+                stats_df = pd.read_csv(stats_file)
+                logger.info(f"Loaded {len(stats_df)} players from {stats_file.name}")
+                
+                # If max_players is specified and we have more players, filter to top performers
+                if self.max_players is not None and len(stats_df) > self.max_players:
+                    # Sort by fantasy points or total score if available
+                    if 'total_fantasy_points' in stats_df.columns:
+                        stats_df = stats_df.nlargest(self.max_players, 'total_fantasy_points')
+                    elif 'points_2024' in stats_df.columns:
+                        stats_df = stats_df.nlargest(self.max_players, 'points_2024')
+                    else:
+                        # Take first max_players
+                        stats_df = stats_df.head(self.max_players)
+                    
+                    logger.info(f"Filtered to top {len(stats_df)} players")
+                else:
+                    logger.info(f"Ranking all {len(stats_df)} available players")
+            else:
+                # Create a minimal dataset if no files exist
+                logger.warning("No player stats files found, creating minimal dataset")
+                stats_df = self._create_minimal_dataset()
             
             # Load news features
             news_file = self.news_dir / "player_features.json"
@@ -95,6 +121,50 @@ class PlayerRanker:
         except Exception as e:
             logger.error(f"Error loading data: {e}")
             raise
+    
+    def _create_minimal_dataset(self) -> pd.DataFrame:
+        """Create a minimal dataset with top fantasy players"""
+        # This is a fallback if no data files exist
+        top_players = [
+            {'player': 'Christian McCaffrey', 'position': 'RB', 'team': 'SF', 'points_2024': 320.5, 'age': 28, 'experience': 8},
+            {'player': 'Tyreek Hill', 'position': 'WR', 'team': 'MIA', 'points_2024': 298.2, 'age': 30, 'experience': 8},
+            {'player': 'Travis Kelce', 'position': 'TE', 'team': 'KC', 'points_2024': 245.6, 'age': 35, 'experience': 12},
+            {'player': 'Patrick Mahomes', 'position': 'QB', 'team': 'KC', 'points_2024': 398.7, 'age': 29, 'experience': 8},
+            {'player': 'Josh Allen', 'position': 'QB', 'team': 'BUF', 'points_2024': 425.3, 'age': 28, 'experience': 7},
+            {'player': 'CeeDee Lamb', 'position': 'WR', 'team': 'DAL', 'points_2024': 275.8, 'age': 25, 'experience': 5},
+            {'player': 'Bijan Robinson', 'position': 'RB', 'team': 'ATL', 'points_2024': 265.3, 'age': 22, 'experience': 2},
+            {'player': 'Amon-Ra St. Brown', 'position': 'WR', 'team': 'DET', 'points_2024': 258.7, 'age': 24, 'experience': 4},
+            {'player': 'Saquon Barkley', 'position': 'RB', 'team': 'PHI', 'points_2024': 245.9, 'age': 27, 'experience': 7},
+            {'player': 'Sam LaPorta', 'position': 'TE', 'team': 'DET', 'points_2024': 198.3, 'age': 24, 'experience': 2},
+        ]
+        
+        # Add more players to reach max_players
+        additional_players = [
+            {'player': 'Dak Prescott', 'position': 'QB', 'team': 'DAL', 'points_2024': 365.4, 'age': 31, 'experience': 9},
+            {'player': 'Jalen Hurts', 'position': 'QB', 'team': 'PHI', 'points_2024': 385.2, 'age': 26, 'experience': 5},
+            {'player': 'Lamar Jackson', 'position': 'QB', 'team': 'BAL', 'points_2024': 372.8, 'age': 27, 'experience': 7},
+            {'player': 'Breece Hall', 'position': 'RB', 'team': 'NYJ', 'points_2024': 285.1, 'age': 23, 'experience': 3},
+            {'player': 'Jonathan Taylor', 'position': 'RB', 'team': 'IND', 'points_2024': 232.1, 'age': 25, 'experience': 5},
+            {'player': 'Garrett Wilson', 'position': 'WR', 'team': 'NYJ', 'points_2024': 238.4, 'age': 24, 'experience': 3},
+            {'player': 'AJ Brown', 'position': 'WR', 'team': 'PHI', 'points_2024': 228.6, 'age': 27, 'experience': 6},
+            {'player': 'Evan Engram', 'position': 'TE', 'team': 'JAX', 'points_2024': 176.2, 'age': 30, 'experience': 8},
+            {'player': 'T.J. Hockenson', 'position': 'TE', 'team': 'MIN', 'points_2024': 187.5, 'age': 27, 'experience': 6},
+            {'player': 'George Kittle', 'position': 'TE', 'team': 'SF', 'points_2024': 165.8, 'age': 31, 'experience': 8},
+        ]
+        
+        all_players = top_players + additional_players
+        
+        # Create DataFrame with required columns
+        df = pd.DataFrame(all_players)
+        
+        # Add missing columns with default values
+        df['injury_score'] = 1.0
+        df['consistency_score'] = 0.7
+        df['weekly_avg'] = df['points_2024'] / 17  # Approximate weekly average
+        df['weekly_std'] = df['weekly_avg'] * 0.3  # Approximate standard deviation
+        df['experience_level'] = df['experience'].apply(lambda x: 'Rookie' if x <= 1 else 'Young' if x <= 4 else 'Veteran')
+        
+        return df
     
     def calculate_historical_performance_score(self, row: pd.Series) -> float:
         """Calculate exponential moving average of fantasy performance"""
@@ -259,21 +329,64 @@ class PlayerRanker:
             return 0.5
     
     def calculate_consistency_score(self, row: pd.Series) -> float:
-        """Calculate consistency score from weekly performance"""
+        """Calculate consistency score based on weekly performance stability"""
         try:
             consistency = row.get('consistency_score', 0.5)
-            weekly_std = row.get('weekly_std', 5.0)
-            
-            # Normalize consistency (higher is better)
-            # Weekly std of 2 = very consistent, 10 = inconsistent
-            std_score = max(0, 1.0 - (weekly_std - 2) / 8)
-            
-            # Combine consistency metrics
-            final_consistency = (consistency * 0.7) + (std_score * 0.3)
-            return final_consistency
+            return consistency
             
         except Exception as e:
             logger.warning(f"Error calculating consistency for {row.get('player', 'Unknown')}: {e}")
+            return 0.5
+    
+    def calculate_ceiling_potential(self, row: pd.Series) -> float:
+        """Calculate ceiling potential based on historical high games and recent trends"""
+        try:
+            position = row.get('position', 'WR')
+            
+            # Get available data
+            weekly_avg = row.get('weekly_avg', 0)
+            weekly_std = row.get('weekly_std', 0)
+            consistency_score = row.get('consistency_score', 0.5)
+            
+            if weekly_avg == 0:
+                return 0.5
+            
+            # Estimate ceiling based on standard deviation (higher std = higher ceiling potential)
+            if weekly_std > 0:
+                # Calculate potential ceiling as avg + 2*std
+                estimated_ceiling = weekly_avg + (2 * weekly_std)
+                ceiling_ratio = estimated_ceiling / weekly_avg
+            else:
+                ceiling_ratio = 1.5  # Default if no std data
+            
+            # Position-specific ceiling expectations
+            position_ceilings = {
+                'QB': 1.8,  # QBs can have 1.8x their average in great games
+                'RB': 2.0,  # RBs can have 2x their average in great games
+                'WR': 2.2,  # WRs can have 2.2x their average in great games
+                'TE': 1.6,  # TEs are more consistent, lower ceiling
+                'K': 1.3,   # Kickers are very consistent
+                'DST': 1.5  # Defenses can have big games
+            }
+            
+            expected_ceiling = position_ceilings.get(position, 1.5)
+            
+            # Score based on how close they are to expected ceiling
+            ceiling_score = min(ceiling_ratio / expected_ceiling, 1.0)
+            
+            # Bonus for young players (higher potential)
+            experience = row.get('experience', 3)
+            if experience <= 2:
+                ceiling_score *= 1.2  # 20% bonus for young players
+            
+            # Penalty for very consistent players (lower ceiling potential)
+            if consistency_score > 0.8:
+                ceiling_score *= 0.9  # 10% penalty for very consistent players
+            
+            return min(ceiling_score, 1.0)
+            
+        except Exception as e:
+            logger.warning(f"Error calculating ceiling potential for {row.get('player', 'Unknown')}: {e}")
             return 0.5
     
     def calculate_total_score(self, row: pd.Series, news_data: Dict) -> float:
@@ -294,7 +407,8 @@ class PlayerRanker:
                 'experience_bonus': self.calculate_experience_bonus(row),
                 'team_context': self.calculate_team_context_score(row),
                 'news_sentiment': self.calculate_news_sentiment_score(row, news_data),
-                'consistency': self.calculate_consistency_score(row)
+                'consistency': self.calculate_consistency_score(row),
+                'ceiling_potential': self.calculate_ceiling_potential(row)
             }
             
             # Calculate weighted total
@@ -309,29 +423,72 @@ class PlayerRanker:
             logger.error(f"Error calculating total score for {row.get('player', 'Unknown')}: {e}")
             return 0.0
     
-    def assign_tiers(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Assign tiers based on score distribution"""
+    def calculate_vorp_scores(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Calculate VORP (Value Over Replacement Player) scores"""
         try:
-            # Group by position for tier assignment
-            for position in df['position'].unique():
-                pos_mask = df['position'] == position
-                pos_scores = df.loc[pos_mask, 'total_score']
+            # Step 1: Define replacement level rank per position
+            # These represent the "replacement level" player you can get on waivers
+            replacement_ranks = {
+                'QB': 15,    # QB12 is typically available on waivers
+                'RB': 20,    # RB24 is replacement level (flex play)
+                'WR': 30,    # WR30 is replacement level (flex play)
+                'TE': 12,    # TE12 is replacement level
+                'K': 12,     # K12 is replacement level
+                'DST': 12    # DST12 is replacement level
+            }
+            
+            # Step 2: Compute baseline scores per position
+            baseline_scores = {}
+            for pos in df['position'].unique():
+                pos_df = df[df['position'] == pos].copy()
+                baseline_rank = replacement_ranks.get(pos, 12)
                 
-                if len(pos_scores) == 0:
-                    continue
+                if len(pos_df) >= baseline_rank:
+                    # Get the score of the replacement level player
+                    pos_df_sorted = pos_df.nlargest(baseline_rank, 'total_score')
+                    baseline_score = pos_df_sorted.iloc[-1]['total_score']
+                    baseline_scores[pos] = baseline_score
+                else:
+                    # Fallback to median if not enough players
+                    baseline_scores[pos] = pos_df['total_score'].median()
                 
-                # Calculate tier boundaries
-                tier1_cutoff = pos_scores.quantile(0.1)  # Top 10%
-                tier2_cutoff = pos_scores.quantile(0.25)  # Top 25%
-                tier3_cutoff = pos_scores.quantile(0.5)   # Top 50%
-                tier4_cutoff = pos_scores.quantile(0.75)  # Top 75%
-                
-                # Assign tiers
-                df.loc[pos_mask, 'tier'] = 5  # Default tier
-                df.loc[pos_mask & (pos_scores >= tier1_cutoff), 'tier'] = 1
-                df.loc[pos_mask & (pos_scores < tier1_cutoff) & (pos_scores >= tier2_cutoff), 'tier'] = 2
-                df.loc[pos_mask & (pos_scores < tier2_cutoff) & (pos_scores >= tier3_cutoff), 'tier'] = 3
-                df.loc[pos_mask & (pos_scores < tier3_cutoff) & (pos_scores >= tier4_cutoff), 'tier'] = 4
+                logger.info(f"Position {pos}: replacement level score = {baseline_scores[pos]:.2f}")
+            
+            # Step 3: Calculate VORP score for each player
+            df['baseline_score'] = df['position'].map(baseline_scores)
+            df['vorp_score'] = df['total_score'] - df['baseline_score']
+            
+            # Step 4: Calculate VORP rank (more important than raw rank for drafting)
+            df['vorp_rank'] = df.groupby('position')['vorp_score'].rank(method='dense', ascending=False)
+            
+            return df
+            
+        except Exception as e:
+            logger.error(f"Error calculating VORP scores: {e}")
+            return df
+    
+    def assign_tiers(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Assign tiers based on VORP score using constant thresholds"""
+        try:
+            def get_tier_from_vorp(vorp_score):
+                """Assign tier based on VORP score using constant thresholds"""
+                if vorp_score >= 15:
+                    return 1
+                elif vorp_score >= 10:
+                    return 2
+                elif vorp_score >= 5:
+                    return 3
+                elif vorp_score >= 0:
+                    return 4
+                else:
+                    return 5
+            
+            # Apply tier assignment based on VORP scores
+            df['tier'] = df['vorp_score'].apply(get_tier_from_vorp)
+            
+            # Log tier distribution for analysis
+            tier_counts = df['tier'].value_counts().sort_index()
+            logger.info(f"Tier distribution: {dict(tier_counts)}")
             
             return df
             
@@ -353,13 +510,22 @@ class PlayerRanker:
                 lambda row: self.calculate_total_score(row, news_data), axis=1
             )
             
-            # Sort by total score within each position
-            stats_df = stats_df.sort_values(['position', 'total_score'], ascending=[True, False])
+            # Add ceiling potential column
+            stats_df['ceiling_potential'] = stats_df.apply(
+                lambda row: self.calculate_ceiling_potential(row), axis=1
+            )
             
-            # Assign ranks within positions
-            stats_df['rank'] = stats_df.groupby('position')['total_score'].rank(method='dense', ascending=False)
+            # Calculate VORP scores
+            logger.info("Calculating VORP scores...")
+            stats_df = self.calculate_vorp_scores(stats_df)
             
-            # Assign tiers
+            # Sort by VORP score within each position (more relevant for drafting)
+            stats_df = stats_df.sort_values(['position', 'vorp_score'], ascending=[True, False])
+            
+            # Assign ranks within positions based on VORP
+            stats_df['rank'] = stats_df.groupby('position')['vorp_score'].rank(method='dense', ascending=False)
+            
+            # Assign tiers based on VORP
             stats_df = self.assign_tiers(stats_df)
             
             # Add metadata
@@ -389,57 +555,210 @@ class PlayerRanker:
                 pos_df.to_csv(pos_file, index=False)
                 logger.info(f"Exported {position} rankings to {pos_file}")
             
-            # Create summary JSON
+            # Create ranking summary with position scarcity analysis
+            self.create_ranking_summary(df)
+            
+        except Exception as e:
+            logger.error(f"Error exporting rankings: {e}")
+            raise
+    
+    def create_ranking_summary(self, df: pd.DataFrame) -> None:
+        """Create comprehensive ranking summary with VORP and position scarcity analysis"""
+        try:
             summary = {
                 'total_players': len(df),
                 'positions': df['position'].value_counts().to_dict(),
                 'tiers': df['tier'].value_counts().to_dict(),
+                'ranked_at': datetime.now().isoformat(),
+                'vorp_analysis': {},
                 'top_players_by_position': {},
-                'ranked_at': datetime.now().isoformat()
+                'position_scarcity': {},
+                'risk_reward_players': [],
+                'undervalued_players': [],
+                'best_values_by_vorp': []
             }
             
+            # VORP analysis by position
             for position in df['position'].unique():
                 pos_df = df[df['position'] == position]
-                top_5 = pos_df.head(5)[['player', 'team', 'total_score', 'tier']].to_dict('records')
-                summary['top_players_by_position'][position] = top_5
+                baseline_score = pos_df['baseline_score'].iloc[0] if len(pos_df) > 0 else 0
+                
+                summary['vorp_analysis'][position] = {
+                    'baseline_score': baseline_score,
+                    'max_vorp': pos_df['vorp_score'].max() if len(pos_df) > 0 else 0,
+                    'avg_vorp': pos_df['vorp_score'].mean() if len(pos_df) > 0 else 0,
+                    'players_above_baseline': len(pos_df[pos_df['vorp_score'] > 0])
+                }
             
+            # Top players by position (now including VORP)
+            for position in df['position'].unique():
+                pos_df = df[df['position'] == position].head(5)
+                summary['top_players_by_position'][position] = [
+                    {
+                        'player': row['player'],
+                        'team': row['team'],
+                        'total_score': row['total_score'],
+                        'vorp_score': row['vorp_score'],
+                        'tier': row['tier'],
+                        'consistency_score': row.get('consistency_score', 0),
+                        'ceiling_potential': row.get('ceiling_potential', 0)
+                    }
+                    for _, row in pos_df.iterrows()
+                ]
+            
+            # Position scarcity analysis (now VORP-based)
+            for position in df['position'].unique():
+                pos_df = df[df['position'] == position]
+                # Count players with significant VORP (top tier players)
+                high_vorp_count = len(pos_df[pos_df['vorp_score'] > pos_df['vorp_score'].quantile(0.25)])
+                medium_vorp_count = len(pos_df[(pos_df['vorp_score'] > pos_df['vorp_score'].quantile(0.5)) & 
+                                             (pos_df['vorp_score'] <= pos_df['vorp_score'].quantile(0.25))])
+                
+                scarcity_level = 'high' if high_vorp_count <= 3 else 'medium' if high_vorp_count <= 6 else 'low'
+                
+                summary['position_scarcity'][position] = {
+                    'high_vorp_count': high_vorp_count,
+                    'medium_vorp_count': medium_vorp_count,
+                    'scarcity_level': scarcity_level,
+                    'draft_priority': 'early' if scarcity_level == 'high' else 'mid' if scarcity_level == 'medium' else 'late'
+                }
+            
+            # Best values by VORP (highest VORP scores across all positions)
+            best_values_df = df.nlargest(20, 'vorp_score')
+            summary['best_values_by_vorp'] = [
+                {
+                    'player': row['player'],
+                    'position': row['position'],
+                    'team': row['team'],
+                    'vorp_score': row['vorp_score'],
+                    'total_score': row['total_score'],
+                    'tier': row['tier']
+                }
+                for _, row in best_values_df.iterrows()
+            ]
+            
+            # Risk/reward players (high ceiling, low consistency or injury risk)
+            risk_reward_df = df[
+                (df['ceiling_potential'] > 0.7) & 
+                ((df['consistency_score'] < 0.6) | (df['injury_score'] < 0.8))
+            ].head(10)
+            
+            summary['risk_reward_players'] = [
+                {
+                    'player': row['player'],
+                    'position': row['position'],
+                    'team': row['team'],
+                    'vorp_score': row['vorp_score'],
+                    'ceiling_potential': row['ceiling_potential'],
+                    'consistency_score': row.get('consistency_score', 0),
+                    'injury_score': row.get('injury_score', 1.0),
+                    'risk_type': 'injury' if row.get('injury_score', 1.0) < 0.8 else 'inconsistency'
+                }
+                for _, row in risk_reward_df.iterrows()
+            ]
+            
+            # Save summary
             summary_file = self.outputs_dir / "ranking_summary.json"
             with open(summary_file, 'w') as f:
                 json.dump(summary, f, indent=2)
             logger.info(f"Exported ranking summary to {summary_file}")
             
         except Exception as e:
-            logger.error(f"Error exporting rankings: {e}")
+            logger.error(f"Error creating ranking summary: {e}")
             raise
     
     def print_top_rankings(self, df: pd.DataFrame, position: str = None, top_n: int = 10) -> None:
         """Print top rankings in a nice format"""
         try:
             if position:
-                df = df[df['position'] == position]
-                print(f"\n🏈 Top {top_n} {position} Rankings:")
+                pos_df = df[df['position'] == position].copy()
+                print(f"\n🏈 Top {top_n} {position} Rankings (VORP-based):")
+                print(f"📊 Total {position} players ranked: {len(pos_df)}")
             else:
-                print(f"\n🏈 Top {top_n} Overall Rankings:")
+                pos_df = df.copy()
+                print(f"\n🏈 Top {top_n} Overall Rankings (VORP-based):")
+                print(f"📊 Total players ranked: {len(pos_df)}")
             
-            print("=" * 80)
-            print(f"{'Rank':<4} {'Player':<20} {'Pos':<3} {'Team':<4} {'Score':<6} {'Tier':<4} {'Age':<4} {'Exp':<4}")
-            print("-" * 80)
+            print("=" * 100)
+            print(f"{'Rank':<4} {'Player':<20} {'Pos':<3} {'Team':<4} {'Score':<6} {'VORP':<6} {'Tier':<4} {'Age':<4} {'Exp':<4}")
+            print("-" * 100)
             
-            for _, row in df.head(top_n).iterrows():
+            for _, row in pos_df.head(top_n).iterrows():
                 print(f"{int(row['rank']):<4} {row['player']:<20} {row['position']:<3} "
-                      f"{row['team']:<4} {row['total_score']:<6.1f} {int(row['tier']):<4} "
+                      f"{row['team']:<4} {row['total_score']:<6.1f} {row['vorp_score']:<6.1f} {int(row['tier']):<4} "
                       f"{row.get('age', 'N/A'):<4} {row.get('experience', 'N/A'):<4}")
             
-            print("=" * 80)
+            print("=" * 100)
             
         except Exception as e:
             logger.error(f"Error printing rankings: {e}")
+    
+    def print_vorp_analysis(self, df: pd.DataFrame) -> None:
+        """Print VORP analysis for draft strategy"""
+        try:
+            print("\n📊 VORP Analysis for Draft Strategy:")
+            print("=" * 80)
+            print(f"{'Position':<8} {'Baseline':<10} {'Max VORP':<10} {'Avg VORP':<10} {'Above Baseline':<15}")
+            print("-" * 80)
+            
+            for position in ['QB', 'RB', 'WR', 'TE', 'K', 'DST']:
+                pos_df = df[df['position'] == position]
+                if len(pos_df) > 0:
+                    baseline = pos_df['baseline_score'].iloc[0]
+                    max_vorp = pos_df['vorp_score'].max()
+                    avg_vorp = pos_df['vorp_score'].mean()
+                    above_baseline = len(pos_df[pos_df['vorp_score'] > 0])
+                    
+                    print(f"{position:<8} {baseline:<10.1f} {max_vorp:<10.1f} {avg_vorp:<10.1f} {above_baseline:<15}")
+            
+            print("=" * 80)
+            print("💡 Draft Strategy: Focus on positions with higher VORP scores")
+            print("   - Higher VORP = More value over replacement level")
+            print("   - Positions with steep VORP drops after top players are more scarce")
+            
+        except Exception as e:
+            logger.error(f"Error printing VORP analysis: {e}")
+    
+    def print_best_values(self, df: pd.DataFrame, top_n: int = 15) -> None:
+        """Print best value players by VORP score"""
+        try:
+            print(f"\n💎 Top {top_n} Value Picks (Highest VORP Scores):")
+            print("=" * 100)
+            print(f"{'Rank':<4} {'Player':<20} {'Pos':<3} {'Team':<4} {'VORP':<8} {'Score':<8} {'Tier':<4}")
+            print("-" * 100)
+            
+            best_values = df.nlargest(top_n, 'vorp_score')
+            for i, (_, row) in enumerate(best_values.iterrows(), 1):
+                print(f"{i:<4} {row['player']:<20} {row['position']:<3} "
+                      f"{row['team']:<4} {row['vorp_score']:<8.1f} {row['total_score']:<8.1f} {int(row['tier']):<4}")
+            
+            print("=" * 100)
+            
+        except Exception as e:
+            logger.error(f"Error printing best values: {e}")
 
 def main():
     """Main function to run the ranking system"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='NFL Fantasy Player Ranking System')
+    parser.add_argument('--max-players', type=int, default=None, 
+                       help='Maximum number of players to rank (default: None = all available)')
+    parser.add_argument('--top-n', type=int, default=10, 
+                       help='Number of top players to display per position (default: 10)')
+    parser.add_argument('--position', type=str, choices=['QB', 'RB', 'WR', 'TE', 'ALL'], default='ALL',
+                       help='Position to rank (default: ALL)')
+    parser.add_argument('--rank-all', action='store_true',
+                       help='Rank all available players (overrides max-players)')
+    
+    args = parser.parse_args()
+    
     try:
+        # If rank-all is specified, set max_players to None to rank all available
+        max_players = None if args.rank_all else args.max_players
+        
         # Initialize ranker
-        ranker = PlayerRanker()
+        ranker = PlayerRanker(max_players=max_players)
         
         # Generate rankings
         ranked_df = ranker.rank_players()
@@ -447,14 +766,35 @@ def main():
         # Export results
         ranker.export_rankings(ranked_df)
         
+        # Print VORP analysis for draft strategy
+        ranker.print_vorp_analysis(ranked_df)
+        
+        # Print best value picks by VORP (top 20 overall)
+        ranker.print_best_values(ranked_df, top_n=20)
+        
         # Print top rankings by position
-        for position in ['QB', 'RB', 'WR', 'TE']:
-            ranker.print_top_rankings(ranked_df, position=position, top_n=10)
+        if args.position == 'ALL':
+            print(f"\n🎯 TOP {args.top_n} PLAYERS BY POSITION (VORP-based)")
+            print("=" * 80)
+            
+            for position in ['QB', 'RB', 'WR', 'TE']:
+                ranker.print_top_rankings(ranked_df, position=position, top_n=args.top_n)
+            
+            # Print overall top players
+            print(f"\n🏆 TOP {args.top_n} OVERALL PLAYERS (VORP-based)")
+            ranker.print_top_rankings(ranked_df, top_n=args.top_n)
+        else:
+            ranker.print_top_rankings(ranked_df, position=args.position, top_n=args.top_n)
         
-        # Print overall top 20
-        ranker.print_top_rankings(ranked_df, top_n=20)
+        # Print summary
+        total_players = len(ranked_df)
+        position_counts = ranked_df['position'].value_counts()
+        print(f"\n📊 RANKING SUMMARY:")
+        print(f"   Total players ranked: {total_players}")
+        for pos, count in position_counts.items():
+            print(f"   {pos}: {count} players")
         
-        logger.info("Ranking process completed successfully!")
+        logger.info(f"Ranking process completed successfully! Ranked {total_players} players.")
         
     except Exception as e:
         logger.error(f"Error in main ranking process: {e}")

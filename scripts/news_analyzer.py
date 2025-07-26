@@ -13,6 +13,7 @@ from typing import Dict, List, Any, Optional
 import ollama
 from datetime import datetime
 import time
+import pandas as pd
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -21,6 +22,49 @@ logger = logging.getLogger(__name__)
 # Ollama configuration
 OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'http://localhost:11434')
 OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'deepseek-r1:14b')  # Default model, can be overridden
+
+def load_nfl_roster() -> set:
+    """Load current NFL roster to validate player names"""
+    try:
+        # Try to load from enhanced stats first
+        roster_file = "data/enhanced_player_stats.csv"
+        if os.path.exists(roster_file):
+            df = pd.read_csv(roster_file)
+            roster = set(df['player'].str.lower().tolist())
+            logger.info(f"Loaded {len(roster)} players from enhanced roster")
+            return roster
+        
+        # Fallback to base stats
+        roster_file = "data/nfl_player_data.csv"
+        if os.path.exists(roster_file):
+            df = pd.read_csv(roster_file)
+            roster = set(df['player'].str.lower().tolist())
+            logger.info(f"Loaded {len(roster)} players from base roster")
+            return roster
+        
+        # If no roster file exists, return empty set (will allow all names)
+        logger.warning("No roster file found, skipping player validation")
+        return set()
+        
+    except Exception as e:
+        logger.error(f"Error loading NFL roster: {e}")
+        return set()
+
+def validate_player_name(player_name: str, nfl_roster: set) -> bool:
+    """Validate if a player name exists in the NFL roster"""
+    if not nfl_roster:  # If no roster loaded, allow all names
+        return True
+    
+    # Check exact match first
+    if player_name.lower() in nfl_roster:
+        return True
+    
+    # Check for partial matches (handle nicknames, etc.)
+    for roster_name in nfl_roster:
+        if player_name.lower() in roster_name or roster_name in player_name.lower():
+            return True
+    
+    return False
 
 def setup_ollama_client():
     """Setup Ollama client with custom host if needed."""
@@ -139,8 +183,13 @@ def analyze_headline(client: ollama.Client, headline: Dict[str, Any]) -> Optiona
         logger.error(f"Error analyzing headline '{headline['title'][:50]}...': {str(e)}")
         return None
 
-def process_single_player(player_name: str, analysis: Dict[str, Any], player_features: Dict[str, Dict[str, Any]]) -> None:
+def process_single_player(player_name: str, analysis: Dict[str, Any], player_features: Dict[str, Dict[str, Any]], nfl_roster: set) -> None:
     """Process a single player's analysis and add to player_features."""
+    # Validate player name against NFL roster
+    if not validate_player_name(player_name, nfl_roster):
+        logger.warning(f"Skipping non-NFL player: {player_name}")
+        return
+    
     if player_name not in player_features:
         player_features[player_name] = {
             'player': player_name,
@@ -183,12 +232,13 @@ def process_single_player(player_name: str, analysis: Dict[str, Any], player_fea
        analysis['published'] > player_features[player_name]['latest_analysis']['published']:
         player_features[player_name]['latest_analysis'] = analysis
 
-def aggregate_player_features(analyses: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+def aggregate_player_features(analyses: List[Dict[str, Any]], nfl_roster: set) -> Dict[str, Dict[str, Any]]:
     """
     Aggregate features by player name.
     
     Args:
         analyses: List of headline analyses
+        nfl_roster: Set of valid NFL player names
         
     Returns:
         Dictionary of player features aggregated from all headlines
@@ -206,9 +256,9 @@ def aggregate_player_features(analyses: List[Dict[str, Any]]) -> Dict[str, Dict[
             # Process each player in the list
             for player in player_name:
                 if isinstance(player, str) and player.lower() not in ['unknown', 'none', '']:
-                    process_single_player(player, analysis, player_features)
+                    process_single_player(player, analysis, player_features, nfl_roster)
         elif isinstance(player_name, str) and player_name.lower() not in ['unknown', 'none', '']:
-            process_single_player(player_name, analysis, player_features)
+            process_single_player(player_name, analysis, player_features, nfl_roster)
     
     # Calculate aggregated metrics
     for player, features in player_features.items():
@@ -287,7 +337,8 @@ def analyze_headlines(input_file: str = 'news/raw_headlines.json',
     logger.info(f"Successfully analyzed {len(analyses)} headlines")
     
     # Aggregate by player
-    player_features = aggregate_player_features(analyses)
+    nfl_roster = load_nfl_roster()
+    player_features = aggregate_player_features(analyses, nfl_roster)
     
     # Save results
     output_data = {

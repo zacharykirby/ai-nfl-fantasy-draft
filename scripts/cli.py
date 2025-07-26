@@ -172,6 +172,17 @@ class FantasyCLI:
             print(f"Positions: {', '.join([f'{pos} ({count})' for pos, count in summary['positions'].items()])}")
             print(f"Tiers: {', '.join([f'Tier {tier} ({count})' for tier, count in summary['tiers'].items()])}")
             
+            # Position scarcity analysis
+            if 'position_scarcity' in summary:
+                print(f"\n{Colors.BOLD}🎯 POSITION SCARCITY ANALYSIS{Colors.ENDC}")
+                print(f"{'─' * 50}")
+                
+                for position, scarcity in summary['position_scarcity'].items():
+                    scarcity_emoji = "🔴" if scarcity['scarcity_level'] == 'high' else "🟡" if scarcity['scarcity_level'] == 'medium' else "🟢"
+                    priority_emoji = "⚡" if scarcity['draft_priority'] == 'early' else "⏰" if scarcity['draft_priority'] == 'mid' else "⏳"
+                    
+                    print(f"{scarcity_emoji} {position}: {scarcity['tier1_count']} Tier 1, {scarcity['tier2_count']} Tier 2 - {priority_emoji} Draft {scarcity['draft_priority']}")
+            
             # Top players by position
             print(f"\n{Colors.BOLD}🏆 TOP PLAYERS BY POSITION{Colors.ENDC}")
             print(f"{'─' * 50}")
@@ -180,7 +191,22 @@ class FantasyCLI:
                 print(f"\n{Colors.OKBLUE}{Colors.BOLD}{position}:{Colors.ENDC}")
                 for i, player in enumerate(players[:3], 1):
                     tier_emoji = "🥇" if player['tier'] == 1.0 else "🥈" if player['tier'] == 2.0 else "🥉"
-                    print(f"  {i}. {tier_emoji} {player['player']} ({player['team']}) - Score: {player['total_score']:.1f}")
+                    ceiling_emoji = "🚀" if player.get('ceiling_potential', 0) > 0.7 else "📈" if player.get('ceiling_potential', 0) > 0.5 else ""
+                    consistency_emoji = "🎯" if player.get('consistency_score', 0) > 0.7 else "📊" if player.get('consistency_score', 0) > 0.5 else ""
+                    
+                    print(f"  {i}. {tier_emoji} {player['player']} ({player['team']}) - Score: {player['total_score']:.1f} {ceiling_emoji}{consistency_emoji}")
+            
+            # Risk/reward players
+            if 'risk_reward_players' in summary and summary['risk_reward_players']:
+                print(f"\n{Colors.BOLD}🧨 HIGH UPSIDE, HIGH RISK PLAYERS{Colors.ENDC}")
+                print(f"{'─' * 50}")
+                
+                for player in summary['risk_reward_players'][:5]:
+                    risk_emoji = "🚨" if player['risk_type'] == 'injury' else "📊"
+                    ceiling_emoji = "🚀" if player['ceiling_potential'] > 0.8 else "📈"
+                    
+                    print(f"  {risk_emoji} {player['player']} ({player['position']}, {player['team']}) - Ceiling: {player['ceiling_potential']:.2f} {ceiling_emoji}")
+                    print(f"     Risk: {player['risk_type']} - Consistency: {player['consistency_score']:.2f}")
             
         except Exception as e:
             self.print_error(f"Error displaying summary: {e}")
