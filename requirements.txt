@@ -1,0 +1,8 @@
+pandas>=2.0.0
+feedparser>=6.0.0
+requests>=2.31.0
+ollama>=0.1.0
+python-dotenv>=1.0.0
+argparse
+tabulate>=0.9.0 
+nfl_data_py 
