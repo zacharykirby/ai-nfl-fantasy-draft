@@ -46,36 +46,151 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Data Ingestion
+The CLI provides comprehensive fantasy football analysis with multiple modes and options:
 
-First, fetch and process real NFL data:
+### Full Pipeline (Recommended)
+
+Run the complete fantasy football analysis pipeline:
 
 ```bash
-python scripts/data_ingest.py
+python scripts/cli.py --pipeline
 ```
 
 This will:
-- Download seasonal data for 2022-2024
-- Fetch weekly statistics for consistency analysis
-- Get roster information for player details
-- Collect NFL Combine data for athletic measurements
-- Merge all data sources into a comprehensive dataset
-- Save results to `data/nfl_player_data.csv`
+- Fetch and process NFL player data (2022-2024 historical data)
+- Analyze player performance and calculate rankings
+- Generate VORP (Value Over Replacement Player) scores
+- Display top 20 players by VORP
+- Show top 7 players for each position (QB, RB, WR, TE)
+- Save detailed rankings to `outputs/ranked_all_players.csv`
+- Generate ranking summary to `outputs/ranking_summary.json`
 
-### Data Quality Testing
+### Skip News Analysis
 
-Test the quality of the ingested data:
+If you want to skip the news fetching and analysis step:
 
 ```bash
-python scripts/test_data_ingest.py
+python scripts/cli.py --pipeline --skip-news
 ```
 
-This provides:
-- Data quality analysis
-- Missing data assessment
-- Top performers by position
-- Consistency analysis
-- Data structure overview
+### AI-Powered Draft Recommendations
+
+Generate strategic draft recommendations using Ollama LLM:
+
+```bash
+python scripts/cli.py --draft-recommendations
+```
+
+This requires:
+- Ollama running locally (default: http://127.0.0.1:11434)
+- A compatible model (default: gemma3)
+
+#### Custom Draft Recommendations
+
+```bash
+# Use custom Ollama URL and model
+python scripts/cli.py --draft-recommendations --ollama-url http://localhost:11434 --ollama-model llama3
+
+# Generate recommendations for top 30 players over 12 rounds
+python scripts/cli.py --draft-recommendations --top 30 --draft-rounds 12
+
+# Save recommendations to file
+python scripts/cli.py --draft-recommendations --save-recommendations
+```
+
+### Individual Components
+
+#### Data Ingestion Only
+
+Fetch and process NFL data without running the full pipeline:
+
+```bash
+python scripts/cli.py --data-only
+```
+
+#### News Analysis Only
+
+Fetch and analyze NFL news sentiment:
+
+```bash
+python scripts/cli.py --news-only
+```
+
+#### Player Ranking Only
+
+Run player ranking analysis using existing data:
+
+```bash
+python scripts/cli.py --ranking
+```
+
+#### Player Search
+
+Search for specific player information:
+
+```bash
+python scripts/cli.py --player "Patrick Mahomes"
+```
+
+### Advanced Options
+
+#### Top N Players
+
+Specify how many top players to display:
+
+```bash
+python scripts/cli.py --pipeline --top 50
+```
+
+#### Position Filtering
+
+Filter by specific position:
+
+```bash
+python scripts/cli.py --pipeline --position QB
+```
+
+#### Team Filtering
+
+Filter by specific team:
+
+```bash
+python scripts/cli.py --pipeline --team "Kansas City Chiefs"
+```
+
+### Environment Setup
+
+For Ollama integration, set the environment variable:
+
+```bash
+# Windows
+set OLLAMA_HOST=127.0.0.1
+
+# macOS/Linux
+export OLLAMA_HOST=127.0.0.1
+```
+
+### Complete Examples
+
+```bash
+# Full pipeline with news analysis
+python scripts/cli.py --pipeline
+
+# Full pipeline without news (faster)
+python scripts/cli.py --pipeline --skip-news
+
+# AI draft recommendations with custom settings
+python scripts/cli.py --draft-recommendations --top 40 --draft-rounds 16 --save-recommendations
+
+# Player-specific analysis
+python scripts/cli.py --player "Christian McCaffrey"
+
+# Data ingestion only
+python scripts/cli.py --data-only
+
+# News analysis only
+python scripts/cli.py --news-only
+```
 
 ## Data Structure
 

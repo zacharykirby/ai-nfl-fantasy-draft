@@ -1,257 +1,253 @@
 {
-  "total_players": 100,
+  "total_players": 545,
   "positions": {
-    "WR": 31,
-    "RB": 25,
-    "TE": 24,
-    "QB": 20
+    "WR": 216,
+    "RB": 142,
+    "TE": 114,
+    "QB": 73
   },
   "tiers": {
-    "1": 25,
-    "5": 23,
-    "4": 19,
-    "3": 18,
-    "2": 15
+    "5": 138,
+    "3": 137,
+    "4": 135,
+    "2": 82,
+    "1": 53
   },
-  "ranked_at": "2025-07-26T16:10:28.551604",
+  "ranked_at": "2025-07-30T14:47:33.626392",
   "vorp_analysis": {
     "QB": {
-      "baseline_score": 68.2963888888889,
-      "max_vorp": 8.99499999999999,
-      "avg_vorp": 1.5761437908496685,
-      "players_above_baseline": 14
+      "baseline_score": 65.0415266780129,
+      "max_vorp": 34.9584733219871,
+      "avg_vorp": 14.383400254071004,
+      "players_above_baseline": 54
     },
     "RB": {
-      "baseline_score": 53.8470588235294,
-      "max_vorp": 15.502205882352946,
-      "avg_vorp": 3.0151372549019686,
-      "players_above_baseline": 19
+      "baseline_score": 60.68474742338907,
+      "max_vorp": 39.31525257661093,
+      "avg_vorp": 11.89602530087175,
+      "players_above_baseline": 106
     },
     "TE": {
-      "baseline_score": 45.74823529411765,
-      "max_vorp": 18.095294117647065,
-      "avg_vorp": 1.2916237745098036,
+      "baseline_score": 89.2402321093047,
+      "max_vorp": 10.7597678906953,
+      "avg_vorp": -19.054202610456954,
       "players_above_baseline": 11
     },
     "WR": {
-      "baseline_score": 53.70772727272728,
-      "max_vorp": 16.000588235294103,
-      "avg_vorp": 4.5581637053648345,
-      "players_above_baseline": 29
+      "baseline_score": 63.094209573341935,
+      "max_vorp": 36.905790426658065,
+      "avg_vorp": 10.631361218871476,
+      "players_above_baseline": 162
     }
   },
   "top_players_by_position": {
     "QB": [
       {
-        "player": "Patrick Mahomes",
-        "team": "KC",
-        "total_score": 77.29138888888889,
-        "vorp_score": 8.99499999999999,
+        "player": "Baker Mayfield",
+        "team": "TB",
+        "total_score": 44.421525349637655,
+        "vorp_score": 34.9584733219871,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.8888888888888888
-      },
-      {
-        "player": "Josh Allen",
-        "team": "BUF",
-        "total_score": 77.0888888888889,
-        "vorp_score": 8.792500000000004,
-        "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.888888888888889
-      },
-      {
-        "player": "Dak Prescott",
-        "team": "DAL",
-        "total_score": 75.3938888888889,
-        "vorp_score": 7.097499999999997,
-        "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.888888888888889
-      },
-      {
-        "player": "Jalen Hurts",
-        "team": "PHI",
-        "total_score": 75.3788888888889,
-        "vorp_score": 7.082499999999996,
-        "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.8888888888888891
+        "consistency_score": 2.921852534963765,
+        "ceiling_potential": 0.3
       },
       {
         "player": "Lamar Jackson",
         "team": "BAL",
-        "total_score": 74.74888888888889,
-        "vorp_score": 6.452499999999986,
+        "total_score": 44.10896127662625,
+        "vorp_score": 34.45913315862643,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.8888888888888888
+        "consistency_score": 2.976996127662625,
+        "ceiling_potential": 0.3
+      },
+      {
+        "player": "Josh Allen",
+        "team": "BUF",
+        "total_score": 44.05301601175931,
+        "vorp_score": 34.36975718707356,
+        "tier": 1,
+        "consistency_score": 2.928201601175931,
+        "ceiling_potential": 0.3
+      },
+      {
+        "player": "Jared Goff",
+        "team": "DET",
+        "total_score": 43.96908544407352,
+        "vorp_score": 34.23567298803111,
+        "tier": 1,
+        "consistency_score": 2.8766085444073517,
+        "ceiling_potential": 0.3
+      },
+      {
+        "player": "Joe Burrow",
+        "team": "CIN",
+        "total_score": 43.62559878626529,
+        "vorp_score": 33.686932110137846,
+        "tier": 1,
+        "consistency_score": 2.9286598786265294,
+        "ceiling_potential": 0.3
       }
     ],
     "RB": [
       {
-        "player": "Christian McCaffrey",
-        "team": "SF",
-        "total_score": 69.34926470588235,
-        "vorp_score": 15.502205882352946,
+        "player": "Derrick Henry",
+        "team": "BAL",
+        "total_score": 30.853012459436197,
+        "vorp_score": 39.31525257661093,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.8
-      },
-      {
-        "player": "Bijan Robinson",
-        "team": "ATL",
-        "total_score": 68.19436274509803,
-        "vorp_score": 14.347303921568631,
-        "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.9599999999999999
+        "consistency_score": 2.8706024918872397,
+        "ceiling_potential": 0.3
       },
       {
         "player": "Saquon Barkley",
         "team": "PHI",
-        "total_score": 64.12132352941177,
-        "vorp_score": 10.274264705882366,
+        "total_score": 28.79978959634012,
+        "vorp_score": 34.020387113237234,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.8
+        "consistency_score": 2.891957919268023,
+        "ceiling_potential": 0.3
       },
       {
-        "player": "Breece Hall",
-        "team": "NYJ",
-        "total_score": 63.244852941176475,
-        "vorp_score": 9.397794117647074,
+        "player": "Alvin Kamara",
+        "team": "NO",
+        "total_score": 28.618185592615863,
+        "vorp_score": 33.55206543972929,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.7999999999999999
+        "consistency_score": 2.7676371185231736,
+        "ceiling_potential": 0.3
       },
       {
-        "player": "Derrick Henry",
-        "team": "BAL",
-        "total_score": 60.024264705882345,
-        "vorp_score": 6.177205882352943,
+        "player": "Aaron Jones",
+        "team": "MIN",
+        "total_score": 28.391583151466005,
+        "vorp_score": 32.96770148142457,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.7999999999999999
+        "consistency_score": 2.722316630293202,
+        "ceiling_potential": 0.3
+      },
+      {
+        "player": "Joe Mixon",
+        "team": "HOU",
+        "total_score": 28.160180742288016,
+        "vorp_score": 32.370959332035866,
+        "tier": 1,
+        "consistency_score": 2.7200361484576026,
+        "ceiling_potential": 0.3
       }
     ],
     "TE": [
       {
-        "player": "Travis Kelce",
-        "team": "KC",
-        "total_score": 63.84352941176471,
-        "vorp_score": 18.095294117647065,
+        "player": "Jonnu Smith",
+        "team": "MIA",
+        "total_score": 57.72825372764064,
+        "vorp_score": 10.7597678906953,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 1.0
+        "consistency_score": 2.7162253727640637,
+        "ceiling_potential": 0.3
       },
       {
-        "player": "Sam LaPorta",
-        "team": "DET",
-        "total_score": 52.05485294117646,
-        "vorp_score": 6.306617647058815,
+        "player": "Trey McBride",
+        "team": "ARI",
+        "total_score": 53.81307239791051,
+        "vorp_score": 7.2715046202018385,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 1.0
+        "consistency_score": 2.76130723979105,
+        "ceiling_potential": 0.3
+      },
+      {
+        "player": "Brock Bowers",
+        "team": "LV",
+        "total_score": 53.6582549915665,
+        "vorp_score": 7.13356876827028,
+        "tier": 1,
+        "consistency_score": 2.7958254991566505,
+        "ceiling_potential": 0.3
       },
       {
         "player": "George Kittle",
         "team": "SF",
-        "total_score": 50.711470588235294,
-        "vorp_score": 4.963235294117645,
-        "tier": 2,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.9999999999999999
+        "total_score": 52.68565809157245,
+        "vorp_score": 6.2670254954255284,
+        "tier": 1,
+        "consistency_score": 2.7469620101747156,
+        "ceiling_potential": 0.3
       },
       {
-        "player": "T.J. Hockenson",
-        "team": "MIN",
-        "total_score": 49.777205882352945,
-        "vorp_score": 4.028970588235296,
-        "tier": 2,
-        "consistency_score": 0.7,
-        "ceiling_potential": 1.0
-      },
-      {
-        "player": "Mark Andrews",
-        "team": "BAL",
-        "total_score": 49.76691176470588,
-        "vorp_score": 4.0186764705882325,
-        "tier": 2,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.9999999999999999
+        "player": "Travis Kelce",
+        "team": "KC",
+        "total_score": 51.45805366775384,
+        "vorp_score": 5.173281154701229,
+        "tier": 1,
+        "consistency_score": 2.6487188123854986,
+        "ceiling_potential": 0.3
       }
     ],
     "WR": [
       {
         "player": "Tyreek Hill",
         "team": "MIA",
-        "total_score": 69.70831550802139,
-        "vorp_score": 16.000588235294103,
+        "total_score": 48.67211960201412,
+        "vorp_score": 36.905790426658065,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.7272727272727273
+        "consistency_score": 2.721423920402824,
+        "ceiling_potential": 0.3
+      },
+      {
+        "player": "Ja'Marr Chase",
+        "team": "CIN",
+        "total_score": 48.08284237053873,
+        "vorp_score": 35.86174108441522,
+        "tier": 1,
+        "consistency_score": 2.9715684741077446,
+        "ceiling_potential": 0.3
       },
       {
         "player": "CeeDee Lamb",
         "team": "DAL",
-        "total_score": 67.36949197860963,
-        "vorp_score": 13.661764705882348,
+        "total_score": 47.77470623849499,
+        "vorp_score": 35.315802248163145,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.7272727272727272
+        "consistency_score": 2.8099412476989993,
+        "ceiling_potential": 0.3
       },
       {
         "player": "Amon-Ra St. Brown",
         "team": "DET",
-        "total_score": 64.08405080213903,
-        "vorp_score": 10.37632352941175,
+        "total_score": 46.5528751041927,
+        "vorp_score": 33.151028311613366,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.7272727272727272
+        "consistency_score": 2.88557502083854,
+        "ceiling_potential": 0.3
       },
       {
-        "player": "AJ Brown",
+        "player": "A.J. Brown",
         "team": "PHI",
-        "total_score": 63.04125668449198,
-        "vorp_score": 9.333529411764694,
+        "total_score": 46.25316479474716,
+        "vorp_score": 32.620017889478824,
         "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.7272727272727273
-      },
-      {
-        "player": "Stefon Diggs",
-        "team": "HOU",
-        "total_score": 62.09669786096257,
-        "vorp_score": 8.388970588235289,
-        "tier": 1,
-        "consistency_score": 0.7,
-        "ceiling_potential": 0.7272727272727273
+        "consistency_score": 2.7184329589494323,
+        "ceiling_potential": 0.3
       }
     ]
   },
   "position_scarcity": {
     "QB": {
-      "high_vorp_count": 15,
-      "medium_vorp_count": 0,
+      "above_zero": 54,
       "scarcity_level": "low",
       "draft_priority": "late"
     },
     "RB": {
-      "high_vorp_count": 18,
-      "medium_vorp_count": 0,
+      "above_zero": 106,
       "scarcity_level": "low",
       "draft_priority": "late"
     },
     "TE": {
-      "high_vorp_count": 18,
-      "medium_vorp_count": 0,
+      "above_zero": 11,
       "scarcity_level": "low",
       "draft_priority": "late"
     },
     "WR": {
-      "high_vorp_count": 23,
-      "medium_vorp_count": 0,
+      "above_zero": 162,
       "scarcity_level": "low",
       "draft_priority": "late"
     }
@@ -260,163 +256,163 @@
   "undervalued_players": [],
   "best_values_by_vorp": [
     {
-      "player": "Travis Kelce",
-      "position": "TE",
-      "team": "KC",
-      "vorp_score": 18.095294117647065,
-      "total_score": 63.84352941176471,
+      "player": "Derrick Henry",
+      "position": "RB",
+      "team": "BAL",
+      "vorp_score": 39.31525257661093,
+      "total_score": 30.853012459436197,
       "tier": 1
     },
     {
       "player": "Tyreek Hill",
       "position": "WR",
       "team": "MIA",
-      "vorp_score": 16.000588235294103,
-      "total_score": 69.70831550802139,
+      "vorp_score": 36.905790426658065,
+      "total_score": 48.67211960201412,
       "tier": 1
     },
     {
-      "player": "Christian McCaffrey",
-      "position": "RB",
-      "team": "SF",
-      "vorp_score": 15.502205882352946,
-      "total_score": 69.34926470588235,
-      "tier": 1
-    },
-    {
-      "player": "Bijan Robinson",
-      "position": "RB",
-      "team": "ATL",
-      "vorp_score": 14.347303921568631,
-      "total_score": 68.19436274509803,
+      "player": "Ja'Marr Chase",
+      "position": "WR",
+      "team": "CIN",
+      "vorp_score": 35.86174108441522,
+      "total_score": 48.08284237053873,
       "tier": 1
     },
     {
       "player": "CeeDee Lamb",
       "position": "WR",
       "team": "DAL",
-      "vorp_score": 13.661764705882348,
-      "total_score": 67.36949197860963,
+      "vorp_score": 35.315802248163145,
+      "total_score": 47.77470623849499,
       "tier": 1
     },
     {
-      "player": "Amon-Ra St. Brown",
-      "position": "WR",
-      "team": "DET",
-      "vorp_score": 10.37632352941175,
-      "total_score": 64.08405080213903,
-      "tier": 1
-    },
-    {
-      "player": "Saquon Barkley",
-      "position": "RB",
-      "team": "PHI",
-      "vorp_score": 10.274264705882366,
-      "total_score": 64.12132352941177,
-      "tier": 1
-    },
-    {
-      "player": "Breece Hall",
-      "position": "RB",
-      "team": "NYJ",
-      "vorp_score": 9.397794117647074,
-      "total_score": 63.244852941176475,
-      "tier": 1
-    },
-    {
-      "player": "AJ Brown",
-      "position": "WR",
-      "team": "PHI",
-      "vorp_score": 9.333529411764694,
-      "total_score": 63.04125668449198,
-      "tier": 1
-    },
-    {
-      "player": "Patrick Mahomes",
+      "player": "Baker Mayfield",
       "position": "QB",
-      "team": "KC",
-      "vorp_score": 8.99499999999999,
-      "total_score": 77.29138888888889,
-      "tier": 1
-    },
-    {
-      "player": "Josh Allen",
-      "position": "QB",
-      "team": "BUF",
-      "vorp_score": 8.792500000000004,
-      "total_score": 77.0888888888889,
-      "tier": 1
-    },
-    {
-      "player": "Stefon Diggs",
-      "position": "WR",
-      "team": "HOU",
-      "vorp_score": 8.388970588235289,
-      "total_score": 62.09669786096257,
-      "tier": 1
-    },
-    {
-      "player": "Cooper Kupp",
-      "position": "WR",
-      "team": "LAR",
-      "vorp_score": 8.146029411764694,
-      "total_score": 61.85375668449198,
-      "tier": 1
-    },
-    {
-      "player": "DeVonta Smith",
-      "position": "WR",
-      "team": "PHI",
-      "vorp_score": 7.355294117647048,
-      "total_score": 61.06302139037433,
-      "tier": 1
-    },
-    {
-      "player": "Dak Prescott",
-      "position": "QB",
-      "team": "DAL",
-      "vorp_score": 7.097499999999997,
-      "total_score": 75.3938888888889,
-      "tier": 1
-    },
-    {
-      "player": "Jalen Hurts",
-      "position": "QB",
-      "team": "PHI",
-      "vorp_score": 7.082499999999996,
-      "total_score": 75.3788888888889,
-      "tier": 1
-    },
-    {
-      "player": "Brandon Aiyuk",
-      "position": "WR",
-      "team": "SF",
-      "vorp_score": 6.903529411764694,
-      "total_score": 60.61125668449198,
-      "tier": 1
-    },
-    {
-      "player": "Garrett Wilson",
-      "position": "WR",
-      "team": "NYJ",
-      "vorp_score": 6.75676470588234,
-      "total_score": 60.46449197860962,
+      "team": "TB",
+      "vorp_score": 34.9584733219871,
+      "total_score": 44.421525349637655,
       "tier": 1
     },
     {
       "player": "Lamar Jackson",
       "position": "QB",
       "team": "BAL",
-      "vorp_score": 6.452499999999986,
-      "total_score": 74.74888888888889,
+      "vorp_score": 34.45913315862643,
+      "total_score": 44.10896127662625,
       "tier": 1
     },
     {
-      "player": "Sam LaPorta",
-      "position": "TE",
+      "player": "Josh Allen",
+      "position": "QB",
+      "team": "BUF",
+      "vorp_score": 34.36975718707356,
+      "total_score": 44.05301601175931,
+      "tier": 1
+    },
+    {
+      "player": "Jared Goff",
+      "position": "QB",
       "team": "DET",
-      "vorp_score": 6.306617647058815,
-      "total_score": 52.05485294117646,
+      "vorp_score": 34.23567298803111,
+      "total_score": 43.96908544407352,
+      "tier": 1
+    },
+    {
+      "player": "Saquon Barkley",
+      "position": "RB",
+      "team": "PHI",
+      "vorp_score": 34.020387113237234,
+      "total_score": 28.79978959634012,
+      "tier": 1
+    },
+    {
+      "player": "Joe Burrow",
+      "position": "QB",
+      "team": "CIN",
+      "vorp_score": 33.686932110137846,
+      "total_score": 43.62559878626529,
+      "tier": 1
+    },
+    {
+      "player": "Alvin Kamara",
+      "position": "RB",
+      "team": "NO",
+      "vorp_score": 33.55206543972929,
+      "total_score": 28.618185592615863,
+      "tier": 1
+    },
+    {
+      "player": "Amon-Ra St. Brown",
+      "position": "WR",
+      "team": "DET",
+      "vorp_score": 33.151028311613366,
+      "total_score": 46.5528751041927,
+      "tier": 1
+    },
+    {
+      "player": "Aaron Jones",
+      "position": "RB",
+      "team": "MIN",
+      "vorp_score": 32.96770148142457,
+      "total_score": 28.391583151466005,
+      "tier": 1
+    },
+    {
+      "player": "Patrick Mahomes",
+      "position": "QB",
+      "team": "KC",
+      "vorp_score": 32.64168986213859,
+      "total_score": 42.97132501000937,
+      "tier": 1
+    },
+    {
+      "player": "A.J. Brown",
+      "position": "WR",
+      "team": "PHI",
+      "vorp_score": 32.620017889478824,
+      "total_score": 46.25316479474716,
+      "tier": 1
+    },
+    {
+      "player": "Geno Smith",
+      "position": "QB",
+      "team": "SEA",
+      "vorp_score": 32.52878142268027,
+      "total_score": 42.9006494979958,
+      "tier": 1
+    },
+    {
+      "player": "Sam Darnold",
+      "position": "QB",
+      "team": "MIN",
+      "vorp_score": 32.52047109831503,
+      "total_score": 42.89544761554725,
+      "tier": 2
+    },
+    {
+      "player": "Jauan Jennings",
+      "position": "WR",
+      "team": "SF",
+      "vorp_score": 32.48570586204405,
+      "total_score": 46.17735705609126,
+      "tier": 1
+    },
+    {
+      "player": "Joe Mixon",
+      "position": "RB",
+      "team": "HOU",
+      "vorp_score": 32.370959332035866,
+      "total_score": 28.160180742288016,
+      "tier": 1
+    },
+    {
+      "player": "Kareem Hunt",
+      "position": "RB",
+      "team": "KC",
+      "vorp_score": 32.3068214266562,
+      "total_score": 28.13530958840742,
       "tier": 1
     }
   ]

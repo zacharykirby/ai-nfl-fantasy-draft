@@ -1,0 +1,22 @@
+{
+  "Rashee Rice": {
+    "suspension_weeks": 8,
+    "risk_type": "suspension",
+    "description": "Facing 8-game suspension for off-field incident"
+  },
+  "Deshaun Watson": {
+    "suspension_weeks": 0,
+    "risk_type": "injury_risk",
+    "description": "Returning from season-ending injury, limited preseason"
+  },
+  "Breece Hall": {
+    "suspension_weeks": 0,
+    "risk_type": "injury_risk", 
+    "description": "Coming off ACL injury, workload management expected"
+  },
+  "J.K. Dobbins": {
+    "suspension_weeks": 0,
+    "risk_type": "injury_risk",
+    "description": "Multiple injury history, durability concerns"
+  }
+} 

@@ -1,0 +1,2812 @@
+[
+  {
+    "name": "Ja'Marr Chase",
+    "pos": "WR",
+    "team": "CIN",
+    "score": 305.85,
+    "VORP": 146.42,
+    "tier": "Tier 3",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 465.5,
+    "raw_score": 305.85
+  },
+  {
+    "name": "Saquon Barkley",
+    "pos": "RB",
+    "team": "PHI",
+    "score": 258.59,
+    "VORP": 126.37,
+    "tier": "Tier 4",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 371.3,
+    "raw_score": 258.59
+  },
+  {
+    "name": "Jahmyr Gibbs",
+    "pos": "RB",
+    "team": "DET",
+    "score": 243.19,
+    "VORP": 110.97,
+    "tier": "Tier 1",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 370.9,
+    "raw_score": 255.99
+  },
+  {
+    "name": "Lamar Jackson",
+    "pos": "QB",
+    "team": "BAL",
+    "score": 318.21,
+    "VORP": 109.5,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 473.4,
+    "raw_score": 318.21
+  },
+  {
+    "name": "Bijan Robinson",
+    "pos": "RB",
+    "team": "ATL",
+    "score": 232.28,
+    "VORP": 100.06,
+    "tier": "Tier 2",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 357.1,
+    "raw_score": 244.51
+  },
+  {
+    "name": "Amon-Ra St. Brown",
+    "pos": "WR",
+    "team": "DET",
+    "score": 244.04,
+    "VORP": 84.6,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 365.2,
+    "raw_score": 244.04
+  },
+  {
+    "name": "Derrick Henry",
+    "pos": "RB",
+    "team": "BAL",
+    "score": 216.45,
+    "VORP": 84.23,
+    "tier": "Tier 4",
+    "age": 30,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 351.5,
+    "raw_score": 245.97
+  },
+  {
+    "name": "Justin Jefferson",
+    "pos": "WR",
+    "team": "MIN",
+    "score": 242.3,
+    "VORP": 82.86,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 366.7,
+    "raw_score": 242.3
+  },
+  {
+    "name": "Josh Jacobs",
+    "pos": "RB",
+    "team": "GB",
+    "score": 214.71,
+    "VORP": 82.49,
+    "tier": "Tier 3",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 306.3,
+    "raw_score": 214.71
+  },
+  {
+    "name": "De'Von Achane",
+    "pos": "RB",
+    "team": "MIA",
+    "score": 210.5,
+    "VORP": 78.29,
+    "tier": "Tier 1",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 313.4,
+    "raw_score": 221.58
+  },
+  {
+    "name": "Josh Allen",
+    "pos": "QB",
+    "team": "BUF",
+    "score": 278.16,
+    "VORP": 69.45,
+    "tier": "Tier 3",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 409.6,
+    "raw_score": 278.16
+  },
+  {
+    "name": "Joe Burrow",
+    "pos": "QB",
+    "team": "CIN",
+    "score": 276.16,
+    "VORP": 67.45,
+    "tier": "Tier 2",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 410.1,
+    "raw_score": 276.16
+  },
+  {
+    "name": "James Cook",
+    "pos": "RB",
+    "team": "BUF",
+    "score": 199.41,
+    "VORP": 67.19,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 278.7,
+    "raw_score": 199.41
+  },
+  {
+    "name": "Baker Mayfield",
+    "pos": "QB",
+    "team": "TB",
+    "score": 271.32,
+    "VORP": 62.61,
+    "tier": "Tier 3",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 402.4,
+    "raw_score": 271.32
+  },
+  {
+    "name": "Brock Bowers",
+    "pos": "TE",
+    "team": "LV",
+    "score": 187.3,
+    "VORP": 61.0,
+    "tier": "Tier 1",
+    "age": 21,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 294.7,
+    "raw_score": 197.16
+  },
+  {
+    "name": "Kyren Williams",
+    "pos": "RB",
+    "team": "LA",
+    "score": 193.01,
+    "VORP": 60.79,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 284.3,
+    "raw_score": 193.01
+  },
+  {
+    "name": "George Kittle",
+    "pos": "TE",
+    "team": "SF",
+    "score": 186.59,
+    "VORP": 60.29,
+    "tier": "Tier 4",
+    "age": 30,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 265.5,
+    "raw_score": 186.59
+  },
+  {
+    "name": "Chase Brown",
+    "pos": "RB",
+    "team": "CIN",
+    "score": 189.26,
+    "VORP": 57.04,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 266.5,
+    "raw_score": 189.26
+  },
+  {
+    "name": "Trey McBride",
+    "pos": "TE",
+    "team": "ARI",
+    "score": 181.62,
+    "VORP": 55.32,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 273.5,
+    "raw_score": 181.62
+  },
+  {
+    "name": "Jonathan Taylor",
+    "pos": "RB",
+    "team": "IND",
+    "score": 183.71,
+    "VORP": 51.49,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 257.8,
+    "raw_score": 183.71
+  },
+  {
+    "name": "Jonnu Smith",
+    "pos": "TE",
+    "team": "MIA",
+    "score": 176.59,
+    "VORP": 50.3,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 249.4,
+    "raw_score": 176.59
+  },
+  {
+    "name": "Alvin Kamara",
+    "pos": "RB",
+    "team": "NO",
+    "score": 181.86,
+    "VORP": 49.64,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 277.2,
+    "raw_score": 193.47
+  },
+  {
+    "name": "CeeDee Lamb",
+    "pos": "WR",
+    "team": "DAL",
+    "score": 208.79,
+    "VORP": 49.36,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 304.2,
+    "raw_score": 208.79
+  },
+  {
+    "name": "Brian Thomas Jr.",
+    "pos": "WR",
+    "team": "JAX",
+    "score": 207.54,
+    "VORP": 48.1,
+    "tier": "Tier 5",
+    "age": 21,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 328.0,
+    "raw_score": 218.46
+  },
+  {
+    "name": "Joe Mixon",
+    "pos": "RB",
+    "team": "HOU",
+    "score": 179.57,
+    "VORP": 47.35,
+    "tier": "Tier 4",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 251.3,
+    "raw_score": 179.57
+  },
+  {
+    "name": "Drake London",
+    "pos": "WR",
+    "team": "ATL",
+    "score": 205.37,
+    "VORP": 45.94,
+    "tier": "Tier 2",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 324.3,
+    "raw_score": 216.18
+  },
+  {
+    "name": "Terry McLaurin",
+    "pos": "WR",
+    "team": "WAS",
+    "score": 204.26,
+    "VORP": 44.82,
+    "tier": "Tier 3",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 309.3,
+    "raw_score": 204.26
+  },
+  {
+    "name": "Bucky Irving",
+    "pos": "RB",
+    "team": "TB",
+    "score": 173.07,
+    "VORP": 40.85,
+    "tier": "Tier 1",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 255.4,
+    "raw_score": 182.18
+  },
+  {
+    "name": "Chuba Hubbard",
+    "pos": "RB",
+    "team": "CAR",
+    "score": 172.64,
+    "VORP": 40.42,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 252.5,
+    "raw_score": 172.64
+  },
+  {
+    "name": "Malik Nabers",
+    "pos": "WR",
+    "team": "NYG",
+    "score": 197.97,
+    "VORP": 38.53,
+    "tier": "Tier 1",
+    "age": 21,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 316.0,
+    "raw_score": 208.39
+  },
+  {
+    "name": "James Conner",
+    "pos": "RB",
+    "team": "ARI",
+    "score": 169.94,
+    "VORP": 37.72,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 265.2,
+    "raw_score": 180.79
+  },
+  {
+    "name": "Jayden Daniels",
+    "pos": "QB",
+    "team": "WAS",
+    "score": 246.14,
+    "VORP": 37.43,
+    "tier": "Tier 5",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 391.4,
+    "raw_score": 259.1
+  },
+  {
+    "name": "Garrett Wilson",
+    "pos": "WR",
+    "team": "NYJ",
+    "score": 195.6,
+    "VORP": 36.17,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 290.9,
+    "raw_score": 195.6
+  },
+  {
+    "name": "Breece Hall",
+    "pos": "RB",
+    "team": "NYJ",
+    "score": 168.31,
+    "VORP": 36.09,
+    "tier": "Tier 2",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 251.7,
+    "raw_score": 177.17
+  },
+  {
+    "name": "David Montgomery",
+    "pos": "RB",
+    "team": "DET",
+    "score": 167.03,
+    "VORP": 34.81,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 231.7,
+    "raw_score": 167.03
+  },
+  {
+    "name": "Aaron Jones",
+    "pos": "RB",
+    "team": "MIN",
+    "score": 166.98,
+    "VORP": 34.76,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 252.5,
+    "raw_score": 177.64
+  },
+  {
+    "name": "Jared Goff",
+    "pos": "QB",
+    "team": "DET",
+    "score": 242.79,
+    "VORP": 34.08,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 356.9,
+    "raw_score": 242.79
+  },
+  {
+    "name": "Mike Evans",
+    "pos": "WR",
+    "team": "TB",
+    "score": 190.08,
+    "VORP": 30.65,
+    "tier": "Tier 4",
+    "age": 31,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 277.7,
+    "raw_score": 190.08
+  },
+  {
+    "name": "Jalen Hurts",
+    "pos": "QB",
+    "team": "PHI",
+    "score": 238.68,
+    "VORP": 29.97,
+    "tier": "Tier 2",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 346.6,
+    "raw_score": 238.68
+  },
+  {
+    "name": "Davante Adams",
+    "pos": "WR",
+    "team": "NYJ",
+    "score": 188.06,
+    "VORP": 28.62,
+    "tier": "Tier 4",
+    "age": 31,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 278.7,
+    "raw_score": 188.06
+  },
+  {
+    "name": "Jerry Jeudy",
+    "pos": "WR",
+    "team": "CLE",
+    "score": 187.77,
+    "VORP": 28.34,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 278.2,
+    "raw_score": 187.77
+  },
+  {
+    "name": "Courtland Sutton",
+    "pos": "WR",
+    "team": "DEN",
+    "score": 187.34,
+    "VORP": 27.91,
+    "tier": "Tier 4",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 277.5,
+    "raw_score": 187.34
+  },
+  {
+    "name": "Mark Andrews",
+    "pos": "TE",
+    "team": "BAL",
+    "score": 153.18,
+    "VORP": 26.89,
+    "tier": "Tier 3",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 211.8,
+    "raw_score": 153.18
+  },
+  {
+    "name": "Bo Nix",
+    "pos": "QB",
+    "team": "DEN",
+    "score": 235.12,
+    "VORP": 26.41,
+    "tier": "Tier 5",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 348.9,
+    "raw_score": 235.12
+  },
+  {
+    "name": "D'Andre Swift",
+    "pos": "RB",
+    "team": "CHI",
+    "score": 156.87,
+    "VORP": 24.65,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 224.2,
+    "raw_score": 156.87
+  },
+  {
+    "name": "DJ Moore",
+    "pos": "WR",
+    "team": "CHI",
+    "score": 183.11,
+    "VORP": 23.68,
+    "tier": "Tier 4",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 275.0,
+    "raw_score": 183.11
+  },
+  {
+    "name": "Travis Kelce",
+    "pos": "TE",
+    "team": "KC",
+    "score": 149.91,
+    "VORP": 23.61,
+    "tier": "Tier 4",
+    "age": 34,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 219.2,
+    "raw_score": 157.8
+  },
+  {
+    "name": "Jaxon Smith-Njigba",
+    "pos": "WR",
+    "team": "SEA",
+    "score": 181.82,
+    "VORP": 22.38,
+    "tier": "Tier 2",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 292.2,
+    "raw_score": 191.39
+  },
+  {
+    "name": "Rico Dowdle",
+    "pos": "RB",
+    "team": "DAL",
+    "score": 153.38,
+    "VORP": 21.16,
+    "tier": "Tier 3",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 206.7,
+    "raw_score": 153.38
+  },
+  {
+    "name": "Najee Harris",
+    "pos": "RB",
+    "team": "PIT",
+    "score": 152.92,
+    "VORP": 20.7,
+    "tier": "Tier 3",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 213.8,
+    "raw_score": 152.92
+  },
+  {
+    "name": "Rachaad White",
+    "pos": "RB",
+    "team": "TB",
+    "score": 152.25,
+    "VORP": 20.03,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 208.6,
+    "raw_score": 152.25
+  },
+  {
+    "name": "Sam Darnold",
+    "pos": "QB",
+    "team": "MIN",
+    "score": 228.74,
+    "VORP": 20.03,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 338.8,
+    "raw_score": 228.74
+  },
+  {
+    "name": "Tee Higgins",
+    "pos": "WR",
+    "team": "CIN",
+    "score": 177.05,
+    "VORP": 17.62,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 256.5,
+    "raw_score": 177.05
+  },
+  {
+    "name": "Tyreek Hill",
+    "pos": "WR",
+    "team": "MIA",
+    "score": 176.61,
+    "VORP": 17.18,
+    "tier": "Tier 4",
+    "age": 30,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 252.0,
+    "raw_score": 176.61
+  },
+  {
+    "name": "Ladd McConkey",
+    "pos": "WR",
+    "team": "LAC",
+    "score": 175.85,
+    "VORP": 16.42,
+    "tier": "Tier 5",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 278.2,
+    "raw_score": 185.1
+  },
+  {
+    "name": "A.J. Brown",
+    "pos": "WR",
+    "team": "PHI",
+    "score": 175.68,
+    "VORP": 16.25,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 250.5,
+    "raw_score": 175.68
+  },
+  {
+    "name": "Tony Pollard",
+    "pos": "RB",
+    "team": "TEN",
+    "score": 147.65,
+    "VORP": 15.43,
+    "tier": "Tier 4",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 209.7,
+    "raw_score": 147.65
+  },
+  {
+    "name": "Jauan Jennings",
+    "pos": "WR",
+    "team": "SF",
+    "score": 171.13,
+    "VORP": 11.69,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 243.1,
+    "raw_score": 171.13
+  },
+  {
+    "name": "J.K. Dobbins",
+    "pos": "RB",
+    "team": "LAC",
+    "score": 141.71,
+    "VORP": 9.49,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 200.4,
+    "raw_score": 141.71
+  },
+  {
+    "name": "Nico Collins",
+    "pos": "WR",
+    "team": "HOU",
+    "score": 168.86,
+    "VORP": 9.43,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 243.2,
+    "raw_score": 168.86
+  },
+  {
+    "name": "Jakobi Meyers",
+    "pos": "WR",
+    "team": "LV",
+    "score": 168.8,
+    "VORP": 9.37,
+    "tier": "Tier 4",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 251.8,
+    "raw_score": 168.8
+  },
+  {
+    "name": "Patrick Mahomes",
+    "pos": "QB",
+    "team": "KC",
+    "score": 216.53,
+    "VORP": 7.82,
+    "tier": "Tier 3",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 311.3,
+    "raw_score": 216.53
+  },
+  {
+    "name": "Kyler Murray",
+    "pos": "QB",
+    "team": "ARI",
+    "score": 216.35,
+    "VORP": 7.63,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 327.0,
+    "raw_score": 216.35
+  },
+  {
+    "name": "Sam LaPorta",
+    "pos": "TE",
+    "team": "DET",
+    "score": 133.88,
+    "VORP": 7.58,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 195.9,
+    "raw_score": 140.93
+  },
+  {
+    "name": "Pat Freiermuth",
+    "pos": "TE",
+    "team": "PIT",
+    "score": 133.86,
+    "VORP": 7.56,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 188.8,
+    "raw_score": 133.86
+  },
+  {
+    "name": "Zach Ertz",
+    "pos": "TE",
+    "team": "WAS",
+    "score": 133.42,
+    "VORP": 7.13,
+    "tier": "Tier 4",
+    "age": 33,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 199.0,
+    "raw_score": 137.55
+  },
+  {
+    "name": "DeVonta Smith",
+    "pos": "WR",
+    "team": "PHI",
+    "score": 163.22,
+    "VORP": 3.79,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 230.3,
+    "raw_score": 163.22
+  },
+  {
+    "name": "Tyrone Tracy Jr.",
+    "pos": "RB",
+    "team": "NYG",
+    "score": 135.36,
+    "VORP": 3.14,
+    "tier": "Tier 1",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 190.5,
+    "raw_score": 135.36
+  },
+  {
+    "name": "Zay Flowers",
+    "pos": "WR",
+    "team": "BAL",
+    "score": 161.89,
+    "VORP": 2.46,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 242.0,
+    "raw_score": 170.41
+  },
+  {
+    "name": "Jameson Williams",
+    "pos": "WR",
+    "team": "DET",
+    "score": 161.5,
+    "VORP": 2.07,
+    "tier": "Tier 2",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 245.1,
+    "raw_score": 170.0
+  },
+  {
+    "name": "Justin Herbert",
+    "pos": "QB",
+    "team": "LAC",
+    "score": 210.51,
+    "VORP": 1.8,
+    "tier": "Tier 2",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 313.9,
+    "raw_score": 210.51
+  },
+  {
+    "name": "Tucker Kraft",
+    "pos": "TE",
+    "team": "GB",
+    "score": 126.38,
+    "VORP": 0.08,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 183.2,
+    "raw_score": 133.03
+  },
+  {
+    "name": "Jayden Reed",
+    "pos": "WR",
+    "team": "GB",
+    "score": 159.18,
+    "VORP": -0.25,
+    "tier": "Tier 1",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 227.5,
+    "raw_score": 159.18
+  },
+  {
+    "name": "Jordan Addison",
+    "pos": "WR",
+    "team": "MIN",
+    "score": 159.17,
+    "VORP": -0.26,
+    "tier": "Tier 1",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 245.4,
+    "raw_score": 167.55
+  },
+  {
+    "name": "Rhamondre Stevenson",
+    "pos": "RB",
+    "team": "NE",
+    "score": 131.08,
+    "VORP": -1.13,
+    "tier": "Tier 3",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 183.8,
+    "raw_score": 131.08
+  },
+  {
+    "name": "Brock Purdy",
+    "pos": "QB",
+    "team": "SF",
+    "score": 205.38,
+    "VORP": -3.33,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 293.5,
+    "raw_score": 205.38
+  },
+  {
+    "name": "Calvin Ridley",
+    "pos": "WR",
+    "team": "TEN",
+    "score": 155.41,
+    "VORP": -4.02,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 230.1,
+    "raw_score": 155.41
+  },
+  {
+    "name": "Zach Charbonnet",
+    "pos": "RB",
+    "team": "SEA",
+    "score": 127.26,
+    "VORP": -4.95,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 192.0,
+    "raw_score": 133.96
+  },
+  {
+    "name": "Darnell Mooney",
+    "pos": "WR",
+    "team": "ATL",
+    "score": 153.81,
+    "VORP": -5.62,
+    "tier": "Tier 3",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 223.1,
+    "raw_score": 153.81
+  },
+  {
+    "name": "David Njoku",
+    "pos": "TE",
+    "team": "CLE",
+    "score": 120.02,
+    "VORP": -6.27,
+    "tier": "Tier 4",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 166.6,
+    "raw_score": 120.02
+  },
+  {
+    "name": "Kenneth Walker III",
+    "pos": "RB",
+    "team": "SEA",
+    "score": 125.68,
+    "VORP": -6.54,
+    "tier": "Tier 2",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 189.4,
+    "raw_score": 132.29
+  },
+  {
+    "name": "Khalil Shakir",
+    "pos": "WR",
+    "team": "BUF",
+    "score": 151.19,
+    "VORP": -8.24,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 210.8,
+    "raw_score": 151.19
+  },
+  {
+    "name": "Mike Gesicki",
+    "pos": "TE",
+    "team": "CIN",
+    "score": 117.8,
+    "VORP": -8.5,
+    "tier": "Tier 3",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 158.8,
+    "raw_score": 117.8
+  },
+  {
+    "name": "Puka Nacua",
+    "pos": "WR",
+    "team": "LA",
+    "score": 150.43,
+    "VORP": -9.0,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 238.6,
+    "raw_score": 158.35
+  },
+  {
+    "name": "Cade Otton",
+    "pos": "TE",
+    "team": "TB",
+    "score": 117.17,
+    "VORP": -9.13,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 157.8,
+    "raw_score": 117.17
+  },
+  {
+    "name": "Javonte Williams",
+    "pos": "RB",
+    "team": "DEN",
+    "score": 121.73,
+    "VORP": -10.49,
+    "tier": "Tier 3",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 165.0,
+    "raw_score": 121.73
+  },
+  {
+    "name": "Hunter Henry",
+    "pos": "TE",
+    "team": "NE",
+    "score": 115.19,
+    "VORP": -11.11,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 163.1,
+    "raw_score": 115.19
+  },
+  {
+    "name": "Brian Robinson",
+    "pos": "RB",
+    "team": "WAS",
+    "score": 120.33,
+    "VORP": -11.89,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 167.0,
+    "raw_score": 120.33
+  },
+  {
+    "name": "DK Metcalf",
+    "pos": "WR",
+    "team": "SEA",
+    "score": 147.38,
+    "VORP": -12.05,
+    "tier": "Tier 3",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 220.8,
+    "raw_score": 147.38
+  },
+  {
+    "name": "Xavier Worthy",
+    "pos": "WR",
+    "team": "KC",
+    "score": 146.81,
+    "VORP": -12.62,
+    "tier": "Tier 5",
+    "age": 21,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 216.2,
+    "raw_score": 154.54
+  },
+  {
+    "name": "Rashod Bateman",
+    "pos": "WR",
+    "team": "BAL",
+    "score": 145.57,
+    "VORP": -13.87,
+    "tier": "Tier 3",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 201.7,
+    "raw_score": 145.57
+  },
+  {
+    "name": "Geno Smith",
+    "pos": "QB",
+    "team": "SEA",
+    "score": 194.79,
+    "VORP": -13.92,
+    "tier": "Tier 4",
+    "age": 33,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 292.6,
+    "raw_score": 194.79
+  },
+  {
+    "name": "Keenan Allen",
+    "pos": "WR",
+    "team": "CHI",
+    "score": 144.88,
+    "VORP": -14.56,
+    "tier": "Tier 4",
+    "age": 32,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 213.0,
+    "raw_score": 144.88
+  },
+  {
+    "name": "Kareem Hunt",
+    "pos": "RB",
+    "team": "KC",
+    "score": 117.55,
+    "VORP": -14.66,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 162.4,
+    "raw_score": 125.06
+  },
+  {
+    "name": "Marvin Harrison Jr.",
+    "pos": "WR",
+    "team": "ARI",
+    "score": 143.6,
+    "VORP": -15.83,
+    "tier": "Tier 5",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 227.0,
+    "raw_score": 151.16
+  },
+  {
+    "name": "Josh Downs",
+    "pos": "WR",
+    "team": "IND",
+    "score": 141.21,
+    "VORP": -18.22,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 210.4,
+    "raw_score": 148.64
+  },
+  {
+    "name": "Isaiah Likely",
+    "pos": "TE",
+    "team": "BAL",
+    "score": 107.69,
+    "VORP": -18.6,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 138.8,
+    "raw_score": 107.69
+  },
+  {
+    "name": "Michael Pittman",
+    "pos": "WR",
+    "team": "IND",
+    "score": 136.97,
+    "VORP": -22.47,
+    "tier": "Tier 3",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 191.5,
+    "raw_score": 136.97
+  },
+  {
+    "name": "Wan'Dale Robinson",
+    "pos": "WR",
+    "team": "NYG",
+    "score": 136.48,
+    "VORP": -22.95,
+    "tier": "Tier 2",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 211.0,
+    "raw_score": 143.67
+  },
+  {
+    "name": "Cooper Kupp",
+    "pos": "WR",
+    "team": "LA",
+    "score": 135.85,
+    "VORP": -23.58,
+    "tier": "Tier 4",
+    "age": 31,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 202.1,
+    "raw_score": 135.85
+  },
+  {
+    "name": "Kyle Pitts",
+    "pos": "TE",
+    "team": "ATL",
+    "score": 102.54,
+    "VORP": -23.76,
+    "tier": "Tier 2",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 147.2,
+    "raw_score": 107.93
+  },
+  {
+    "name": "Juwan Johnson",
+    "pos": "TE",
+    "team": "NO",
+    "score": 102.06,
+    "VORP": -24.23,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 137.8,
+    "raw_score": 102.06
+  },
+  {
+    "name": "Dalton Schultz",
+    "pos": "TE",
+    "team": "HOU",
+    "score": 101.51,
+    "VORP": -24.78,
+    "tier": "Tier 4",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 132.6,
+    "raw_score": 101.51
+  },
+  {
+    "name": "Tyler Conklin",
+    "pos": "TE",
+    "team": "NYJ",
+    "score": 101.43,
+    "VORP": -24.86,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 136.8,
+    "raw_score": 101.43
+  },
+  {
+    "name": "Alec Pierce",
+    "pos": "WR",
+    "team": "IND",
+    "score": 133.83,
+    "VORP": -25.6,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 186.4,
+    "raw_score": 133.83
+  },
+  {
+    "name": "Noah Gray",
+    "pos": "TE",
+    "team": "KC",
+    "score": 100.42,
+    "VORP": -25.87,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 127.1,
+    "raw_score": 100.42
+  },
+  {
+    "name": "Justice Hill",
+    "pos": "RB",
+    "team": "BAL",
+    "score": 106.15,
+    "VORP": -26.07,
+    "tier": "Tier 4",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 132.8,
+    "raw_score": 106.15
+  },
+  {
+    "name": "Jerome Ford",
+    "pos": "RB",
+    "team": "CLE",
+    "score": 105.76,
+    "VORP": -26.46,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 140.0,
+    "raw_score": 105.76
+  },
+  {
+    "name": "Alexander Mattison",
+    "pos": "RB",
+    "team": "LV",
+    "score": 105.37,
+    "VORP": -26.85,
+    "tier": "Tier 4",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 143.6,
+    "raw_score": 105.37
+  },
+  {
+    "name": "Deebo Samuel Sr.",
+    "pos": "WR",
+    "team": "SF",
+    "score": 132.04,
+    "VORP": -27.4,
+    "tier": "Tier 3",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 179.7,
+    "raw_score": 132.04
+  },
+  {
+    "name": "Quentin Johnston",
+    "pos": "WR",
+    "team": "LAC",
+    "score": 131.07,
+    "VORP": -28.36,
+    "tier": "Tier 2",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 201.8,
+    "raw_score": 137.97
+  },
+  {
+    "name": "Jordan Love",
+    "pos": "QB",
+    "team": "GB",
+    "score": 180.28,
+    "VORP": -28.43,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [
+      "High Upside"
+    ],
+    "projected_2025_pts": 257.2,
+    "raw_score": 180.28
+  },
+  {
+    "name": "Cole Kmet",
+    "pos": "TE",
+    "team": "CHI",
+    "score": 97.72,
+    "VORP": -28.58,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 135.1,
+    "raw_score": 97.72
+  },
+  {
+    "name": "Caleb Williams",
+    "pos": "QB",
+    "team": "CHI",
+    "score": 179.76,
+    "VORP": -28.96,
+    "tier": "Tier 5",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 280.0,
+    "raw_score": 189.22
+  },
+  {
+    "name": "Travis Etienne",
+    "pos": "RB",
+    "team": "JAX",
+    "score": 103.22,
+    "VORP": -28.99,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 136.1,
+    "raw_score": 103.22
+  },
+  {
+    "name": "Jalen Tolbert",
+    "pos": "WR",
+    "team": "DAL",
+    "score": 129.47,
+    "VORP": -29.96,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 175.6,
+    "raw_score": 129.47
+  },
+  {
+    "name": "Jaylen Waddle",
+    "pos": "WR",
+    "team": "MIA",
+    "score": 127.77,
+    "VORP": -31.67,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 172.8,
+    "raw_score": 127.77
+  },
+  {
+    "name": "Jake Ferguson",
+    "pos": "TE",
+    "team": "DAL",
+    "score": 94.2,
+    "VORP": -32.09,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 117.1,
+    "raw_score": 94.2
+  },
+  {
+    "name": "Dallas Goedert",
+    "pos": "TE",
+    "team": "PHI",
+    "score": 93.65,
+    "VORP": -32.65,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 116.2,
+    "raw_score": 93.65
+  },
+  {
+    "name": "George Pickens",
+    "pos": "WR",
+    "team": "PIT",
+    "score": 126.64,
+    "VORP": -32.79,
+    "tier": "Tier 2",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 189.9,
+    "raw_score": 133.3
+  },
+  {
+    "name": "Jaylen Warren",
+    "pos": "RB",
+    "team": "PIT",
+    "score": 99.15,
+    "VORP": -33.07,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 129.7,
+    "raw_score": 99.15
+  },
+  {
+    "name": "Chig Okonkwo",
+    "pos": "TE",
+    "team": "TEN",
+    "score": 92.97,
+    "VORP": -33.33,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 127.5,
+    "raw_score": 92.97
+  },
+  {
+    "name": "Ray Davis",
+    "pos": "RB",
+    "team": "BUF",
+    "score": 98.8,
+    "VORP": -33.41,
+    "tier": "Tier 5",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 121.3,
+    "raw_score": 98.8
+  },
+  {
+    "name": "DeAndre Hopkins",
+    "pos": "WR",
+    "team": "KC",
+    "score": 125.91,
+    "VORP": -33.52,
+    "tier": "Tier 4",
+    "age": 32,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 169.8,
+    "raw_score": 125.91
+  },
+  {
+    "name": "Jordan Mason",
+    "pos": "RB",
+    "team": "SF",
+    "score": 98.07,
+    "VORP": -34.15,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 120.2,
+    "raw_score": 98.07
+  },
+  {
+    "name": "Dalton Kincaid",
+    "pos": "TE",
+    "team": "BUF",
+    "score": 91.69,
+    "VORP": -34.61,
+    "tier": "Tier 1",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 113.1,
+    "raw_score": 91.69
+  },
+  {
+    "name": "Tank Bigsby",
+    "pos": "RB",
+    "team": "JAX",
+    "score": 97.3,
+    "VORP": -34.92,
+    "tier": "Tier 2",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 134.8,
+    "raw_score": 102.42
+  },
+  {
+    "name": "Will Dissly",
+    "pos": "TE",
+    "team": "LAC",
+    "score": 90.52,
+    "VORP": -35.77,
+    "tier": "Tier 4",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 123.5,
+    "raw_score": 90.52
+  },
+  {
+    "name": "Austin Ekeler",
+    "pos": "RB",
+    "team": "WAS",
+    "score": 95.84,
+    "VORP": -36.38,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 138.3,
+    "raw_score": 101.96
+  },
+  {
+    "name": "Austin Hooper",
+    "pos": "TE",
+    "team": "NE",
+    "score": 89.47,
+    "VORP": -36.82,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 121.8,
+    "raw_score": 89.47
+  },
+  {
+    "name": "Foster Moreau",
+    "pos": "TE",
+    "team": "NO",
+    "score": 88.44,
+    "VORP": -37.86,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 115.9,
+    "raw_score": 88.44
+  },
+  {
+    "name": "Tank Dell",
+    "pos": "WR",
+    "team": "HOU",
+    "score": 118.6,
+    "VORP": -40.84,
+    "tier": "Tier 1",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 161.7,
+    "raw_score": 118.6
+  },
+  {
+    "name": "Ray-Ray McCloud",
+    "pos": "WR",
+    "team": "ATL",
+    "score": 117.71,
+    "VORP": -41.72,
+    "tier": "Tier 4",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 164.6,
+    "raw_score": 117.71
+  },
+  {
+    "name": "Noah Fant",
+    "pos": "TE",
+    "team": "SEA",
+    "score": 83.93,
+    "VORP": -42.37,
+    "tier": "Tier 3",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 116.7,
+    "raw_score": 83.93
+  },
+  {
+    "name": "Chris Godwin",
+    "pos": "WR",
+    "team": "TB",
+    "score": 117.03,
+    "VORP": -42.4,
+    "tier": "Tier 4",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 159.2,
+    "raw_score": 117.03
+  },
+  {
+    "name": "Taysom Hill",
+    "pos": "TE",
+    "team": "NO",
+    "score": 82.5,
+    "VORP": -43.8,
+    "tier": "Tier 4",
+    "age": 34,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 114.8,
+    "raw_score": 87.77
+  },
+  {
+    "name": "Tyler Allgeier",
+    "pos": "RB",
+    "team": "ATL",
+    "score": 87.19,
+    "VORP": -45.03,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 111.0,
+    "raw_score": 87.19
+  },
+  {
+    "name": "C.J. Stroud",
+    "pos": "QB",
+    "team": "HOU",
+    "score": 162.43,
+    "VORP": -46.28,
+    "tier": "Tier 1",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 242.4,
+    "raw_score": 170.98
+  },
+  {
+    "name": "Jordan Akins",
+    "pos": "TE",
+    "team": "CLE",
+    "score": 79.84,
+    "VORP": -46.46,
+    "tier": "Tier 4",
+    "age": 32,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 102.1,
+    "raw_score": 79.84
+  },
+  {
+    "name": "Romeo Doubs",
+    "pos": "WR",
+    "team": "GB",
+    "score": 112.97,
+    "VORP": -46.46,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 152.6,
+    "raw_score": 112.97
+  },
+  {
+    "name": "Demario Douglas",
+    "pos": "WR",
+    "team": "NE",
+    "score": 112.81,
+    "VORP": -46.62,
+    "tier": "Tier 2",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 170.6,
+    "raw_score": 118.75
+  },
+  {
+    "name": "Isaac Guerendo",
+    "pos": "RB",
+    "team": "SF",
+    "score": 85.51,
+    "VORP": -46.71,
+    "tier": "Tier 1",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 100.5,
+    "raw_score": 85.51
+  },
+  {
+    "name": "Tyjae Spears",
+    "pos": "RB",
+    "team": "TEN",
+    "score": 84.99,
+    "VORP": -47.22,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 118.7,
+    "raw_score": 89.47
+  },
+  {
+    "name": "Evan Engram",
+    "pos": "TE",
+    "team": "JAX",
+    "score": 78.79,
+    "VORP": -47.5,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 100.4,
+    "raw_score": 78.79
+  },
+  {
+    "name": "Rome Odunze",
+    "pos": "WR",
+    "team": "CHI",
+    "score": 110.91,
+    "VORP": -48.52,
+    "tier": "Tier 5",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 167.4,
+    "raw_score": 116.75
+  },
+  {
+    "name": "Emanuel Wilson",
+    "pos": "RB",
+    "team": "GB",
+    "score": 83.04,
+    "VORP": -49.17,
+    "tier": "Tier 1",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 100.3,
+    "raw_score": 83.04
+  },
+  {
+    "name": "Nick Westbrook-Ikhine",
+    "pos": "WR",
+    "team": "TEN",
+    "score": 110.2,
+    "VORP": -49.23,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 156.7,
+    "raw_score": 110.2
+  },
+  {
+    "name": "Antonio Gibson",
+    "pos": "RB",
+    "team": "NE",
+    "score": 82.65,
+    "VORP": -49.56,
+    "tier": "Tier 3",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 108.1,
+    "raw_score": 82.65
+  },
+  {
+    "name": "T.J. Hockenson",
+    "pos": "TE",
+    "team": "MIN",
+    "score": 76.7,
+    "VORP": -49.6,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 97.1,
+    "raw_score": 76.7
+  },
+  {
+    "name": "Jalen McMillan",
+    "pos": "WR",
+    "team": "TB",
+    "score": 109.56,
+    "VORP": -49.88,
+    "tier": "Tier 5",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 156.4,
+    "raw_score": 115.32
+  },
+  {
+    "name": "Brenton Strange",
+    "pos": "TE",
+    "team": "JAX",
+    "score": 75.92,
+    "VORP": -50.38,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 102.2,
+    "raw_score": 79.91
+  },
+  {
+    "name": "Amari Cooper",
+    "pos": "WR",
+    "team": "BUF",
+    "score": 108.61,
+    "VORP": -50.82,
+    "tier": "Tier 4",
+    "age": 30,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 141.7,
+    "raw_score": 108.61
+  },
+  {
+    "name": "Ameer Abdullah",
+    "pos": "RB",
+    "team": "LV",
+    "score": 79.72,
+    "VORP": -52.5,
+    "tier": "Tier 4",
+    "age": 31,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 130.8,
+    "raw_score": 97.22
+  },
+  {
+    "name": "Allen Lazard",
+    "pos": "WR",
+    "team": "NYJ",
+    "score": 105.96,
+    "VORP": -53.47,
+    "tier": "Tier 4",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 145.5,
+    "raw_score": 105.96
+  },
+  {
+    "name": "Stefon Diggs",
+    "pos": "WR",
+    "team": "HOU",
+    "score": 105.72,
+    "VORP": -53.71,
+    "tier": "Tier 4",
+    "age": 30,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 140.8,
+    "raw_score": 105.72
+  },
+  {
+    "name": "Devin Singletary",
+    "pos": "RB",
+    "team": "NYG",
+    "score": 78.11,
+    "VORP": -54.11,
+    "tier": "Tier 4",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 100.9,
+    "raw_score": 78.11
+  },
+  {
+    "name": "Matthew Stafford",
+    "pos": "QB",
+    "team": "LA",
+    "score": 154.53,
+    "VORP": -54.18,
+    "tier": "Tier 4",
+    "age": 36,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 236.0,
+    "raw_score": 159.31
+  },
+  {
+    "name": "Jaleel McLaughlin",
+    "pos": "RB",
+    "team": "DEN",
+    "score": 77.12,
+    "VORP": -55.1,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 101.6,
+    "raw_score": 81.18
+  },
+  {
+    "name": "Andrei Iosivas",
+    "pos": "WR",
+    "team": "CIN",
+    "score": 104.29,
+    "VORP": -55.15,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 138.5,
+    "raw_score": 104.29
+  },
+  {
+    "name": "Aaron Rodgers",
+    "pos": "QB",
+    "team": "NYJ",
+    "score": 152.7,
+    "VORP": -56.01,
+    "tier": "Tier 4",
+    "age": 40,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 282.2,
+    "raw_score": 193.29
+  },
+  {
+    "name": "Marvin Mims Jr.",
+    "pos": "WR",
+    "team": "DEN",
+    "score": 103.03,
+    "VORP": -56.4,
+    "tier": "Tier 1",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 149.6,
+    "raw_score": 108.45
+  },
+  {
+    "name": "Elijah Moore",
+    "pos": "WR",
+    "team": "CLE",
+    "score": 102.33,
+    "VORP": -57.1,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 139.6,
+    "raw_score": 102.33
+  },
+  {
+    "name": "Calvin Austin III",
+    "pos": "WR",
+    "team": "PIT",
+    "score": 102.26,
+    "VORP": -57.17,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 139.5,
+    "raw_score": 102.26
+  },
+  {
+    "name": "Adam Thielen",
+    "pos": "WR",
+    "team": "CAR",
+    "score": 101.73,
+    "VORP": -57.7,
+    "tier": "Tier 4",
+    "age": 34,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 161.1,
+    "raw_score": 110.57
+  },
+  {
+    "name": "Tre Tucker",
+    "pos": "WR",
+    "team": "LV",
+    "score": 100.36,
+    "VORP": -59.07,
+    "tier": "Tier 2",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 149.3,
+    "raw_score": 105.64
+  },
+  {
+    "name": "Michael Wilson",
+    "pos": "WR",
+    "team": "ARI",
+    "score": 99.89,
+    "VORP": -59.54,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 143.8,
+    "raw_score": 99.89
+  },
+  {
+    "name": "Demarcus Robinson",
+    "pos": "WR",
+    "team": "LA",
+    "score": 99.18,
+    "VORP": -60.25,
+    "tier": "Tier 4",
+    "age": 29,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 142.6,
+    "raw_score": 99.18
+  },
+  {
+    "name": "Tyler Lockett",
+    "pos": "WR",
+    "team": "SEA",
+    "score": 97.4,
+    "VORP": -62.03,
+    "tier": "Tier 4",
+    "age": 31,
+    "injury_risk": "Low",
+    "flags": [
+      "Age Risk"
+    ],
+    "projected_2025_pts": 139.8,
+    "raw_score": 97.4
+  },
+  {
+    "name": "AJ Barner",
+    "pos": "TE",
+    "team": "SEA",
+    "score": 62.8,
+    "VORP": -63.5,
+    "tier": "Tier 5",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 88.1,
+    "raw_score": 66.11
+  },
+  {
+    "name": "Keon Coleman",
+    "pos": "WR",
+    "team": "BUF",
+    "score": 95.61,
+    "VORP": -63.83,
+    "tier": "Tier 5",
+    "age": 21,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 128.8,
+    "raw_score": 100.64
+  },
+  {
+    "name": "KaVontae Turpin",
+    "pos": "WR",
+    "team": "DAL",
+    "score": 95.44,
+    "VORP": -63.99,
+    "tier": "Tier 2",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 120.4,
+    "raw_score": 95.44
+  },
+  {
+    "name": "Kayshon Boutte",
+    "pos": "WR",
+    "team": "NE",
+    "score": 95.36,
+    "VORP": -64.08,
+    "tier": "Tier 2",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 140.8,
+    "raw_score": 100.38
+  },
+  {
+    "name": "Xavier Legette",
+    "pos": "WR",
+    "team": "CAR",
+    "score": 95.31,
+    "VORP": -64.13,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 144.5,
+    "raw_score": 100.32
+  },
+  {
+    "name": "Olamide Zaccheaus",
+    "pos": "WR",
+    "team": "WAS",
+    "score": 95.04,
+    "VORP": -64.4,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 132.1,
+    "raw_score": 95.04
+  },
+  {
+    "name": "Christian Watson",
+    "pos": "WR",
+    "team": "GB",
+    "score": 93.89,
+    "VORP": -65.54,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 121.6,
+    "raw_score": 93.89
+  },
+  {
+    "name": "Dontayvion Wicks",
+    "pos": "WR",
+    "team": "GB",
+    "score": 92.71,
+    "VORP": -66.72,
+    "tier": "Tier 2",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 127.6,
+    "raw_score": 97.59
+  },
+  {
+    "name": "Ja'Tavion Sanders",
+    "pos": "TE",
+    "team": "CAR",
+    "score": 59.28,
+    "VORP": -67.01,
+    "tier": "Tier 1",
+    "age": 21,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 82.1,
+    "raw_score": 62.4
+  },
+  {
+    "name": "Devaughn Vele",
+    "pos": "WR",
+    "team": "DEN",
+    "score": 92.08,
+    "VORP": -67.35,
+    "tier": "Tier 1",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 123.0,
+    "raw_score": 92.08
+  },
+  {
+    "name": "Darius Slayton",
+    "pos": "WR",
+    "team": "NYG",
+    "score": 91.9,
+    "VORP": -67.53,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 127.1,
+    "raw_score": 91.9
+  },
+  {
+    "name": "Jalen Nailor",
+    "pos": "WR",
+    "team": "MIN",
+    "score": 91.01,
+    "VORP": -68.42,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 121.3,
+    "raw_score": 91.01
+  },
+  {
+    "name": "Josh Palmer",
+    "pos": "WR",
+    "team": "LAC",
+    "score": 90.05,
+    "VORP": -69.38,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 124.0,
+    "raw_score": 90.05
+  },
+  {
+    "name": "Bryce Young",
+    "pos": "QB",
+    "team": "CAR",
+    "score": 138.52,
+    "VORP": -70.19,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie",
+      "High Upside"
+    ],
+    "projected_2025_pts": 214.5,
+    "raw_score": 145.81
+  },
+  {
+    "name": "Ty Johnson",
+    "pos": "RB",
+    "team": "BUF",
+    "score": 57.75,
+    "VORP": -74.46,
+    "tier": "Tier 4",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 95.8,
+    "raw_score": 82.51
+  },
+  {
+    "name": "Cam Akers",
+    "pos": "RB",
+    "team": "MIN",
+    "score": 54.96,
+    "VORP": -77.26,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 97.4,
+    "raw_score": 78.51
+  },
+  {
+    "name": "Samaje Perine",
+    "pos": "RB",
+    "team": "KC",
+    "score": 52.94,
+    "VORP": -79.28,
+    "tier": "Tier 4",
+    "age": 28,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 85.1,
+    "raw_score": 75.63
+  },
+  {
+    "name": "Zack Moss",
+    "pos": "RB",
+    "team": "CIN",
+    "score": 51.54,
+    "VORP": -80.68,
+    "tier": "Tier 3",
+    "age": 26,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 85.6,
+    "raw_score": 73.63
+  },
+  {
+    "name": "Grant Calcaterra",
+    "pos": "TE",
+    "team": "PHI",
+    "score": 44.13,
+    "VORP": -82.17,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 67.1,
+    "raw_score": 63.04
+  },
+  {
+    "name": "Dawson Knox",
+    "pos": "TE",
+    "team": "BUF",
+    "score": 43.78,
+    "VORP": -82.51,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 66.3,
+    "raw_score": 62.55
+  },
+  {
+    "name": "Josh Oliver",
+    "pos": "TE",
+    "team": "MIN",
+    "score": 43.56,
+    "VORP": -82.73,
+    "tier": "Tier 3",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 73.8,
+    "raw_score": 62.23
+  },
+  {
+    "name": "Luke Schoonmaker",
+    "pos": "TE",
+    "team": "DAL",
+    "score": 42.81,
+    "VORP": -83.49,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 64.1,
+    "raw_score": 61.15
+  },
+  {
+    "name": "Braelon Allen",
+    "pos": "RB",
+    "team": "NYJ",
+    "score": 48.65,
+    "VORP": -83.56,
+    "tier": "Tier 5",
+    "age": 20,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 89.0,
+    "raw_score": 73.16
+  },
+  {
+    "name": "Theo Johnson",
+    "pos": "TE",
+    "team": "NYG",
+    "score": 40.68,
+    "VORP": -85.62,
+    "tier": "Tier 5",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 76.4,
+    "raw_score": 61.17
+  },
+  {
+    "name": "Colby Parkinson",
+    "pos": "TE",
+    "team": "LA",
+    "score": 39.87,
+    "VORP": -86.43,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 73.4,
+    "raw_score": 56.95
+  },
+  {
+    "name": "Josh Whyle",
+    "pos": "TE",
+    "team": "TEN",
+    "score": 39.25,
+    "VORP": -87.05,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 68.2,
+    "raw_score": 56.07
+  },
+  {
+    "name": "Kenneth Gainwell",
+    "pos": "RB",
+    "team": "PHI",
+    "score": 44.15,
+    "VORP": -88.07,
+    "tier": "Tier 3",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 65.4,
+    "raw_score": 63.07
+  },
+  {
+    "name": "Miles Sanders",
+    "pos": "RB",
+    "team": "CAR",
+    "score": 44.02,
+    "VORP": -88.2,
+    "tier": "Tier 4",
+    "age": 27,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 80.8,
+    "raw_score": 62.89
+  },
+  {
+    "name": "Roschon Johnson",
+    "pos": "RB",
+    "team": "CHI",
+    "score": 43.42,
+    "VORP": -88.8,
+    "tier": "Tier 1",
+    "age": 23,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 80.9,
+    "raw_score": 65.29
+  },
+  {
+    "name": "Sean Tucker",
+    "pos": "RB",
+    "team": "TB",
+    "score": 43.1,
+    "VORP": -89.12,
+    "tier": "Tier 1",
+    "age": 22,
+    "injury_risk": "Low",
+    "flags": [
+      "Rookie"
+    ],
+    "projected_2025_pts": 71.8,
+    "raw_score": 64.81
+  },
+  {
+    "name": "Isiah Pacheco",
+    "pos": "RB",
+    "team": "KC",
+    "score": 41.48,
+    "VORP": -90.74,
+    "tier": "Tier 2",
+    "age": 25,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 59.5,
+    "raw_score": 59.26
+  },
+  {
+    "name": "Tommy Tremble",
+    "pos": "TE",
+    "team": "CAR",
+    "score": 35.46,
+    "VORP": -90.83,
+    "tier": "Tier 2",
+    "age": 24,
+    "injury_risk": "Low",
+    "flags": [],
+    "projected_2025_pts": 63.3,
+    "raw_score": 50.66
+  }
+]
