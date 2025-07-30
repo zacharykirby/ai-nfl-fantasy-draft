@@ -141,7 +141,7 @@ class FantasyCLI:
             self.print_section_header("STEP 4: PLAYER RANKING")
             self.print_info("Generating comprehensive player rankings with VORP analysis...")
             
-            ranked_df = self.ranker.rank_players(use_historical=True)
+            ranked_df = self.ranker.rank_players()
             if not ranked_df.empty:
                 self.ranker.export_rankings(ranked_df)
                 self.print_success(f"Generated rankings for {len(ranked_df)} players")
@@ -152,7 +152,7 @@ class FantasyCLI:
                 
                 # Display best value picks
                 self.print_section_header("BEST VALUE PICKS")
-                self.ranker.print_best_values(ranked_df, top_n=20)
+                # Note: print_best_values method not implemented yet
                 
                 # Display top players by position
                 self.print_section_header("TOP PLAYERS BY POSITION")
@@ -491,7 +491,7 @@ class FantasyCLI:
         
         try:
             # Generate rankings with historical data
-            ranked_df = self.ranker.rank_players(use_historical=use_historical)
+            ranked_df = self.ranker.rank_players()
             if not ranked_df.empty:
                 self.ranker.export_rankings(ranked_df)
                 self.print_success(f"Generated rankings for {len(ranked_df)} players")
@@ -502,7 +502,7 @@ class FantasyCLI:
                 
                 # Display best value picks
                 self.print_section_header("BEST VALUE PICKS")
-                self.ranker.print_best_values(ranked_df, top_n=20)
+                # Note: print_best_values method not implemented yet
                 
                 # Display top players by position
                 self.print_section_header("TOP PLAYERS BY POSITION")
@@ -666,7 +666,7 @@ Examples:
             sys.exit(0 if success else 1)
             
         elif args.rank_only:
-            success = cli.run_ranking(use_historical=True, rank_all=True)
+            success = cli.run_ranking(rank_all=True)
             sys.exit(0 if success else 1)
             
         elif args.draft_recommendations:

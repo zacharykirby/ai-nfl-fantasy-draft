@@ -83,25 +83,26 @@ class PlayerRanker:
         }
         
     def load_data(self) -> pd.DataFrame:
-        """Load 2025 player data"""
+        """Load player data"""
         try:
-            # Load 2025 data (current season projections)
+            # Try to load 2025 data first, then fall back to general data
             stats_file_2025 = self.data_dir / "nfl_player_data_2025.csv"
+            stats_file_general = self.data_dir / "nfl_player_data.csv"
             
-            if not stats_file_2025.exists():
-                logger.error(f"2025 data file not found: {stats_file_2025}")
+            if stats_file_2025.exists():
+                df = pd.read_csv(stats_file_2025)
+                logger.info(f"Loaded {len(df)} current season records from {stats_file_2025.name}")
+            elif stats_file_general.exists():
+                df = pd.read_csv(stats_file_general)
+                logger.info(f"Loaded {len(df)} records from {stats_file_general.name}")
+            else:
+                logger.error(f"No data files found: {stats_file_2025} or {stats_file_general}")
                 return pd.DataFrame()
-            
-            df = pd.read_csv(stats_file_2025)
-            logger.info(f"Loaded {len(df)} current season records from {stats_file_2025.name}")
             
             # Standardize column names
             column_mapping = {
                 'player_name': 'name',
-                'fantasy_points_2025_projected': 'projected_2025_pts',
-                'fantasy_points_2024': 'points_2024',
-                'fantasy_points_2023': 'points_2023', 
-                'fantasy_points_2022': 'points_2022',
+                'fantasy_points_ppr': 'projected_2025_pts',  # Use PPR points as projections
                 'fantasy_points': 'total_points',
                 'games': 'games_played',
                 'targets': 'targets',
@@ -114,14 +115,24 @@ class PlayerRanker:
                 'rushing_tds': 'rush_tds',
                 'receiving_tds': 'rec_tds',
                 'interceptions': 'int',
-                'fumbles': 'fumbles',
-                'fumbles_lost': 'fumbles_lost'
+                'rushing_fumbles': 'fumbles',
+                'rushing_fumbles_lost': 'fumbles_lost'
             }
             
             # Rename columns that exist
             for old_col, new_col in column_mapping.items():
                 if old_col in df.columns:
                     df = df.rename(columns={old_col: new_col})
+            
+            # Handle games_played column specifically
+            if 'games_played' in df.columns and 'games' in df.columns:
+                # Use games_played if it exists, otherwise use games
+                df['games_played'] = df['games_played'].fillna(df['games'])
+            elif 'games' in df.columns:
+                df['games_played'] = df['games']
+            elif 'games_played' not in df.columns:
+                # Create games_played column if it doesn't exist
+                df['games_played'] = 1  # Default to 1 game
             
             # Ensure required columns exist with defaults
             required_columns = {
@@ -130,9 +141,9 @@ class PlayerRanker:
                 'team': 'Unknown',
                 'age': 0.0,
                 'projected_2025_pts': 0.0,
-                'points_2024': 0.0,
-                'points_2023': 0.0,
-                'points_2022': 0.0,
+                'points_2024': 0.0,  # Will be set to same as projected_2025_pts
+                'points_2023': 0.0,  # Will be set to same as projected_2025_pts
+                'points_2022': 0.0,  # Will be set to same as projected_2025_pts
                 'games_played': 0,
                 'targets': 0,
                 'receptions': 0,
@@ -160,14 +171,39 @@ class PlayerRanker:
             for col in numeric_columns:
                 if col in df.columns:
                     try:
-                        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+                        # Ensure we're working with a Series, not DataFrame
+                        if isinstance(df[col], pd.DataFrame):
+                            logger.warning(f"Column {col} is a DataFrame, skipping conversion")
+                            df[col] = 0
+                        else:
+                            # Handle the case where the column might already be numeric
+                            if df[col].dtype in ['int64', 'float64']:
+                                df[col] = df[col].fillna(0)
+                            else:
+                                df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
                     except Exception as e:
                         logger.warning(f"Failed to convert column {col} to numeric: {e}")
                         df[col] = 0
             
-            # Filter out players with no fantasy points or unknown positions
+            # Set historical points to same as projected points since we don't have separate year data
             if 'projected_2025_pts' in df.columns:
+                df['points_2024'] = df['projected_2025_pts']
+                df['points_2023'] = df['projected_2025_pts']
+                df['points_2022'] = df['projected_2025_pts']
                 df = df[df['projected_2025_pts'] > 0].copy()
+            
+            # Fix duplicate players by keeping only the most recent season entry
+            if 'season' in df.columns:
+                logger.info("Deduplicating players by keeping most recent season...")
+                # Sort by season descending to get most recent first
+                df = df.sort_values('season', ascending=False)
+                # Keep only the first occurrence of each player (most recent season)
+                df = df.drop_duplicates(subset=['name'], keep='first')
+                logger.info(f"After deduplication: {len(df)} unique players")
+            elif 'player_name' in df.columns:
+                logger.info("Deduplicating players by keeping first occurrence...")
+                df = df.drop_duplicates(subset=['player_name'], keep='first')
+                logger.info(f"After deduplication: {len(df)} unique players")
             
             if 'position' in df.columns:
                 valid_positions = ['QB', 'RB', 'WR', 'TE']
@@ -207,10 +243,19 @@ class PlayerRanker:
         """Calculate usage score based on targets, receptions, and carries"""
         position = str(row.get('position', 'Unknown'))
         
+        # Safely get games_played value
+        try:
+            games_played_val = row.get('games_played', 1)
+            if isinstance(games_played_val, (pd.DataFrame, pd.Series)):
+                games = 1  # Default to 1 if it's a DataFrame/Series
+            else:
+                games = max(float(games_played_val), 1)
+        except:
+            games = 1  # Default to 1 if conversion fails
+        
         if position == 'QB':
             # For QBs, focus on passing attempts and rushing attempts
             carries = float(row.get('carries', 0))
-            games = max(float(row.get('games_played', 1)), 1)
             
             # Normalize to per-game basis
             rush_per_game = carries / games
@@ -223,7 +268,6 @@ class PlayerRanker:
             targets = float(row.get('targets', 0))
             receptions = float(row.get('receptions', 0))
             carries = float(row.get('carries', 0))
-            games = max(float(row.get('games_played', 1)), 1)
             
             # Normalize to per-game basis
             targets_per_game = targets / games
@@ -369,7 +413,14 @@ class PlayerRanker:
         
         # Rookie penalty (dampen hype for young players with minimal experience)
         age = float(row.get('age', 0))
-        games_played = float(row.get('games_played', 0))
+        try:
+            games_played_val = row.get('games_played', 0)
+            if isinstance(games_played_val, (pd.DataFrame, pd.Series)):
+                games_played = 0  # Default to 0 if it's a DataFrame/Series
+            else:
+                games_played = float(games_played_val)
+        except:
+            games_played = 0  # Default to 0 if conversion fails
         
         if age <= 23 and games_played < 16:
             adjusted_score *= 0.85  # 15% penalty for rookies/inexperienced young players
@@ -475,7 +526,15 @@ class PlayerRanker:
         
         # Rookie flag
         age = float(row.get('age', 0))
-        games_played = float(row.get('games_played', 0))
+        try:
+            games_played_val = row.get('games_played', 0)
+            if isinstance(games_played_val, (pd.DataFrame, pd.Series)):
+                games_played = 0  # Default to 0 if it's a DataFrame/Series
+            else:
+                games_played = float(games_played_val)
+        except:
+            games_played = 0  # Default to 0 if conversion fails
+            
         if age <= 23 and games_played < 16:
             flags.append("Rookie")
         
