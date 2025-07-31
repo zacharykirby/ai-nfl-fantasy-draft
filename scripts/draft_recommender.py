@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class DraftRecommender:
     """Draft recommendation system using Ollama LLM analysis"""
     
-    def __init__(self, ollama_url: str = None, model: str = "gemma3:12b"):
+    def __init__(self, ollama_url: str = None, model: str = "deepseek-r1"):
         # Use OLLAMA_HOST environment variable or default to network address
         if ollama_url is None:
             import os
@@ -42,47 +42,64 @@ class DraftRecommender:
         self.rankings_dir = Path("outputs")
         
     def load_ranking_data(self) -> pd.DataFrame:
-        """Load the latest ranking data"""
+        """Load the latest ranking data from player_rankings.json"""
         try:
-            # Try to load the overall rankings first
-            rankings_file = self.rankings_dir / "ranked_all_players.csv"
+            # Load the player rankings JSON file
+            rankings_file = self.rankings_dir / "player_rankings.json"
             if not rankings_file.exists():
-                # Fallback to ranking summary
-                summary_file = self.rankings_dir / "ranking_summary.json"
-                if summary_file.exists():
-                    with open(summary_file, 'r') as f:
-                        summary_data = json.load(f)
-                    return self._create_df_from_summary(summary_data)
-                else:
-                    raise FileNotFoundError("No ranking data found")
+                raise FileNotFoundError(f"Ranking data not found at {rankings_file}")
             
-            df = pd.read_csv(rankings_file)
-            logger.info(f"Loaded {len(df)} ranked players")
+            with open(rankings_file, 'r') as f:
+                rankings_data = json.load(f)
+            
+            # Convert JSON data to DataFrame
+            df = pd.DataFrame(rankings_data)
+            
+            # Standardize column names to match expected format
+            column_mapping = {
+                'pos': 'position',
+                'score': 'total_score',
+                'VORP': 'vorp_score'
+            }
+            
+            # Rename columns that exist
+            for old_col, new_col in column_mapping.items():
+                if old_col in df.columns:
+                    df = df.rename(columns={old_col: new_col})
+            
+            # Ensure required columns exist with defaults
+            required_columns = {
+                'name': 'Unknown',
+                'position': 'Unknown', 
+                'team': 'Unknown',
+                'total_score': 0.0,
+                'vorp_score': 0.0,
+                'tier': 'Tier 5',
+                'age': 0,
+                'projected_2025_pts': 0.0,
+                'raw_score': 0.0,
+                'consistency_score': 0.5,
+                'ceiling_potential': 0.5
+            }
+            
+            for col, default_val in required_columns.items():
+                if col not in df.columns:
+                    df[col] = default_val
+            
+            # Convert numeric columns
+            numeric_columns = ['total_score', 'vorp_score', 'age', 'projected_2025_pts', 'raw_score', 'consistency_score', 'ceiling_potential']
+            for col in numeric_columns:
+                if col in df.columns:
+                    df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            
+            logger.info(f"Loaded {len(df)} ranked players from {rankings_file}")
             return df
             
         except Exception as e:
             logger.error(f"Error loading ranking data: {e}")
             raise
     
-    def _create_df_from_summary(self, summary_data: Dict) -> pd.DataFrame:
-        """Create DataFrame from ranking summary if full CSV not available"""
-        players = []
-        
-        # Extract players from top_players_by_position
-        for position, pos_players in summary_data.get('top_players_by_position', {}).items():
-            for player_data in pos_players:
-                players.append({
-                    'player': player_data['player'],
-                    'position': position,
-                    'team': player_data['team'],
-                    'total_score': player_data['total_score'],
-                    'vorp_score': player_data['vorp_score'],
-                    'tier': player_data['tier'],
-                    'consistency_score': player_data.get('consistency_score', 0.5),
-                    'ceiling_potential': player_data.get('ceiling_potential', 0.5)
-                })
-        
-        return pd.DataFrame(players)
+
     
     def get_top_vorp_players(self, df: pd.DataFrame, top_n: int = 50) -> pd.DataFrame:
         """Get top players by VORP score across all positions"""
@@ -107,15 +124,18 @@ class DraftRecommender:
         player_data = []
         for _, player in top_players.iterrows():
             player_info = {
-                'name': player['player'],
+                'name': player['name'],
                 'position': player['position'],
                 'team': player['team'],
                 'vorp_score': round(player['vorp_score'], 2),
                 'total_score': round(player['total_score'], 1),
-                'tier': int(player['tier']),
+                'tier': player['tier'],
                 'position_rank': int(player['position_rank']),
                 'consistency': round(player.get('consistency_score', 0.5), 2),
-                'ceiling': round(player.get('ceiling_potential', 0.5), 2)
+                'ceiling': round(player.get('ceiling_potential', 0.5), 2),
+                'age': int(player.get('age', 0)),
+                'projected_2025_pts': round(player.get('projected_2025_pts', 0), 1),
+                'flags': player.get('flags', [])
             }
             player_data.append(player_info)
         
@@ -263,9 +283,9 @@ class DraftRecommender:
         print("-"*80)
         
         for i, (_, player) in enumerate(top_players.iterrows(), 1):
-            print(f"{i:<4} {player['player']:<20} {player['position']:<3} "
+            print(f"{i:<4} {player['name']:<20} {player['position']:<3} "
                   f"{player['team']:<4} {player['vorp_score']:<6.1f} {player['total_score']:<6.1f} "
-                  f"{int(player['tier']):<4} {int(player['position_rank']):<8}")
+                  f"{player['tier']:<6} {int(player['position_rank']):<8}")
         
         print("="*80)
         
@@ -277,9 +297,9 @@ class DraftRecommender:
         
         # Tier distribution
         print("\n🏆 TIER DISTRIBUTION:")
-        tier_counts = top_players['tier'].value_counts().sort_index()
+        tier_counts = top_players['tier'].value_counts()
         for tier, count in tier_counts.items():
-            print(f"   Tier {int(tier)}: {count} players")
+            print(f"   {tier}: {count} players")
     
     def generate_draft_recommendations(self, top_n: int = 50, draft_rounds: int = 15) -> str:
         """Generate comprehensive draft recommendations"""
@@ -302,18 +322,86 @@ class DraftRecommender:
             logger.info("Requesting draft analysis from Ollama...")
             recommendations = self.query_ollama(prompt)
             
+            # Check if Ollama failed and provide fallback
+            if recommendations.startswith("Error:"):
+                logger.warning("Ollama connection failed, generating fallback recommendations...")
+                recommendations = self.generate_fallback_recommendations(top_players, draft_rounds)
+            
             return recommendations
             
         except Exception as e:
             logger.error(f"Error generating draft recommendations: {e}")
             return f"Error generating recommendations: {str(e)}"
     
+    def generate_fallback_recommendations(self, top_players: pd.DataFrame, draft_rounds: int = 15) -> str:
+        """Generate fallback recommendations when Ollama is not available"""
+        try:
+            recommendations = []
+            recommendations.append("## FALLBACK DRAFT RECOMMENDATIONS")
+            recommendations.append("(Generated without LLM analysis - Ollama unavailable)")
+            recommendations.append("")
+            
+            # Round 1-3 recommendations based on VORP
+            recommendations.append("## ROUND 1-3 DRAFT ROADMAP")
+            recommendations.append("")
+            
+            # Get top players by position for each round
+            for round_num in [1, 2, 3]:
+                recommendations.append(f"### ROUND {round_num}")
+                
+                # Get best available players for this round
+                if round_num == 1:
+                    # Top 3 VORP players
+                    round_players = top_players.head(3)
+                elif round_num == 2:
+                    # Next 3 VORP players
+                    round_players = top_players.iloc[3:6]
+                else:
+                    # Next 3 VORP players
+                    round_players = top_players.iloc[6:9]
+                
+                for i, (_, player) in enumerate(round_players.iterrows(), 1):
+                    recommendations.append(f"**Option {i}:** {player['name']} - {player['position']} - {player['team']}")
+                    recommendations.append(f"  - VORP: {player['vorp_score']:.1f} | Score: {player['total_score']:.1f}")
+                    recommendations.append(f"  - Tier: {player['tier']} | Age: {int(player['age'])}")
+                    if player.get('flags'):
+                        recommendations.append(f"  - Flags: {', '.join(player['flags'])}")
+                    recommendations.append("")
+            
+            # Best available board
+            recommendations.append("## BEST AVAILABLE (ROUNDS 4-6)")
+            recommendations.append("| Rank | Player | Pos | Team | VORP | Score | Tier |")
+            recommendations.append("|------|--------|-----|------|------|-------|------|")
+            
+            # Show next 15 players
+            for i, (_, player) in enumerate(top_players.iloc[9:24].iterrows(), 1):
+                recommendations.append(f"| {i} | {player['name']} | {player['position']} | {player['team']} | "
+                                    f"{player['vorp_score']:.1f} | {player['total_score']:.1f} | {player['tier']} |")
+            
+            recommendations.append("")
+            
+            # Strategy tips
+            recommendations.append("## DRAFT STRATEGY TIPS")
+            recommendations.append("- ♦ Prioritize VORP over ADP - higher VORP = better value")
+            recommendations.append("- ♦ RB scarcity is real - don't wait too long for RB2")
+            recommendations.append("- ♦ WR depth allows for patience in middle rounds")
+            recommendations.append("- ♦ QB can wait until rounds 6-8 in most cases")
+            recommendations.append("- ♦ TE has steep drop-off after top 3-4 options")
+            recommendations.append("- ♦ Consider age and injury risk for older players")
+            recommendations.append("- ♦ Rookies have upside but also risk")
+            recommendations.append("- ♦ Monitor bye weeks to avoid conflicts")
+            
+            return "\n".join(recommendations)
+            
+        except Exception as e:
+            logger.error(f"Error generating fallback recommendations: {e}")
+            return "Error generating fallback recommendations"
+    
     def save_recommendations(self, recommendations: str, filename: str = None) -> None:
         """Save recommendations to file"""
         try:
             if filename is None:
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = f"draft_recommendations_{timestamp}.txt"
+                filename = f"draft_recommendations.txt"
             
             output_file = self.rankings_dir / filename
             
@@ -338,8 +426,8 @@ def main():
                        help='Number of draft rounds to consider (default: 15)')
     parser.add_argument('--ollama-url', type=str, default=None,
                        help='Ollama API URL (default: uses OLLAMA_HOST env var or 127.0.0.1)')
-    parser.add_argument('--model', type=str, default='gemma3:12b',
-                       help='Ollama model to use (default: gemma3:12b)')
+    parser.add_argument('--model', type=str, default='deepseek-r1',
+                       help='Ollama model to use (default: deepseek-r1)')
     parser.add_argument('--save', action='store_true',
                        help='Save recommendations to file')
     parser.add_argument('--output-file', type=str, default=None,

@@ -85,25 +85,93 @@ class PlayerRanker:
     def load_data(self) -> pd.DataFrame:
         """Load player data"""
         try:
-            # Try to load 2025 data first, then fall back to general data
-            stats_file_2025 = self.data_dir / "nfl_player_data_2025.csv"
+            logger.info("Starting load_data function...")
+            # Load main historical data first
             stats_file_general = self.data_dir / "nfl_player_data.csv"
+            stats_file_2025 = self.data_dir / "nfl_player_data_2025.csv"
             
-            if stats_file_2025.exists():
-                df = pd.read_csv(stats_file_2025)
-                logger.info(f"Loaded {len(df)} current season records from {stats_file_2025.name}")
-            elif stats_file_general.exists():
-                df = pd.read_csv(stats_file_general)
-                logger.info(f"Loaded {len(df)} records from {stats_file_general.name}")
-            else:
-                logger.error(f"No data files found: {stats_file_2025} or {stats_file_general}")
+            if not stats_file_general.exists():
+                logger.error(f"Main data file not found: {stats_file_general}")
                 return pd.DataFrame()
+            
+            # Load main historical data
+            df = pd.read_csv(stats_file_general)
+            logger.info(f"Loaded {len(df)} historical records from {stats_file_general.name}")
+            logger.info(f"Historical data columns: {df.columns.tolist()}")
+            logger.info(f"Historical data shape: {df.shape}")
+            
+            # Load 2025 projections if available
+            projections_df = None
+            logger.info(f"Checking if {stats_file_2025} exists...")
+            if stats_file_2025.exists():
+                logger.info("Loading 2025 projections...")
+                try:
+                    projections_df = pd.read_csv(stats_file_2025)
+                    logger.info(f"Loaded {len(projections_df)} projection records from {stats_file_2025.name}")
+                    logger.info(f"Projection columns: {projections_df.columns.tolist()}")
+                    
+                    # Clean and standardize the projections data
+                    projections_df = self._process_2025_projections(projections_df)
+                    
+                except Exception as e:
+                    logger.error(f"Error loading 2025 projections: {e}")
+                    import traceback
+                    logger.error(f"Traceback: {traceback.format_exc()}")
+                    projections_df = None
+            else:
+                logger.info("2025 projections file not found")
+            
+            # Get the most recent season data for each player
+            df = df.sort_values(['player_name', 'season'], ascending=[True, False])
+            df = df.drop_duplicates(subset=['player_name'], keep='first')
+            logger.info(f"After deduplication: {len(df)} unique players from historical data")
+            
+            # Debug: Check what positions we have
+            if 'position' in df.columns:
+                logger.info(f"Position distribution: {df['position'].value_counts().to_dict()}")
+            
+            # Merge with 2025 projections if available
+            if projections_df is not None:
+                logger.info("Merging with 2025 projections...")
+                # Handle duplicate player names in projections by keeping the first occurrence
+                projections_df_clean = projections_df.drop_duplicates(subset=['name'], keep='first')
+                logger.info(f"Removed {len(projections_df) - len(projections_df_clean)} duplicate player names from projections")
+                
+                # Create a mapping from player_name to 2025 projections
+                projection_mapping = projections_df_clean.set_index('name').to_dict('index')
+                
+                # Add 2025 projections to main dataframe
+                for col in ['projected_2025_pts', 'tier_2025', 'rank_2025', 'projected_pass_yards', 
+                           'projected_pass_tds', 'projected_rec', 'projected_rec_yards', 
+                           'projected_rec_tds', 'projected_rush_att', 'projected_rush_yards', 
+                           'projected_rush_tds']:
+                    df[col] = df['player_name'].map(
+                        lambda x: projection_mapping.get(x, {}).get(col, 0)
+                    )
+                
+                # Fill missing projections with 0
+                for col in ['projected_2025_pts', 'projected_pass_yards', 'projected_pass_tds', 
+                           'projected_rec', 'projected_rec_yards', 'projected_rec_tds', 
+                           'projected_rush_att', 'projected_rush_yards', 'projected_rush_tds']:
+                    df[col] = df[col].fillna(0)
+                
+                # Fill missing tier and rank with defaults
+                df['tier_2025'] = df['tier_2025'].fillna(99)
+                df['rank_2025'] = df['rank_2025'].fillna(999)
+                
+                logger.info(f"Added 2025 projections for {len(df[df['projected_2025_pts'] > 0])} players")
+            else:
+                # If no projections, use current fantasy points as projections
+                df['projected_2025_pts'] = df['fantasy_points']
+                df['tier_2025'] = 99
+                df['rank_2025'] = 999
+                logger.info("No 2025 projections found, using current fantasy points as projections")
             
             # Standardize column names
             column_mapping = {
                 'player_name': 'name',
-                'fantasy_points_ppr': 'projected_2025_pts',  # Use PPR points as projections
                 'fantasy_points': 'total_points',
+                'fantasy_points_ppr': 'fantasy_points_ppr',
                 'games': 'games_played',
                 'targets': 'targets',
                 'receptions': 'receptions',
@@ -141,6 +209,8 @@ class PlayerRanker:
                 'team': 'Unknown',
                 'age': 0.0,
                 'projected_2025_pts': 0.0,
+                'tier_2025': 99,
+                'rank_2025': 999,
                 'points_2024': 0.0,  # Will be set to same as projected_2025_pts
                 'points_2023': 0.0,  # Will be set to same as projected_2025_pts
                 'points_2022': 0.0,  # Will be set to same as projected_2025_pts
@@ -164,9 +234,11 @@ class PlayerRanker:
                     df[col] = default_val
             
             # Convert numeric columns
-            numeric_columns = ['age', 'projected_2025_pts', 'points_2024', 'points_2023', 'points_2022', 
+            numeric_columns = ['age', 'projected_2025_pts', 'tier_2025', 'rank_2025', 'points_2024', 'points_2023', 'points_2022', 
                               'games_played', 'targets', 'receptions', 'carries', 'rush_yards', 'rec_yards',
-                              'pass_yards', 'pass_tds', 'rush_tds', 'rec_tds', 'int', 'fumbles', 'fumbles_lost']
+                              'pass_yards', 'pass_tds', 'rush_tds', 'rec_tds', 'int', 'fumbles', 'fumbles_lost',
+                              'projected_pass_yards', 'projected_pass_tds', 'projected_rec', 'projected_rec_yards', 
+                              'projected_rec_tds', 'projected_rush_att', 'projected_rush_yards', 'projected_rush_tds']
             
             for col in numeric_columns:
                 if col in df.columns:
@@ -185,35 +257,120 @@ class PlayerRanker:
                         logger.warning(f"Failed to convert column {col} to numeric: {e}")
                         df[col] = 0
             
-            # Set historical points to same as projected points since we don't have separate year data
+            # Set historical points based on current season data
+            if 'fantasy_points' in df.columns:
+                df['points_2024'] = df['fantasy_points']  # Current season points
+                df['points_2023'] = df['fantasy_points']  # Use same for now (could be enhanced with actual 2023 data)
+                df['points_2022'] = df['fantasy_points']  # Use same for now (could be enhanced with actual 2022 data)
+            
+            # Filter to players with projections or fantasy points
             if 'projected_2025_pts' in df.columns:
-                df['points_2024'] = df['projected_2025_pts']
-                df['points_2023'] = df['projected_2025_pts']
-                df['points_2022'] = df['projected_2025_pts']
                 df = df[df['projected_2025_pts'] > 0].copy()
+            elif 'fantasy_points' in df.columns:
+                df = df[df['fantasy_points'] > 0].copy()
             
-            # Fix duplicate players by keeping only the most recent season entry
-            if 'season' in df.columns:
-                logger.info("Deduplicating players by keeping most recent season...")
-                # Sort by season descending to get most recent first
-                df = df.sort_values('season', ascending=False)
-                # Keep only the first occurrence of each player (most recent season)
-                df = df.drop_duplicates(subset=['name'], keep='first')
-                logger.info(f"After deduplication: {len(df)} unique players")
-            elif 'player_name' in df.columns:
-                logger.info("Deduplicating players by keeping first occurrence...")
-                df = df.drop_duplicates(subset=['player_name'], keep='first')
-                logger.info(f"After deduplication: {len(df)} unique players")
-            
-            if 'position' in df.columns:
-                valid_positions = ['QB', 'RB', 'WR', 'TE']
-                df = df[df['position'].isin(valid_positions)].copy()
-            
+            logger.info(f"Final dataset has {len(df)} players")
             return df
             
         except Exception as e:
-            logger.error(f"Error loading data: {e}")
+            logger.error(f"Error in load_data: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return pd.DataFrame()
+
+    def _process_2025_projections(self, projections_df: pd.DataFrame) -> pd.DataFrame:
+        """Process the 2025 projections CSV to standardize format"""
+        try:
+            logger.info("Processing 2025 projections data...")
+            
+            # Rename columns to match expected format
+            column_mapping = {
+                'RK': 'rank_2025',
+                'TIERS': 'tier_2025', 
+                'PLAYER NAME': 'name',
+                'TEAM': 'team',
+                'FANTASYPTS': 'projected_2025_pts'
+            }
+            
+            # Rename existing columns
+            for old_col, new_col in column_mapping.items():
+                if old_col in projections_df.columns:
+                    projections_df = projections_df.rename(columns={old_col: new_col})
+            
+            # Handle the duplicate YDS and TDS columns by creating specific ones
+            # The CSV has: YDS, TDS, REC, YDS, TDS, ATT, YDS, TDS
+            # This represents: Pass_YDS, Pass_TDS, REC, Rec_YDS, Rec_TDS, Rush_ATT, Rush_YDS, Rush_TDS
+            
+            # Create new columns for the different stat types
+            projections_df['projected_pass_yards'] = 0
+            projections_df['projected_pass_tds'] = 0
+            projections_df['projected_rec'] = 0
+            projections_df['projected_rec_yards'] = 0
+            projections_df['projected_rec_tds'] = 0
+            projections_df['projected_rush_att'] = 0
+            projections_df['projected_rush_yards'] = 0
+            projections_df['projected_rush_tds'] = 0
+            
+            # Map the columns based on their position in the CSV
+            # Assuming the order is: Pass_YDS, Pass_TDS, REC, Rec_YDS, Rec_TDS, Rush_ATT, Rush_YDS, Rush_TDS
+            if 'YDS' in projections_df.columns:
+                # First YDS column is passing yards
+                projections_df['projected_pass_yards'] = pd.to_numeric(projections_df['YDS'], errors='coerce').fillna(0)
+            
+            if 'TDS' in projections_df.columns:
+                # First TDS column is passing touchdowns
+                projections_df['projected_pass_tds'] = pd.to_numeric(projections_df['TDS'], errors='coerce').fillna(0)
+            
+            if 'REC' in projections_df.columns:
+                projections_df['projected_rec'] = pd.to_numeric(projections_df['REC'], errors='coerce').fillna(0)
+            
+            if 'ATT' in projections_df.columns:
+                projections_df['projected_rush_att'] = pd.to_numeric(projections_df['ATT'], errors='coerce').fillna(0)
+            
+            # For the duplicate YDS and TDS columns, we need to handle them differently
+            # Since we can't easily distinguish which is which, we'll need to infer based on player patterns
+            # For now, let's assume the second set of YDS/TDS are receiving stats
+            
+            # Add position detection based on statistical patterns
+            projections_df['position'] = projections_df.apply(self._detect_position_from_stats, axis=1)
+            
+            # Clean up the data
+            projections_df = projections_df.dropna(subset=['name'])
+            
+            logger.info(f"Processed {len(projections_df)} projection records")
+            logger.info(f"Position distribution: {projections_df['position'].value_counts().to_dict()}")
+            
+            return projections_df
+            
+        except Exception as e:
+            logger.error(f"Error processing 2025 projections: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return pd.DataFrame()
+
+    def _detect_position_from_stats(self, row: pd.Series) -> str:
+        """Detect player position based on statistical patterns"""
+        try:
+            # Get the relevant stats
+            pass_yards = row.get('projected_pass_yards', 0)
+            pass_tds = row.get('projected_pass_tds', 0)
+            rec = row.get('projected_rec', 0)
+            rush_att = row.get('projected_rush_att', 0)
+            
+            # Position detection logic
+            if pass_yards > 1000 or pass_tds > 5:
+                return 'QB'
+            elif rush_att > 50:
+                return 'RB'
+            elif rec > 20:
+                return 'WR'
+            else:
+                # Default to WR if we can't determine
+                return 'WR'
+                
+        except Exception as e:
+            logger.warning(f"Error detecting position for {row.get('name', 'Unknown')}: {e}")
+            return 'WR'  # Default fallback
     
     def calculate_weighted_historical_average(self, row: pd.Series) -> float:
         """Calculate weighted average of last 2 seasons (60% last year, 40% year before)"""
@@ -373,25 +530,35 @@ class PlayerRanker:
         return max(0.5, penalty)  # Cap at 50% penalty
     
     def calculate_raw_score(self, row: pd.Series) -> float:
-        """Calculate raw score using the weighted formula"""
+        """Calculate raw score using the weighted formula with 2025 projections"""
         # Get component scores
         projected_2025_pts = float(row.get('projected_2025_pts', 0))
+        tier_2025 = float(row.get('tier_2025', 99))
+        rank_2025 = float(row.get('rank_2025', 999))
         
         # Apply projection dampening to correct inflated projections
         projected_2025_pts = self.dampen_inflated_projections(row, projected_2025_pts)
+        
+        # Calculate tier-based bonus/penalty
+        tier_score = self.calculate_tier_score(tier_2025)
+        
+        # Calculate rank-based adjustment
+        rank_score = self.calculate_rank_score(rank_2025)
         
         weighted_avg_last_2 = self.calculate_weighted_historical_average(row)
         consistency_score = self.calculate_consistency_score(row)
         usage_score = self.calculate_usage_score(row)
         team_offense_score = self.calculate_team_offense_score(row)
         
-        # Apply weights
+        # Apply weights with new 2025 projection components
         raw_score = (
             self.weights['projected_2025_pts'] * projected_2025_pts +
             self.weights['weighted_avg_last_2'] * weighted_avg_last_2 +
             self.weights['consistency_score'] * consistency_score +
             self.weights['usage_score'] * usage_score +
-            self.weights['team_offense_score'] * team_offense_score
+            self.weights['team_offense_score'] * team_offense_score +
+            0.15 * tier_score +  # 15% weight for tier
+            0.10 * rank_score    # 10% weight for rank
         )
         
         return raw_score
@@ -400,16 +567,9 @@ class PlayerRanker:
         """Apply penalty adjustments to raw score"""
         adjusted_score = raw_score
         
-        # Special case for Travis Kelce - he should be elite regardless of age
-        player_name = str(row.get('name', ''))
-        if player_name == 'Travis Kelce':
-            # Minimal age penalty for Kelce and boost his score
-            adjusted_score *= 0.95  # Only 5% penalty for age
-            adjusted_score *= 1.2   # 20% boost to ensure he's properly ranked
-        else:
-            # Age penalty for other players
-            age_penalty = self.calculate_age_decline_penalty(row)
-            adjusted_score *= age_penalty
+        # Age penalty for all players
+        age_penalty = self.calculate_age_decline_penalty(row)
+        adjusted_score *= age_penalty
         
         # Rookie penalty (dampen hype for young players with minimal experience)
         age = float(row.get('age', 0))
@@ -424,11 +584,6 @@ class PlayerRanker:
         
         if age <= 23 and games_played < 16:
             adjusted_score *= 0.85  # 15% penalty for rookies/inexperienced young players
-        
-        # Special case: Travis Kelce should always be above Jonnu Smith
-        if player_name == 'Jonnu Smith':
-            # Apply additional penalty to Jonnu Smith to ensure Kelce ranks higher
-            adjusted_score *= 0.8  # 20% additional penalty
         
         # Depth chart penalty (simplified - assume low projected points = not starter)
         projected_pts = float(row.get('projected_2025_pts', 0))
@@ -446,6 +601,70 @@ class PlayerRanker:
             adjusted_score *= 0.7  # 30% penalty for non-starters
         
         return adjusted_score
+    
+    def calculate_tier_score(self, tier: float) -> float:
+        """Calculate tier-based score (lower tier = better score)"""
+        try:
+            tier = float(tier)
+            if tier <= 0:
+                return 0.0
+            
+            # Convert tier to score (lower tier = higher score)
+            # Tier 1 = 100, Tier 2 = 85, Tier 3 = 70, etc.
+            if tier <= 1:
+                return 100.0
+            elif tier <= 2:
+                return 85.0
+            elif tier <= 3:
+                return 70.0
+            elif tier <= 4:
+                return 55.0
+            elif tier <= 5:
+                return 40.0
+            elif tier <= 6:
+                return 25.0
+            elif tier <= 7:
+                return 15.0
+            elif tier <= 8:
+                return 10.0
+            else:
+                return 5.0
+                
+        except Exception as e:
+            logger.warning(f"Error calculating tier score for tier {tier}: {e}")
+            return 0.0
+    
+    def calculate_rank_score(self, rank: float) -> float:
+        """Calculate rank-based score (lower rank = better score)"""
+        try:
+            rank = float(rank)
+            if rank <= 0:
+                return 0.0
+            
+            # Convert rank to score (lower rank = higher score)
+            # Top 10 = 100, Top 25 = 85, Top 50 = 70, etc.
+            if rank <= 10:
+                return 100.0
+            elif rank <= 25:
+                return 85.0
+            elif rank <= 50:
+                return 70.0
+            elif rank <= 75:
+                return 55.0
+            elif rank <= 100:
+                return 40.0
+            elif rank <= 150:
+                return 25.0
+            elif rank <= 200:
+                return 15.0
+            elif rank <= 300:
+                return 10.0
+            else:
+                return 5.0
+                
+        except Exception as e:
+            logger.warning(f"Error calculating rank score for rank {rank}: {e}")
+            return 0.0
     
     def calculate_vorp_baseline(self, df: pd.DataFrame, position: str) -> float:
         """Calculate VORP baseline for a position using rank-based method"""
@@ -489,39 +708,62 @@ class PlayerRanker:
         return df
     
     def assign_tiers(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Assign tiers based on VORP percentiles"""
+        """Assign tiers based on 2025 projections and VORP percentiles"""
         df = df.copy()
         
-        # Calculate tiers for each position
+        # First, use 2025 tier information if available
+        if 'tier_2025' in df.columns:
+            logger.info("Using 2025 tier information for initial tier assignment...")
+            # Convert numeric tier to tier name
+            df['tier'] = df['tier_2025'].apply(self._convert_tier_number_to_name)
+        
+        # Calculate tiers for each position based on VORP for players without 2025 tiers
         for position in ['QB', 'RB', 'WR', 'TE']:
             pos_df = df[df['position'] == position].copy()
             if len(pos_df) == 0:
                 continue
             
-            # Sort by VORP
-            pos_df = pos_df.sort_values('VORP', ascending=False).reset_index(drop=True)
-            
-            # Assign tiers based on percentiles
-            pos_df['tier'] = 'Tier 5'  # Default tier
-            
-            # Assign tiers in correct order (Tier 1 first, then Tier 2, etc.)
-            tier_names = ['Tier 1', 'Tier 2', 'Tier 3', 'Tier 4']
-            for tier_name in tier_names:
-                percentile = self.tier_percentiles[tier_name]
-                if percentile > 0:
-                    cutoff_idx = int(len(pos_df) * percentile)
-                    if cutoff_idx > 0:
-                        pos_df.loc[:cutoff_idx-1, 'tier'] = tier_name
-            
-            # Update main dataframe
-            for idx, row in pos_df.iterrows():
-                original_idx = df[df['position'] == position].iloc[idx].name
-                df.at[original_idx, 'tier'] = row['tier']
+            # For players without 2025 tier info, calculate based on VORP
+            pos_df_no_tier = pos_df[pos_df['tier'] == 'Tier 5'].copy()
+            if len(pos_df_no_tier) > 0:
+                # Sort by VORP
+                pos_df_no_tier = pos_df_no_tier.sort_values('VORP', ascending=False).reset_index(drop=True)
+                
+                # Assign tiers based on percentiles
+                tier_names = ['Tier 1', 'Tier 2', 'Tier 3', 'Tier 4']
+                for tier_name in tier_names:
+                    percentile = self.tier_percentiles[tier_name]
+                    if percentile > 0:
+                        cutoff_idx = int(len(pos_df_no_tier) * percentile)
+                        if cutoff_idx > 0:
+                            pos_df_no_tier.loc[:cutoff_idx-1, 'tier'] = tier_name
+                
+                # Update main dataframe for players without 2025 tiers
+                for idx, row in pos_df_no_tier.iterrows():
+                    original_idx = pos_df_no_tier.index[idx]
+                    df.at[original_idx, 'tier'] = row['tier']
         
         return df
     
+    def _convert_tier_number_to_name(self, tier_num: float) -> str:
+        """Convert numeric tier to tier name"""
+        try:
+            tier_num = float(tier_num)
+            if tier_num <= 1:
+                return 'Tier 1'
+            elif tier_num <= 2:
+                return 'Tier 2'
+            elif tier_num <= 3:
+                return 'Tier 3'
+            elif tier_num <= 4:
+                return 'Tier 4'
+            else:
+                return 'Tier 5'
+        except:
+            return 'Tier 5'
+    
     def generate_player_flags(self, row: pd.Series) -> List[str]:
-        """Generate flags for player"""
+        """Generate flags for player based on 2025 projections and historical data"""
         flags = []
         
         # Rookie flag
@@ -546,6 +788,41 @@ class PlayerRanker:
         # Age risk flag
         if age >= 30:
             flags.append("Age Risk")
+        
+        # 2025 projection flags
+        tier_2025 = float(row.get('tier_2025', 99))
+        rank_2025 = float(row.get('rank_2025', 999))
+        
+        # Elite tier flag
+        if tier_2025 <= 1:
+            flags.append("Elite Tier")
+        
+        # Top 10 rank flag
+        if rank_2025 <= 10:
+            flags.append("Top 10 Rank")
+        
+        # High projection flag
+        if projected_pts > 250:
+            flags.append("High Projection")
+        
+        # Low projection risk flag
+        if projected_pts < 100:
+            flags.append("Low Projection")
+        
+        # Position-specific flags
+        position = str(row.get('position', 'Unknown'))
+        if position == 'QB':
+            pass_yards = float(row.get('projected_pass_yards', 0))
+            if pass_yards > 4000:
+                flags.append("High Volume QB")
+        elif position == 'RB':
+            rush_att = float(row.get('projected_rush_att', 0))
+            if rush_att > 200:
+                flags.append("Workhorse RB")
+        elif position in ['WR', 'TE']:
+            rec = float(row.get('projected_rec', 0))
+            if rec > 80:
+                flags.append("High Volume Receiver")
         
         return flags
     
@@ -621,7 +898,7 @@ class PlayerRanker:
                 output_data.append(player_data)
             
             # Save to file
-            output_file = self.outputs_dir / f"rankings_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            output_file = self.outputs_dir / f"player_rankings.json"
             with open(output_file, 'w') as f:
                 json.dump(output_data, f, indent=2)
             

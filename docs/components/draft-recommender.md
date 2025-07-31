@@ -59,7 +59,7 @@ python scripts/draft_recommender.py --save --output-file my_draft_plan.txt
 - `--top-n`: Number of top VORP players to analyze (default: 50)
 - `--draft-rounds`: Number of draft rounds to consider (default: 15)
 - `--ollama-url`: Ollama API URL (default: uses OLLAMA_HOST env var or 192.168.0.128)
-- `--model`: Ollama model to use (default: gemma3)
+- `--model`: Ollama model to use (default: deepseek-r1)
 - `--save`: Save recommendations to file
 - `--output-file`: Custom output filename (auto-generated if not specified)
 

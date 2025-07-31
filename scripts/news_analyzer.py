@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 # Ollama configuration
 OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'http://localhost:11434')
-OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'gemma3')  # Default model, can be overridden
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'deepseek-r1')  # Default model, can be overridden
 
 def load_nfl_roster() -> set:
     """Load current NFL roster to validate player names"""
@@ -295,7 +295,7 @@ def aggregate_player_features(analyses: List[Dict[str, Any]], nfl_roster: set) -
     
     return player_features
 
-def analyze_headlines(input_file: str = 'news/raw_headlines.json', 
+def analyze_headlines(input_file: str = 'news/final_quality_headlines.json', 
                      output_file: str = 'news/player_features.json') -> None:
     """
     Analyze all headlines and save player features.
@@ -373,7 +373,7 @@ def main():
     logger.info("Starting news analysis pipeline...")
     
     # Check if input file exists
-    if not os.path.exists('news/raw_headlines.json'):
+    if not os.path.exists('news/final_quality_headlines.json'):
         logger.error("No headlines file found. Run news_fetcher.py first.")
         return
     

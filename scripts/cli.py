@@ -518,7 +518,7 @@ class FantasyCLI:
             return False
     
     def run_draft_recommendations(self, top_n: int = 50, draft_rounds: int = 15, 
-                                ollama_url: str = None, model: str = "gemma3", save_output: bool = False):
+                                ollama_url: str = None, model: str = "deepseek-r1", save_output: bool = False):
         """Run draft recommendations using Ollama LLM"""
         self.print_section_header("DRAFT RECOMMENDATIONS WITH AI")
         
@@ -624,8 +624,8 @@ Examples:
     # Draft recommendations options
     parser.add_argument('--ollama-url', type=str, default=None,
                        help='Ollama API URL (default: uses OLLAMA_HOST env var or localhost)')
-    parser.add_argument('--ollama-model', type=str, default='gemma3',
-                       help='Ollama model to use (default: gemma3)')
+    parser.add_argument('--ollama-model', type=str, default='deepseek-r1',
+                       help='Ollama model to use (default: deepseek-r1)')
     parser.add_argument('--draft-rounds', type=int, default=15,
                        help='Number of draft rounds to consider (default: 15)')
     parser.add_argument('--save-recommendations', action='store_true',

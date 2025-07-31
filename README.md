@@ -83,13 +83,13 @@ python scripts/cli.py --draft-recommendations
 
 This requires:
 - Ollama running locally (default: http://127.0.0.1:11434)
-- A compatible model (default: gemma3)
+- A compatible model (default: deepseek-r1)
 
 #### Custom Draft Recommendations
 
 ```bash
 # Use custom Ollama URL and model
-python scripts/cli.py --draft-recommendations --ollama-url http://localhost:11434 --ollama-model llama3
+python scripts/cli.py --draft-recommendations --ollama-url http://localhost:11434 --ollama-model deepseek-r1
 
 # Generate recommendations for top 30 players over 12 rounds
 python scripts/cli.py --draft-recommendations --top 30 --draft-rounds 12
