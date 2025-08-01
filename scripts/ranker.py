@@ -89,6 +89,7 @@ class PlayerRanker:
             # Load main historical data first
             stats_file_general = self.data_dir / "nfl_player_data.csv"
             stats_file_2025 = self.data_dir / "nfl_player_data_2025.csv"
+            players_2025_bye = self.data_dir / "players_2025_positions_bye.csv"
             
             if not stats_file_general.exists():
                 logger.error(f"Main data file not found: {stats_file_general}")
@@ -100,11 +101,29 @@ class PlayerRanker:
             logger.info(f"Historical data columns: {df.columns.tolist()}")
             logger.info(f"Historical data shape: {df.shape}")
             
-            # Load 2025 projections if available
+            # Load 2025 projections with bye weeks if available
             projections_df = None
-            logger.info(f"Checking if {stats_file_2025} exists...")
-            if stats_file_2025.exists():
-                logger.info("Loading 2025 projections...")
+            bye_week_df = None
+            logger.info(f"Checking if {players_2025_bye} exists...")
+            if players_2025_bye.exists():
+                logger.info("Loading 2025 projections with bye weeks...")
+                try:
+                    bye_week_df = pd.read_csv(players_2025_bye)
+                    logger.info(f"Loaded {len(bye_week_df)} projection records from {players_2025_bye.name}")
+                    logger.info(f"Bye week data columns: {bye_week_df.columns.tolist()}")
+                    
+                    # Clean and standardize the bye week data
+                    bye_week_df = self._process_2025_bye_week_data(bye_week_df)
+                    
+                except Exception as e:
+                    logger.error(f"Error loading 2025 bye week data: {e}")
+                    import traceback
+                    logger.error(f"Traceback: {traceback.format_exc()}")
+                    bye_week_df = None
+            
+            # Load original 2025 projections if available (as backup)
+            if not bye_week_df is not None and stats_file_2025.exists():
+                logger.info("Loading original 2025 projections...")
                 try:
                     projections_df = pd.read_csv(stats_file_2025)
                     logger.info(f"Loaded {len(projections_df)} projection records from {stats_file_2025.name}")
@@ -130,9 +149,44 @@ class PlayerRanker:
             if 'position' in df.columns:
                 logger.info(f"Position distribution: {df['position'].value_counts().to_dict()}")
             
-            # Merge with 2025 projections if available
-            if projections_df is not None:
-                logger.info("Merging with 2025 projections...")
+            # Merge with 2025 bye week data if available
+            if bye_week_df is not None:
+                logger.info("Merging with 2025 bye week data...")
+                # Handle duplicate player names in bye week data by keeping the first occurrence
+                bye_week_df_clean = bye_week_df.drop_duplicates(subset=['PLAYER NAME'], keep='first')
+                logger.info(f"Removed {len(bye_week_df) - len(bye_week_df_clean)} duplicate player names from bye week data")
+                
+                # Create a mapping from player_name to 2025 data
+                bye_week_mapping = bye_week_df_clean.set_index('PLAYER NAME').to_dict('index')
+                
+                # Add 2025 data to main dataframe
+                for col in ['BYE WEEK', 'POS', 'TIERS', 'FANTASYPTS']:
+                    df[col] = df['player_name'].map(
+                        lambda x: bye_week_mapping.get(x, {}).get(col, 0)
+                    )
+                
+                # Fill missing values
+                df['BYE WEEK'] = df['BYE WEEK'].fillna('N/A')
+                df['POS'] = df['POS'].fillna('Unknown')
+                df['TIERS'] = df['TIERS'].fillna(99)
+                df['FANTASYPTS'] = df['FANTASYPTS'].fillna(0)
+                
+                # Use 2025 position if available, otherwise keep historical position
+                # Clean up position column to remove rank numbers (e.g., "WR1" -> "WR")
+                df['POS'] = df['POS'].str.replace(r'\d+', '', regex=True)
+                df['position'] = df['POS'].where(df['POS'] != 'Unknown', df['position'])
+                
+                # Convert fantasy points to numeric
+                df['FANTASYPTS'] = pd.to_numeric(df['FANTASYPTS'], errors='coerce').fillna(0)
+                df['projected_2025_pts'] = df['FANTASYPTS']
+                df['tier_2025'] = df['TIERS']
+                df['rank_2025'] = df.index + 1  # Simple rank based on order
+                
+                logger.info(f"Added 2025 bye week data for {len(df[df['BYE WEEK'] != 'N/A'])} players")
+                
+            # Fallback to original projections if no bye week data
+            elif projections_df is not None:
+                logger.info("Merging with original 2025 projections...")
                 # Handle duplicate player names in projections by keeping the first occurrence
                 projections_df_clean = projections_df.drop_duplicates(subset=['name'], keep='first')
                 logger.info(f"Removed {len(projections_df) - len(projections_df_clean)} duplicate player names from projections")
@@ -159,12 +213,16 @@ class PlayerRanker:
                 df['tier_2025'] = df['tier_2025'].fillna(99)
                 df['rank_2025'] = df['rank_2025'].fillna(999)
                 
+                # Add default bye week column
+                df['BYE WEEK'] = 'N/A'
+                
                 logger.info(f"Added 2025 projections for {len(df[df['projected_2025_pts'] > 0])} players")
             else:
                 # If no projections, use current fantasy points as projections
                 df['projected_2025_pts'] = df['fantasy_points']
                 df['tier_2025'] = 99
                 df['rank_2025'] = 999
+                df['BYE WEEK'] = 'N/A'
                 logger.info("No 2025 projections found, using current fantasy points as projections")
             
             # Standardize column names
@@ -226,7 +284,8 @@ class PlayerRanker:
                 'rec_tds': 0,
                 'int': 0,
                 'fumbles': 0,
-                'fumbles_lost': 0
+                'fumbles_lost': 0,
+                'BYE WEEK': 'N/A'
             }
             
             for col, default_val in required_columns.items():
@@ -344,6 +403,35 @@ class PlayerRanker:
             
         except Exception as e:
             logger.error(f"Error processing 2025 projections: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return pd.DataFrame()
+
+    def _process_2025_bye_week_data(self, bye_week_df: pd.DataFrame) -> pd.DataFrame:
+        """Process the 2025 bye week data CSV to standardize format"""
+        try:
+            logger.info("Processing 2025 bye week data...")
+            
+            # Clean up the data
+            bye_week_df = bye_week_df.dropna(subset=['PLAYER NAME'])
+            
+            # Convert bye week to string and handle any non-numeric values
+            bye_week_df['BYE WEEK'] = bye_week_df['BYE WEEK'].astype(str)
+            
+            # Convert tiers to numeric
+            bye_week_df['TIERS'] = pd.to_numeric(bye_week_df['TIERS'], errors='coerce').fillna(99)
+            
+            # Create a fantasy points column based on rank (since there's no explicit fantasy points)
+            # We'll use the rank to estimate fantasy points (higher rank = more points)
+            bye_week_df['FANTASYPTS'] = 300 - (pd.to_numeric(bye_week_df['RK'], errors='coerce').fillna(500) * 0.5)
+            
+            logger.info(f"Processed {len(bye_week_df)} bye week records")
+            logger.info(f"Bye week distribution: {bye_week_df['BYE WEEK'].value_counts().to_dict()}")
+            
+            return bye_week_df
+            
+        except Exception as e:
+            logger.error(f"Error processing 2025 bye week data: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             return pd.DataFrame()
@@ -893,7 +981,8 @@ class PlayerRanker:
                     "injury_risk": "Low",  # Simplified for now
                     "flags": row.get('flags', []),
                     "projected_2025_pts": round(row.get('projected_2025_pts', 0), 1),
-                    "raw_score": round(row.get('raw_score', 0), 2)
+                    "raw_score": round(row.get('raw_score', 0), 2),
+                    "bye_week": str(row.get('BYE WEEK', 'N/A'))
                 }
                 output_data.append(player_data)
             
@@ -921,7 +1010,7 @@ class PlayerRanker:
             print(f"{i:2d}. {row['name']:<20} {row['position']:<2} {row['team']:<3} "
                   f"Score: {row['adjusted_score']:6.1f} VORP: {row['VORP']:5.1f} "
                   f"Tier: {row['tier']:<6} Age: {int(row['age']):2d} "
-                  f"Flags: {row['flags']}")
+                  f"Flags: {row['flags']} Bye: {row['BYE WEEK']}")
     
     def print_vorp_analysis(self, df: pd.DataFrame) -> None:
         """Print VORP analysis by position"""
@@ -944,7 +1033,7 @@ class PlayerRanker:
             top_5 = pos_df.head(5)
             print(f"  Top 5:")
             for _, row in top_5.iterrows():
-                print(f"    {row['name']:<15} VORP: {row['VORP']:5.1f} Score: {row['adjusted_score']:6.1f}")
+                print(f"    {row['name']:<15} VORP: {row['VORP']:5.1f} Score: {row['adjusted_score']:6.1f} Bye: {row['BYE WEEK']}")
 
 def main():
     """Main function to run the ranking system"""
@@ -964,7 +1053,7 @@ def main():
         ranker.export_rankings(rankings_df)
         
         # Print analysis
-        ranker.print_top_rankings(rankings_df, top_n=20)
+        ranker.print_top_rankings(rankings_df, top_n=50)
         ranker.print_vorp_analysis(rankings_df)
         
         # Print position-specific top rankings

@@ -79,7 +79,8 @@ class DraftRecommender:
                 'projected_2025_pts': 0.0,
                 'raw_score': 0.0,
                 'consistency_score': 0.5,
-                'ceiling_potential': 0.5
+                'ceiling_potential': 0.5,
+                'bye_week': 'N/A'
             }
             
             for col, default_val in required_columns.items():
@@ -117,10 +118,10 @@ class DraftRecommender:
             logger.error(f"Error getting top VORP players: {e}")
             raise
     
-    def create_draft_analysis_prompt(self, top_players: pd.DataFrame, draft_rounds: int = 15) -> str:
-        """Create a comprehensive prompt for draft analysis"""
+    def create_comprehensive_draft_plan(self, top_players: pd.DataFrame, pick_position: int = 1, league_size: int = 8) -> str:
+        """Create a streamlined draft plan with 5 picks per round focusing on VORP and bye weeks"""
         
-        # Create player data for the prompt
+        # Create simplified player data for the prompt
         player_data = []
         for _, player in top_players.iterrows():
             player_info = {
@@ -128,93 +129,285 @@ class DraftRecommender:
                 'position': player['position'],
                 'team': player['team'],
                 'vorp_score': round(player['vorp_score'], 2),
-                'total_score': round(player['total_score'], 1),
-                'tier': player['tier'],
-                'position_rank': int(player['position_rank']),
-                'consistency': round(player.get('consistency_score', 0.5), 2),
-                'ceiling': round(player.get('ceiling_potential', 0.5), 2),
-                'age': int(player.get('age', 0)),
-                'projected_2025_pts': round(player.get('projected_2025_pts', 0), 1),
-                'flags': player.get('flags', [])
+                'bye_week': str(player.get('bye_week', 'N/A'))
             }
             player_data.append(player_info)
+
+        # Calculate snake draft picks
+        snake_picks = self._calculate_snake_picks(pick_position, league_size)
         
-        # Create position scarcity analysis
-        position_counts = top_players['position'].value_counts()
-        scarcity_analysis = {}
-        for pos in ['QB', 'RB', 'WR', 'TE']:
-            count = position_counts.get(pos, 0)
-            if count <= 3:
-                scarcity = "HIGH - Very few elite options"
-            elif count <= 6:
-                scarcity = "MEDIUM - Some good options available"
-            else:
-                scarcity = "LOW - Many good options available"
-            scarcity_analysis[pos] = scarcity
+        prompt = f"""Create a realistic fantasy football draft strategy for an 8-team league, drafting from position {pick_position}.
 
-        league_size = 7
-        draft_pick = 4
-        
-        prompt = f"""
-        you are an expert fantasy‑football draft strategist.
+Available Players: {json.dumps(player_data, indent=2)}
 
-        ### draft context
-        - league size: {league_size} teams, snake draft
-        - your draft position: {draft_pick} (use this to keep recommendations realistic)
-        - rounds to plan: {draft_rounds}
-        - roster: 1 QB, 2 RB, 2 WR, 1 TE, 1 FLEX
-        - scoring: full‑PPR
-        - objective: maximize total team VORP while balancing positional scarcity and risk.
+Draft Philosophy:
+- Build a BALANCED roster, not just chase the highest VORP scores
+- Consider positional scarcity and replacement level differences
+- Maintain bye week diversity to avoid roster management nightmares
+- Adapt to realistic draft flow - don't assume your targets will always be available
+- Balance floor vs ceiling based on draft position and league competitiveness
 
-        ### data you have
-        **position scarcity analysis**
-        {json.dumps(scarcity_analysis, indent=2)}
+Roster Construction Guidelines:
+- Early rounds (1-3): Focus on weekly starters with high floors
+- Mid rounds (4-6): Mix of reliable starters and high-upside plays
+- Late rounds (7-8): Handcuffs, lottery tickets, and bye week fill-ins
+- Target roster: 2 RB, 3 WR, 1 QB, 1 TE, 1 K, 1 DST (adjust based on league settings)
 
-        **top players by VORP**
-        {json.dumps(player_data, indent=2)}
+For each round, provide:
+1. PRIMARY TARGET: Your ideal pick if available
+2. PIVOT OPTIONS: 3-4 realistic alternatives if your target is gone
+3. STRATEGY NOTE: Brief explanation of round strategy and positional priorities
 
-        ### deliverables
-        1. **round‑by‑round plan for the first 3 rounds** (two fallback options per pick):
-        - show “primary target” + “fallback if gone”
-        - explain *why* (VORP edge, scarcity, risk, team construction).
-        2. **call out positional drop‑offs** (e.g., “after TE2 there’s a 6‑point VORP cliff”).
-        3. **best available board for rounds 4‑6**:
-        - list 15 players with short reasoning + ADP range to prove they’re gettable.
-        4. **draft strategy cheatsheet** at the end:
-        - bullet points on roster balance, when to pivot, bye‑week awareness, etc.
+Format each player as: "Player Name - Position - Team (VORP: X.X | Bye: Week Y | Floor/Ceiling Assessment)"
 
-        ### response format
-        ## round 1‑3 draft roadmap
+Consider these realistic scenarios:
+- Other drafters may reach for popular players
+- Position runs can happen unexpectedly
+- Value can shift dramatically based on who's already been picked
+- Sometimes the "wrong" pick is the right pick for roster construction
 
-        ### round 1 (pick {draft_pick})
-        **primary:** <name> – <pos> – <team> (VORP X | ADP Y)
-        - why & scarcity
+## FLEXIBLE DRAFT STRATEGY - Position {pick_position}
 
-        **fallbacks if primary gone:**
-        1. <name> – <pos> – VORP / ADP – 1‑sentence reason
-        2. <name> – <pos> – VORP / ADP – 1‑sentence reason
+**ROUND 1 (Pick {snake_picks[0]}) - Secure Your Foundation**
+Primary Target: 
+Pivot Options:
+1.
+2.
+3.
+4.
+Strategy Note: 
 
-        ### round 2
-        <same structure>
+**ROUND 2 (Pick {snake_picks[1]}) - Complement Round 1**
+Primary Target:
+Pivot Options:
+1.
+2.
+3.
+4.
+Strategy Note:
 
-        ### round 3
-        <same structure>
+**ROUND 3 (Pick {snake_picks[2]}) - Address Positional Need**
+Primary Target:
+Pivot Options:
+1.
+2.
+3.
+4.
+Strategy Note:
 
-        ## best available (rounds 4‑6)
-        | rank | player | pos | team | VORP | ADP | note |
-        |------|--------|-----|------|------|-----|------|
-        | 1    | …      |     |      |      |     |      |
-        … (15 rows)
+**ROUND 4 (Pick {snake_picks[3]}) - Value vs Need Balance**
+Primary Target:
+Pivot Options:
+1.
+2.
+3.
+4.
+Strategy Note:
 
-        ## draft strategy cheatsheet
-        - ♦ key scarcity points
-        - ♦ when to grab QB if you passed early
-        - ♦ injury volatility considerations
-        - ♦ bye‑week stacking tips
-        """
+**ROUND 5 (Pick {snake_picks[4]}) - Starter or Upside Play**
+Primary Target:
+Pivot Options:
+1.
+2.
+3.
+4.
+Strategy Note:
 
-        
+**ROUND 6 (Pick {snake_picks[5]}) - Fill Remaining Starters**
+Primary Target:
+Pivot Options:
+1.
+2.
+3.
+4.
+Strategy Note:
+
+**ROUND 7 (Pick {snake_picks[6]}) - Depth and Lottery Tickets**
+Primary Target:
+Pivot Options:
+1.
+2.
+3.
+4.
+Strategy Note:
+
+**ROUND 8 (Pick {snake_picks[7]}) - Final Roster Spot**
+Primary Target:
+Pivot Options:
+1.
+2.
+3.
+4.
+Strategy Note:
+
+**POST-DRAFT ROSTER CONSTRUCTION CHECK:**
+- Do you have 2+ startable RBs?
+- Do you have 3+ startable WRs?
+- Are your bye weeks reasonably spread out?
+- Do you have at least 2 high-ceiling players?
+- Do you have handcuffs for your top RBs if available?
+
+Remember: The best draft is the one that builds a complete, balanced roster - not the one that looks best on paper immediately after the draft."""
+
         return prompt
+
+    def _calculate_snake_picks(self, pick_position: int, league_size: int) -> List[int]:
+        """Calculate all picks for a given draft position in snake draft"""
+        picks = []
+        for round_num in range(1, 16):  # 15 rounds
+            if round_num % 2 == 1:  # Odd rounds (1, 3, 5, etc.)
+                pick = pick_position
+            else:  # Even rounds (2, 4, 6, etc.)
+                pick = league_size - pick_position + 1
+            
+            picks.append(pick)
+        return picks
+
+    def generate_comprehensive_draft_plan(self, top_n: int = 50, pick_position: int = 1, league_size: int = 8) -> str:
+        """Generate comprehensive draft plan for 8-team league"""
+        try:
+            logger.info(f"Generating comprehensive draft plan for {league_size}-team league, pick position {pick_position}...")
+            
+            # Load ranking data
+            df = self.load_ranking_data()
+            
+            # Get top VORP players
+            top_players = self.get_top_vorp_players(df, top_n)
+            
+            # Print summary of players being analyzed
+            self.print_player_summary(top_players)
+            
+            # Create comprehensive analysis prompt
+            prompt = self.create_comprehensive_draft_plan(top_players, pick_position, league_size)
+            
+            # Get LLM analysis
+            logger.info("Requesting comprehensive draft analysis from Ollama...")
+            recommendations = self.query_ollama(prompt)
+            
+            # Check if Ollama failed and provide fallback
+            if recommendations.startswith("Error:"):
+                logger.warning("Ollama connection failed, generating fallback recommendations...")
+                recommendations = self.generate_fallback_comprehensive_plan(top_players, pick_position, league_size)
+            
+            return recommendations
+            
+        except Exception as e:
+            logger.error(f"Error generating comprehensive draft plan: {e}")
+            return f"Error generating draft plan: {str(e)}"
+
+    def generate_fallback_comprehensive_plan(self, top_players: pd.DataFrame, pick_position: int, league_size: int) -> str:
+        """Generate fallback comprehensive draft plan when Ollama is not available"""
+        try:
+            snake_picks = self._calculate_snake_picks(pick_position, league_size)
+            
+            recommendations = []
+            recommendations.append("## COMPREHENSIVE DRAFT PLAN - 8-TEAM LEAGUE")
+            recommendations.append(f"**Draft Position:** {pick_position} | **Your Picks:** {snake_picks}")
+            recommendations.append("(Generated without LLM analysis - Ollama unavailable)")
+            recommendations.append("")
+            
+            # Round-by-round strategy
+            recommendations.append("### ROUND-BY-ROUND STRATEGY")
+            recommendations.append("")
+            
+            # Group players by position for easier analysis
+            qbs = top_players[top_players['position'] == 'QB'].head(8)
+            rbs = top_players[top_players['position'] == 'RB'].head(16)
+            wrs = top_players[top_players['position'] == 'WR'].head(20)
+            tes = top_players[top_players['position'] == 'TE'].head(6)
+            
+            # Round 1-3 recommendations
+            for round_num in [1, 2, 3]:
+                recommendations.append(f"**ROUND {round_num} (Pick {snake_picks[round_num-1]})**")
+                
+                if round_num == 1:
+                    # First round - prioritize highest VORP
+                    primary = top_players.iloc[0]
+                    fallback1 = top_players.iloc[1]
+                    fallback2 = top_players.iloc[2]
+                elif round_num == 2:
+                    # Second round - consider position scarcity
+                    primary = top_players.iloc[3]
+                    fallback1 = top_players.iloc[4]
+                    fallback2 = top_players.iloc[5]
+                else:
+                    # Third round - balance position needs
+                    primary = top_players.iloc[6]
+                    fallback1 = top_players.iloc[7]
+                    fallback2 = top_players.iloc[8]
+                
+                recommendations.append(f"**Primary Target:** {primary['name']} - {primary['position']} - {primary['team']}")
+                recommendations.append(f"  - VORP: {primary['vorp_score']:.1f} | Bye: Week {primary.get('bye_week', 'N/A')}")
+                recommendations.append(f"  - Reasoning: Best available VORP value")
+                recommendations.append("")
+                
+                recommendations.append("**Fallback Options:**")
+                recommendations.append(f"1. {fallback1['name']} - {fallback1['position']} - {fallback1['team']} (VORP: {fallback1['vorp_score']:.1f} | Bye: {fallback1.get('bye_week', 'N/A')})")
+                recommendations.append(f"2. {fallback2['name']} - {fallback2['position']} - {fallback2['team']} (VORP: {fallback2['vorp_score']:.1f} | Bye: {fallback2.get('bye_week', 'N/A')})")
+                recommendations.append("")
+            
+            # Positional strategy
+            recommendations.append("### POSITIONAL STRATEGY")
+            recommendations.append("")
+            recommendations.append("**QB Strategy:** In 8-team leagues, QB depth is plentiful. Target QB in rounds 6-8 unless elite QB falls.")
+            recommendations.append("**RB Strategy:** RB scarcity is real. Target RB1 in first 2 rounds, RB2 by round 4.")
+            recommendations.append("**WR Strategy:** WR depth allows patience. Target WR1 in rounds 1-3, WR2 in rounds 4-6.")
+            recommendations.append("**TE Strategy:** Steep drop-off after top 3-4 TEs. Target TE1 in rounds 3-5.")
+            recommendations.append("")
+            
+            # Bye week management
+            recommendations.append("### BYE WEEK MANAGEMENT")
+            recommendations.append("")
+            recommendations.append("**Bye Week Conflicts to Monitor:**")
+            bye_weeks = top_players['bye_week'].value_counts()
+            for bye_week, count in bye_weeks.head(5).items():
+                if bye_week != 'N/A' and count > 2:
+                    recommendations.append(f"- Week {bye_week}: {count} top players")
+            recommendations.append("")
+            recommendations.append("**Strategy:** Avoid having more than 2 starters with same bye week")
+            recommendations.append("")
+            
+            # Draft board analysis
+            recommendations.append("### DRAFT BOARD ANALYSIS")
+            recommendations.append("")
+            recommendations.append("**Players Likely Available at Your Picks:**")
+            for round_num in range(1, 9):
+                pick_num = snake_picks[round_num-1]
+                # Estimate which players might be available
+                start_idx = (round_num - 1) * 8
+                end_idx = start_idx + 8
+                available_players = top_players.iloc[start_idx:end_idx]
+                
+                recommendations.append(f"**Round {round_num} (Pick {pick_num}):**")
+                for _, player in available_players.head(3).iterrows():
+                    recommendations.append(f"  - {player['name']} ({player['position']}) - VORP: {player['vorp_score']:.1f} | Bye: {player.get('bye_week', 'N/A')}")
+                recommendations.append("")
+            
+            # Contingency plans
+            recommendations.append("### CONTINGENCY PLANS")
+            recommendations.append("")
+            recommendations.append("**If RB Run Happens Early:** Pivot to WR-heavy strategy, target RB2 in rounds 4-6")
+            recommendations.append("**If WR Run Happens Early:** Double up on RBs early, target WR2 in rounds 5-7")
+            recommendations.append("**If TE Run Happens Early:** Take TE1 earlier than planned, adjust other positions")
+            recommendations.append("**End-Game Strategy:** Target high-upside players and handcuffs in final rounds")
+            recommendations.append("")
+            
+            # Draft cheatsheet
+            recommendations.append("### DRAFT CHEATSHEET")
+            recommendations.append("")
+            recommendations.append("- ♦ RB scarcity is critical - don't wait too long for RB2")
+            recommendations.append("- ♦ WR depth allows for patience in middle rounds")
+            recommendations.append("- ♦ QB can wait until rounds 6-8 in 8-team leagues")
+            recommendations.append("- ♦ TE has steep drop-off after top 3-4 options")
+            recommendations.append("- ♦ Monitor bye weeks to avoid conflicts")
+            recommendations.append("- ♦ In 8-team leagues, focus on upside over floor")
+            recommendations.append("- ♦ Don't reach for positions - let value come to you")
+            
+            return "\n".join(recommendations)
+            
+        except Exception as e:
+            logger.error(f"Error generating fallback comprehensive plan: {e}")
+            return "Error generating fallback comprehensive plan"
     
     def query_ollama(self, prompt: str) -> str:
         """Send prompt to Ollama and get response"""
@@ -230,7 +423,7 @@ class DraftRecommender:
             }
             
             logger.info(f"Sending draft analysis request to Ollama ({self.model})...")
-            response = requests.post(f"{self.ollama_url}/api/generate", json=payload, timeout=120)
+            response = requests.post(f"{self.ollama_url}/api/generate", json=payload, timeout=60)
             
             if response.status_code == 200:
                 result = response.json()
@@ -301,102 +494,6 @@ class DraftRecommender:
         for tier, count in tier_counts.items():
             print(f"   {tier}: {count} players")
     
-    def generate_draft_recommendations(self, top_n: int = 50, draft_rounds: int = 15) -> str:
-        """Generate comprehensive draft recommendations"""
-        try:
-            logger.info("Starting draft recommendation generation...")
-            
-            # Load ranking data
-            df = self.load_ranking_data()
-            
-            # Get top VORP players
-            top_players = self.get_top_vorp_players(df, top_n)
-            
-            # Print summary of players being analyzed
-            self.print_player_summary(top_players)
-            
-            # Create analysis prompt
-            prompt = self.create_draft_analysis_prompt(top_players, draft_rounds)
-            
-            # Get LLM analysis
-            logger.info("Requesting draft analysis from Ollama...")
-            recommendations = self.query_ollama(prompt)
-            
-            # Check if Ollama failed and provide fallback
-            if recommendations.startswith("Error:"):
-                logger.warning("Ollama connection failed, generating fallback recommendations...")
-                recommendations = self.generate_fallback_recommendations(top_players, draft_rounds)
-            
-            return recommendations
-            
-        except Exception as e:
-            logger.error(f"Error generating draft recommendations: {e}")
-            return f"Error generating recommendations: {str(e)}"
-    
-    def generate_fallback_recommendations(self, top_players: pd.DataFrame, draft_rounds: int = 15) -> str:
-        """Generate fallback recommendations when Ollama is not available"""
-        try:
-            recommendations = []
-            recommendations.append("## FALLBACK DRAFT RECOMMENDATIONS")
-            recommendations.append("(Generated without LLM analysis - Ollama unavailable)")
-            recommendations.append("")
-            
-            # Round 1-3 recommendations based on VORP
-            recommendations.append("## ROUND 1-3 DRAFT ROADMAP")
-            recommendations.append("")
-            
-            # Get top players by position for each round
-            for round_num in [1, 2, 3]:
-                recommendations.append(f"### ROUND {round_num}")
-                
-                # Get best available players for this round
-                if round_num == 1:
-                    # Top 3 VORP players
-                    round_players = top_players.head(3)
-                elif round_num == 2:
-                    # Next 3 VORP players
-                    round_players = top_players.iloc[3:6]
-                else:
-                    # Next 3 VORP players
-                    round_players = top_players.iloc[6:9]
-                
-                for i, (_, player) in enumerate(round_players.iterrows(), 1):
-                    recommendations.append(f"**Option {i}:** {player['name']} - {player['position']} - {player['team']}")
-                    recommendations.append(f"  - VORP: {player['vorp_score']:.1f} | Score: {player['total_score']:.1f}")
-                    recommendations.append(f"  - Tier: {player['tier']} | Age: {int(player['age'])}")
-                    if player.get('flags'):
-                        recommendations.append(f"  - Flags: {', '.join(player['flags'])}")
-                    recommendations.append("")
-            
-            # Best available board
-            recommendations.append("## BEST AVAILABLE (ROUNDS 4-6)")
-            recommendations.append("| Rank | Player | Pos | Team | VORP | Score | Tier |")
-            recommendations.append("|------|--------|-----|------|------|-------|------|")
-            
-            # Show next 15 players
-            for i, (_, player) in enumerate(top_players.iloc[9:24].iterrows(), 1):
-                recommendations.append(f"| {i} | {player['name']} | {player['position']} | {player['team']} | "
-                                    f"{player['vorp_score']:.1f} | {player['total_score']:.1f} | {player['tier']} |")
-            
-            recommendations.append("")
-            
-            # Strategy tips
-            recommendations.append("## DRAFT STRATEGY TIPS")
-            recommendations.append("- ♦ Prioritize VORP over ADP - higher VORP = better value")
-            recommendations.append("- ♦ RB scarcity is real - don't wait too long for RB2")
-            recommendations.append("- ♦ WR depth allows for patience in middle rounds")
-            recommendations.append("- ♦ QB can wait until rounds 6-8 in most cases")
-            recommendations.append("- ♦ TE has steep drop-off after top 3-4 options")
-            recommendations.append("- ♦ Consider age and injury risk for older players")
-            recommendations.append("- ♦ Rookies have upside but also risk")
-            recommendations.append("- ♦ Monitor bye weeks to avoid conflicts")
-            
-            return "\n".join(recommendations)
-            
-        except Exception as e:
-            logger.error(f"Error generating fallback recommendations: {e}")
-            return "Error generating fallback recommendations"
-    
     def save_recommendations(self, recommendations: str, filename: str = None) -> None:
         """Save recommendations to file"""
         try:
@@ -422,8 +519,10 @@ def main():
     parser = argparse.ArgumentParser(description='NFL Fantasy Draft Recommendation System')
     parser.add_argument('--top-n', type=int, default=50,
                        help='Number of top VORP players to analyze (default: 50)')
-    parser.add_argument('--draft-rounds', type=int, default=15,
-                       help='Number of draft rounds to consider (default: 15)')
+    parser.add_argument('--pick-position', type=int, default=1,
+                       help='Your draft position (1-8 for 8-team league, default: 1)')
+    parser.add_argument('--league-size', type=int, default=8,
+                       help='Number of teams in league (default: 8)')
     parser.add_argument('--ollama-url', type=str, default=None,
                        help='Ollama API URL (default: uses OLLAMA_HOST env var or 127.0.0.1)')
     parser.add_argument('--model', type=str, default='deepseek-r1',
@@ -432,6 +531,8 @@ def main():
                        help='Save recommendations to file')
     parser.add_argument('--output-file', type=str, default=None,
                        help='Output filename (default: auto-generated)')
+    parser.add_argument('--print-prompt', action='store_true',
+                       help='Print only the prompt and exit (for copy/paste)')
     
     args = parser.parse_args()
     
@@ -442,10 +543,28 @@ def main():
             model=args.model
         )
         
+        # If --print-prompt is specified, just print the prompt and exit
+        if args.print_prompt:
+            # Load ranking data
+            df = recommender.load_ranking_data()
+            
+            # Get top VORP players
+            top_players = recommender.get_top_vorp_players(df, args.top_n)
+            
+            # Create and print the prompt
+            prompt = recommender.create_comprehensive_draft_plan(top_players, args.pick_position, args.league_size)
+            print("="*80)
+            print("📝 DRAFT RECOMMENDER PROMPT")
+            print("="*80)
+            print(prompt)
+            print("="*80)
+            return
+        
         # Generate recommendations
-        recommendations = recommender.generate_draft_recommendations(
+        recommendations = recommender.generate_comprehensive_draft_plan(
             top_n=args.top_n,
-            draft_rounds=args.draft_rounds
+            pick_position=args.pick_position,
+            league_size=args.league_size
         )
         
         # Print recommendations
