@@ -13,6 +13,7 @@ import time
 from typing import Dict, List, Optional
 import logging
 from pathlib import Path
+from datetime import datetime
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -25,6 +26,11 @@ class FantasyDataIngester:
         # Create data directory if it doesn't exist
         self.data_dir = Path("data")
         self.data_dir.mkdir(exist_ok=True)
+
+    def default_historical_years(self, lookback: int = 3) -> List[int]:
+        """Return the most recent completed NFL seasons for historical analysis."""
+        last_completed_season = datetime.now().year - 1
+        return list(range(last_completed_season - lookback + 1, last_completed_season + 1))
         
     def get_seasonal_data(self, years: List[int] = [2023]) -> pd.DataFrame:
         """
@@ -33,19 +39,25 @@ class FantasyDataIngester:
         """
         logger.info(f"Fetching seasonal data for years: {years}")
         
-        try:
-            # Get seasonal data with all available columns
-            df = nfl.import_seasonal_data(years=years, s_type='REG')
-            
-            # Clean up the data
-            df = self._clean_seasonal_data(df)
-            
-            logger.info(f"Successfully fetched {len(df)} player records from seasonal data")
-            return df
-            
-        except Exception as e:
-            logger.error(f"Error fetching seasonal data: {e}")
+        frames = []
+        for year in years:
+            try:
+                df = nfl.import_seasonal_data(years=[year], s_type='REG')
+                if not df.empty:
+                    frames.append(df)
+                    logger.info(f"Fetched {len(df)} seasonal records for {year}")
+            except Exception as e:
+                logger.warning(f"Skipping seasonal data for {year}: {e}")
+
+        if not frames:
+            logger.error("No seasonal data could be fetched")
             return pd.DataFrame()
+
+        df = pd.concat(frames, ignore_index=True)
+        df = self._clean_seasonal_data(df)
+
+        logger.info(f"Successfully fetched {len(df)} player records from seasonal data")
+        return df
     
     def get_weekly_data(self, years: List[int] = [2023]) -> pd.DataFrame:
         """
@@ -54,19 +66,25 @@ class FantasyDataIngester:
         """
         logger.info(f"Fetching weekly data for years: {years}")
         
-        try:
-            # Get weekly data
-            df = nfl.import_weekly_data(years=years, downcast=True)
-            
-            # Clean up the data
-            df = self._clean_weekly_data(df)
-            
-            logger.info(f"Successfully fetched {len(df)} weekly records")
-            return df
-            
-        except Exception as e:
-            logger.error(f"Error fetching weekly data: {e}")
+        frames = []
+        for year in years:
+            try:
+                df = nfl.import_weekly_data(years=[year], downcast=True)
+                if not df.empty:
+                    frames.append(df)
+                    logger.info(f"Fetched {len(df)} weekly records for {year}")
+            except Exception as e:
+                logger.warning(f"Skipping weekly data for {year}: {e}")
+
+        if not frames:
+            logger.error("No weekly data could be fetched")
             return pd.DataFrame()
+
+        df = pd.concat(frames, ignore_index=True)
+        df = self._clean_weekly_data(df)
+
+        logger.info(f"Successfully fetched {len(df)} weekly records")
+        return df
     
     def get_roster_data(self, years: List[int] = [2023]) -> pd.DataFrame:
         """
@@ -75,19 +93,25 @@ class FantasyDataIngester:
         """
         logger.info(f"Fetching roster data for years: {years}")
         
-        try:
-            # Get seasonal roster data
-            df = nfl.import_seasonal_rosters(years=years)
-            
-            # Clean up the data
-            df = self._clean_roster_data(df)
-            
-            logger.info(f"Successfully fetched {len(df)} roster records")
-            return df
-            
-        except Exception as e:
-            logger.error(f"Error fetching roster data: {e}")
+        frames = []
+        for year in years:
+            try:
+                df = nfl.import_seasonal_rosters(years=[year])
+                if not df.empty:
+                    frames.append(df)
+                    logger.info(f"Fetched {len(df)} roster records for {year}")
+            except Exception as e:
+                logger.warning(f"Skipping roster data for {year}: {e}")
+
+        if not frames:
+            logger.error("No roster data could be fetched")
             return pd.DataFrame()
+
+        df = pd.concat(frames, ignore_index=True)
+        df = self._clean_roster_data(df)
+
+        logger.info(f"Successfully fetched {len(df)} roster records")
+        return df
     
     def get_combine_data(self, years: List[int] = [2020, 2021, 2022, 2023, 2024]) -> pd.DataFrame:
         """
@@ -386,10 +410,13 @@ class FantasyDataIngester:
         
         logger.info(f"Summary saved to {summary_path}")
     
-    def get_fantasy_data(self, years: List[int] = [2022, 2023, 2024]) -> pd.DataFrame:
+    def get_fantasy_data(self, years: Optional[List[int]] = None) -> pd.DataFrame:
         """
         Main function to get fantasy data from nfl_data_py.
         """
+        if years is None:
+            years = self.default_historical_years()
+
         logger.info("Starting fantasy data ingestion from nfl_data_py...")
         
         # Fetch data from all sources
@@ -412,8 +439,8 @@ def main():
     ingester = FantasyDataIngester()
     
     try:
-        # Get data for the last 3 seasons (2022, 2023, 2024)
-        df = ingester.get_fantasy_data(years=[2022, 2023, 2024])
+        # Get data for the most recent completed seasons.
+        df = ingester.get_fantasy_data()
         
         if not df.empty:
             print(f"\n✅ Successfully ingested {len(df)} players")

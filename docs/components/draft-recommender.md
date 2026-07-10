@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `draft_recommender.py` script uses Ollama LLM to analyze top VORP-ranked players and provide strategic draft pick recommendations. It combines the ranking data with AI analysis to suggest optimal pick ordering based on position scarcity, team needs, and strategic considerations.
+The `draft_recommender.py` script uses OpenRouter models to analyze top VORP-ranked players and provide strategic draft pick recommendations. It combines the ranking data with AI analysis to suggest optimal pick ordering based on position scarcity, team needs, and strategic considerations.
 
 ## Features
 
@@ -15,8 +15,8 @@ The `draft_recommender.py` script uses Ollama LLM to analyze top VORP-ranked pla
 
 ## Prerequisites
 
-1. **Ollama Installation**: Must have Ollama running locally with a model installed
-2. **Ranking Data**: Must have run the ranker script first to generate player rankings
+1. **OpenRouter API Key**: Set `OPENROUTER_API_KEY` in your environment or `.env`
+2. **Ranking Data**: Run the ranker first so `outputs/player_rankings.json` exists
 3. **Python Dependencies**: Same as other scripts (pandas, requests, etc.)
 
 ## Usage
@@ -30,22 +30,19 @@ python scripts/draft_recommender.py
 # Analyze top 30 players instead of 50
 python scripts/draft_recommender.py --top-n 30
 
-# Consider 12-round draft instead of 15
-python scripts/draft_recommender.py --draft-rounds 12
+# Verify OpenRouter connectivity from the main CLI
+python scripts/cli.py --openrouter-smoke-test
 ```
 
 ### Advanced Options
 
 ```bash
-# Use a different Ollama model
-python scripts/draft_recommender.py --model deepseek-r1:14b
+# Use a different OpenRouter model
+python scripts/draft_recommender.py --model deepseek/deepseek-v4-flash
 
-# Connect to remote Ollama instance
-python scripts/draft_recommender.py --ollama-url http://192.168.0.128:11434
-
-# Or set environment variable
-export OLLAMA_HOST=192.168.0.128
-python scripts/draft_recommender.py
+# Or set environment variables
+export OPENROUTER_API_KEY=your-api-key
+export OPENROUTER_MODEL=deepseek/deepseek-v4-flash
 
 # Save recommendations to file
 python scripts/draft_recommender.py --save
@@ -57,9 +54,10 @@ python scripts/draft_recommender.py --save --output-file my_draft_plan.txt
 ### Command Line Arguments
 
 - `--top-n`: Number of top VORP players to analyze (default: 50)
-- `--draft-rounds`: Number of draft rounds to consider (default: 15)
-- `--ollama-url`: Ollama API URL (default: uses OLLAMA_HOST env var or 192.168.0.128)
-- `--model`: Ollama model to use (default: deepseek-r1)
+- `--pick-position`: Your snake draft position (default: 1)
+- `--league-size`: Number of teams in the league (default: 8)
+- `--model`: OpenRouter model slug (default: `OPENROUTER_MODEL` or `openai/gpt-4o-mini`)
+- `--allow-stale-rankings`: Allow stale rankings for inspection only
 - `--save`: Save recommendations to file
 - `--output-file`: Custom output filename (auto-generated if not specified)
 
@@ -137,8 +135,8 @@ This script is designed to work with the complete NFL Fantasy Draft Forecast sys
 
 ## Troubleshooting
 
-- **Ollama Connection Issues**: Ensure Ollama is running and accessible at the specified URL
-- **Model Not Found**: Verify the specified model is installed in Ollama (`ollama list`)
+- **OpenRouter Connection Issues**: Run `python scripts/cli.py --openrouter-smoke-test`
+- **Model Not Found**: Verify the OpenRouter model slug in `OPENROUTER_MODEL` or `--model`
 - **No Ranking Data**: Run the ranker script first to generate required data files
 - **Timeout Errors**: Increase timeout or use a faster model for quicker responses
 - **Response Formatting**: The script automatically filters out `<think>` sections from reasoning models

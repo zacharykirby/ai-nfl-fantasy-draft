@@ -17,7 +17,7 @@ A comprehensive fantasy football draft assistant that combines player statistics
   - [x] Set up Python virtual environment (`python -m venv venv`)
   - [x] Install dependencies:
     ```bash
-    pip install pandas feedparser requests ollama python-dotenv
+    pip install pandas feedparser requests openrouter python-dotenv
     ```
 
 ---
@@ -75,7 +75,7 @@ A comprehensive fantasy football draft assistant that combines player statistics
 - Error handling for malformed feeds
 - Headline filtering by age
 - Structured JSON output with metadata
-- Ollama-powered headline analysis with your custom prompt
+- OpenRouter-powered headline analysis with your custom prompt
 - Player feature extraction and aggregation
 - Support for multiple players per headline
 - Comprehensive testing suite
@@ -84,12 +84,12 @@ A comprehensive fantasy football draft assistant that combines player statistics
 
 ## 🧠 Phase 3: News Feature Extraction ✅
 **File:** `scripts/news_analyzer.py`  
-**Goal:** Convert headlines into useful features using Ollama
+**Goal:** Convert headlines into useful features using OpenRouter
 
 ### Tasks:
 - [x] **Process Headlines**
   - [x] Loop through each headline in `raw_headlines.json`
-  - [x] Send to Ollama with custom prompt for fantasy football analysis
+  - [x] Send to OpenRouter with custom prompt for fantasy football analysis
   - [x] Parse model response into dict with comprehensive features
 
 - [x] **Aggregate Features**
@@ -102,7 +102,7 @@ A comprehensive fantasy football draft assistant that combines player statistics
   - [x] Write to `news/player_features.json`
 
 ### ✅ Completed Features:
-- Ollama integration with deepseek-r1:14b model
+- OpenRouter integration with deepseek/deepseek-v4-flash model
 - Custom prompt for fantasy football headline analysis
 - JSON response parsing with error handling
 - Support for multiple players per headline

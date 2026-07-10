@@ -5,7 +5,7 @@ Phase 5: VORP-Based Ranking System
 
 This module creates comprehensive player rankings using:
 - 2022-2024 historical data with proper weighting
-- 2025 projections as primary input
+- target-season projections as primary input
 - Age-based decline penalties
 - Position-specific VORP calculations
 - Consistency and usage metrics
@@ -28,15 +28,20 @@ logger = logging.getLogger(__name__)
 class PlayerRanker:
     """Comprehensive VORP-based player ranking system for fantasy football"""
     
-    def __init__(self, data_dir: str = "data", outputs_dir: str = "outputs", max_players: int = 200):
+    def __init__(self, data_dir: str = "data", outputs_dir: str = "outputs", news_dir: str = "news",
+                 max_players: int = 500, target_season: int = None):
         self.data_dir = Path(data_dir)
         self.outputs_dir = Path(outputs_dir)
+        self.news_dir = Path(news_dir)
         self.max_players = max_players
+        self.target_season = target_season or datetime.now().year
+        self.projection_source = "unknown"
+        self.news_source = "none"
         self.outputs_dir.mkdir(exist_ok=True)
         
         # Core scoring weights for raw_score calculation
         self.weights = {
-            'projected_2025_pts': 0.40,      # 2025 projections (primary)
+            'projected_fantasy_points': 0.40,      # target-season projections (primary)
             'weighted_avg_last_2': 0.25,     # Weighted average of last 2 seasons
             'consistency_score': 0.15,       # Performance consistency
             'usage_score': 0.10,             # Snap share and touches/routes
@@ -81,6 +86,19 @@ class PlayerRanker:
             'Tier 4': 0.25,  # Top 75%
             'Tier 5': 0.00   # All others
         }
+
+        # Explicit feature columns used to build raw_score. Keeping these in the
+        # ranked dataframe makes score changes auditable and easy to test.
+        self.score_feature_columns = [
+            'projected_points_component',
+            'historical_points_component',
+            'consistency_component',
+            'usage_component',
+            'team_offense_component',
+            'projection_tier_component',
+            'projection_rank_component',
+            'news_component',
+        ]
         
     def load_data(self) -> pd.DataFrame:
         """Load player data"""
@@ -88,8 +106,8 @@ class PlayerRanker:
             logger.info("Starting load_data function...")
             # Load main historical data first
             stats_file_general = self.data_dir / "nfl_player_data.csv"
-            stats_file_2025 = self.data_dir / "nfl_player_data_2025.csv"
-            players_2025_bye = self.data_dir / "players_2025_positions_bye.csv"
+            stats_file_projection = self.data_dir / f"nfl_player_data_{self.target_season}.csv"
+            players_projection_bye = self.data_dir / f"players_{self.target_season}_positions_bye.csv"
             
             if not stats_file_general.exists():
                 logger.error(f"Main data file not found: {stats_file_general}")
@@ -100,67 +118,103 @@ class PlayerRanker:
             logger.info(f"Loaded {len(df)} historical records from {stats_file_general.name}")
             logger.info(f"Historical data columns: {df.columns.tolist()}")
             logger.info(f"Historical data shape: {df.shape}")
+            historical_features = self.build_historical_features(df)
             
-            # Load 2025 projections with bye weeks if available
+            # Load target-season projections with bye weeks if available
             projections_df = None
             bye_week_df = None
-            logger.info(f"Checking if {players_2025_bye} exists...")
-            if players_2025_bye.exists():
-                logger.info("Loading 2025 projections with bye weeks...")
+            logger.info(f"Checking if {players_projection_bye} exists...")
+            if players_projection_bye.exists():
+                logger.info(f"Loading {self.target_season} projections with bye weeks...")
                 try:
-                    bye_week_df = pd.read_csv(players_2025_bye)
-                    logger.info(f"Loaded {len(bye_week_df)} projection records from {players_2025_bye.name}")
+                    bye_week_df = pd.read_csv(players_projection_bye)
+                    self.projection_source = str(players_projection_bye)
+                    logger.info(f"Loaded {len(bye_week_df)} projection records from {players_projection_bye.name}")
                     logger.info(f"Bye week data columns: {bye_week_df.columns.tolist()}")
                     
-                    # Clean and standardize the bye week data
-                    bye_week_df = self._process_2025_bye_week_data(bye_week_df)
+                    # Clean and standardize the projection/bye week data
+                    bye_week_df = self._process_projection_bye_week_data(bye_week_df)
                     
                 except Exception as e:
-                    logger.error(f"Error loading 2025 bye week data: {e}")
+                    logger.error(f"Error loading projection bye week data: {e}")
                     import traceback
                     logger.error(f"Traceback: {traceback.format_exc()}")
                     bye_week_df = None
             
-            # Load original 2025 projections if available (as backup)
-            if not bye_week_df is not None and stats_file_2025.exists():
-                logger.info("Loading original 2025 projections...")
+            # Load original target-season projections if available (as backup)
+            if bye_week_df is None and stats_file_projection.exists():
+                logger.info(f"Loading {self.target_season} projections...")
                 try:
-                    projections_df = pd.read_csv(stats_file_2025)
-                    logger.info(f"Loaded {len(projections_df)} projection records from {stats_file_2025.name}")
+                    projections_df = pd.read_csv(stats_file_projection)
+                    self.projection_source = str(stats_file_projection)
+                    logger.info(f"Loaded {len(projections_df)} projection records from {stats_file_projection.name}")
                     logger.info(f"Projection columns: {projections_df.columns.tolist()}")
                     
                     # Clean and standardize the projections data
-                    projections_df = self._process_2025_projections(projections_df)
+                    projections_df = self._process_projection_file(projections_df)
                     
                 except Exception as e:
-                    logger.error(f"Error loading 2025 projections: {e}")
+                    logger.error(f"Error loading target-season projections: {e}")
                     import traceback
                     logger.error(f"Traceback: {traceback.format_exc()}")
                     projections_df = None
             else:
-                logger.info("2025 projections file not found")
+                logger.info(f"{self.target_season} projections file not found")
             
             # Get the most recent season data for each player
             df = df.sort_values(['player_name', 'season'], ascending=[True, False])
             df = df.drop_duplicates(subset=['player_name'], keep='first')
             logger.info(f"After deduplication: {len(df)} unique players from historical data")
+            if not historical_features.empty:
+                df = pd.merge(df, historical_features, on='player_name', how='left')
+                logger.info(f"Merged historical features for {len(historical_features)} players")
             
             # Debug: Check what positions we have
             if 'position' in df.columns:
                 logger.info(f"Position distribution: {df['position'].value_counts().to_dict()}")
             
-            # Merge with 2025 bye week data if available
+            # Merge with projection bye week data if available
             if bye_week_df is not None:
-                logger.info("Merging with 2025 bye week data...")
-                # Handle duplicate player names in bye week data by keeping the first occurrence
+                logger.info("Merging with projection bye week data...")
+                # Handle duplicate player names in projection data by keeping the first occurrence
                 bye_week_df_clean = bye_week_df.drop_duplicates(subset=['PLAYER NAME'], keep='first')
                 logger.info(f"Removed {len(bye_week_df) - len(bye_week_df_clean)} duplicate player names from bye week data")
+
+                missing_projection_players = bye_week_df_clean[
+                    ~bye_week_df_clean['PLAYER NAME'].isin(df['player_name'])
+                ].copy()
+                if not missing_projection_players.empty:
+                    logger.info(f"Adding {len(missing_projection_players)} projection-only players")
+                    projection_only_rows = pd.DataFrame({
+                        'player_name': missing_projection_players['PLAYER NAME'],
+                        'season': self.target_season,
+                        'team': missing_projection_players['TEAM'],
+                        'position': missing_projection_players['POS'].str.replace(r'\d+', '', regex=True),
+                        'fantasy_points': 0.0,
+                        'fantasy_points_ppr': 0.0,
+                        'games': 0,
+                        'games_played': 0,
+                        'age': 0,
+                        'targets': 0,
+                        'receptions': 0,
+                        'carries': 0,
+                        'rushing_yards': 0,
+                        'receiving_yards': 0,
+                        'passing_yards': 0,
+                        'passing_tds': 0,
+                        'rushing_tds': 0,
+                        'receiving_tds': 0,
+                        'interceptions': 0,
+                        'rushing_fumbles': 0,
+                        'rushing_fumbles_lost': 0,
+                    })
+                    df = pd.concat([df, projection_only_rows], ignore_index=True, sort=False)
                 
-                # Create a mapping from player_name to 2025 data
+                # Create a mapping from player_name to projection data
                 bye_week_mapping = bye_week_df_clean.set_index('PLAYER NAME').to_dict('index')
                 
-                # Add 2025 data to main dataframe
-                for col in ['BYE WEEK', 'POS', 'TIERS', 'FANTASYPTS']:
+                # Add projection data to main dataframe
+                for col in ['BYE WEEK', 'POS', 'TIERS', 'FANTASYPTS', 'RK']:
                     df[col] = df['player_name'].map(
                         lambda x: bye_week_mapping.get(x, {}).get(col, 0)
                     )
@@ -171,31 +225,31 @@ class PlayerRanker:
                 df['TIERS'] = df['TIERS'].fillna(99)
                 df['FANTASYPTS'] = df['FANTASYPTS'].fillna(0)
                 
-                # Use 2025 position if available, otherwise keep historical position
+                # Use projected position if available, otherwise keep historical position
                 # Clean up position column to remove rank numbers (e.g., "WR1" -> "WR")
                 df['POS'] = df['POS'].str.replace(r'\d+', '', regex=True)
                 df['position'] = df['POS'].where(df['POS'] != 'Unknown', df['position'])
                 
                 # Convert fantasy points to numeric
                 df['FANTASYPTS'] = pd.to_numeric(df['FANTASYPTS'], errors='coerce').fillna(0)
-                df['projected_2025_pts'] = df['FANTASYPTS']
-                df['tier_2025'] = df['TIERS']
-                df['rank_2025'] = df.index + 1  # Simple rank based on order
+                df['projected_fantasy_points'] = df['FANTASYPTS']
+                df['projection_tier'] = df['TIERS']
+                df['projection_rank'] = pd.to_numeric(df['RK'], errors='coerce').fillna(999)
                 
-                logger.info(f"Added 2025 bye week data for {len(df[df['BYE WEEK'] != 'N/A'])} players")
+                logger.info(f"Added {self.target_season} projection/bye week data for {len(df[df['BYE WEEK'] != 'N/A'])} players")
                 
             # Fallback to original projections if no bye week data
             elif projections_df is not None:
-                logger.info("Merging with original 2025 projections...")
+                logger.info("Merging with original target-season projections...")
                 # Handle duplicate player names in projections by keeping the first occurrence
                 projections_df_clean = projections_df.drop_duplicates(subset=['name'], keep='first')
                 logger.info(f"Removed {len(projections_df) - len(projections_df_clean)} duplicate player names from projections")
                 
-                # Create a mapping from player_name to 2025 projections
+                # Create a mapping from player_name to target-season projections
                 projection_mapping = projections_df_clean.set_index('name').to_dict('index')
                 
-                # Add 2025 projections to main dataframe
-                for col in ['projected_2025_pts', 'tier_2025', 'rank_2025', 'projected_pass_yards', 
+                # Add target-season projections to main dataframe
+                for col in ['projected_fantasy_points', 'projection_tier', 'projection_rank', 'projected_pass_yards', 
                            'projected_pass_tds', 'projected_rec', 'projected_rec_yards', 
                            'projected_rec_tds', 'projected_rush_att', 'projected_rush_yards', 
                            'projected_rush_tds']:
@@ -204,33 +258,33 @@ class PlayerRanker:
                     )
                 
                 # Fill missing projections with 0
-                for col in ['projected_2025_pts', 'projected_pass_yards', 'projected_pass_tds', 
+                for col in ['projected_fantasy_points', 'projected_pass_yards', 'projected_pass_tds', 
                            'projected_rec', 'projected_rec_yards', 'projected_rec_tds', 
                            'projected_rush_att', 'projected_rush_yards', 'projected_rush_tds']:
                     df[col] = df[col].fillna(0)
                 
                 # Fill missing tier and rank with defaults
-                df['tier_2025'] = df['tier_2025'].fillna(99)
-                df['rank_2025'] = df['rank_2025'].fillna(999)
+                df['projection_tier'] = df['projection_tier'].fillna(99)
+                df['projection_rank'] = df['projection_rank'].fillna(999)
                 
                 # Add default bye week column
                 df['BYE WEEK'] = 'N/A'
                 
-                logger.info(f"Added 2025 projections for {len(df[df['projected_2025_pts'] > 0])} players")
+                logger.info(f"Added target-season projections for {len(df[df['projected_fantasy_points'] > 0])} players")
             else:
                 # If no projections, use current fantasy points as projections
-                df['projected_2025_pts'] = df['fantasy_points']
-                df['tier_2025'] = 99
-                df['rank_2025'] = 999
+                df['projected_fantasy_points'] = df['fantasy_points']
+                df['projection_tier'] = 99
+                df['projection_rank'] = 999
                 df['BYE WEEK'] = 'N/A'
-                logger.info("No 2025 projections found, using current fantasy points as projections")
+                self.projection_source = "historical_fantasy_points_fallback"
+                logger.warning("No target-season projections found, using historical fantasy points as projections")
             
             # Standardize column names
             column_mapping = {
                 'player_name': 'name',
                 'fantasy_points': 'total_points',
                 'fantasy_points_ppr': 'fantasy_points_ppr',
-                'games': 'games_played',
                 'targets': 'targets',
                 'receptions': 'receptions',
                 'carries': 'carries',
@@ -266,12 +320,12 @@ class PlayerRanker:
                 'position': 'Unknown',
                 'team': 'Unknown',
                 'age': 0.0,
-                'projected_2025_pts': 0.0,
-                'tier_2025': 99,
-                'rank_2025': 999,
-                'points_2024': 0.0,  # Will be set to same as projected_2025_pts
-                'points_2023': 0.0,  # Will be set to same as projected_2025_pts
-                'points_2022': 0.0,  # Will be set to same as projected_2025_pts
+                'projected_fantasy_points': 0.0,
+                'projection_tier': 99,
+                'projection_rank': 999,
+                'weighted_historical_points': 0.0,
+                'historical_consistency_score': 50.0,
+                'historical_seasons_count': 0,
                 'games_played': 0,
                 'targets': 0,
                 'receptions': 0,
@@ -293,7 +347,9 @@ class PlayerRanker:
                     df[col] = default_val
             
             # Convert numeric columns
-            numeric_columns = ['age', 'projected_2025_pts', 'tier_2025', 'rank_2025', 'points_2024', 'points_2023', 'points_2022', 
+            numeric_columns = ['age', 'projected_fantasy_points', 'projection_tier', 'projection_rank',
+                              'weighted_historical_points', 'historical_consistency_score',
+                              'historical_seasons_count',
                               'games_played', 'targets', 'receptions', 'carries', 'rush_yards', 'rec_yards',
                               'pass_yards', 'pass_tds', 'rush_tds', 'rec_tds', 'int', 'fumbles', 'fumbles_lost',
                               'projected_pass_yards', 'projected_pass_tds', 'projected_rec', 'projected_rec_yards', 
@@ -315,18 +371,17 @@ class PlayerRanker:
                     except Exception as e:
                         logger.warning(f"Failed to convert column {col} to numeric: {e}")
                         df[col] = 0
-            
-            # Set historical points based on current season data
-            if 'fantasy_points' in df.columns:
-                df['points_2024'] = df['fantasy_points']  # Current season points
-                df['points_2023'] = df['fantasy_points']  # Use same for now (could be enhanced with actual 2023 data)
-                df['points_2022'] = df['fantasy_points']  # Use same for now (could be enhanced with actual 2022 data)
-            
+
             # Filter to players with projections or fantasy points
-            if 'projected_2025_pts' in df.columns:
-                df = df[df['projected_2025_pts'] > 0].copy()
+            if 'projected_fantasy_points' in df.columns:
+                df = df[df['projected_fantasy_points'] > 0].copy()
             elif 'fantasy_points' in df.columns:
                 df = df[df['fantasy_points'] > 0].copy()
+
+            df['position'] = df['position'].astype(str).str.replace(r'\d+', '', regex=True)
+            df = df[df['position'].isin(['QB', 'RB', 'WR', 'TE'])].copy()
+            df = df[df['name'].notna() & (df['name'].astype(str).str.lower() != 'nan')].copy()
+            df = self.merge_news_features(df)
             
             logger.info(f"Final dataset has {len(df)} players")
             return df
@@ -337,18 +392,163 @@ class PlayerRanker:
             logger.error(f"Traceback: {traceback.format_exc()}")
             return pd.DataFrame()
 
-    def _process_2025_projections(self, projections_df: pd.DataFrame) -> pd.DataFrame:
-        """Process the 2025 projections CSV to standardize format"""
+    def build_historical_features(self, historical_df: pd.DataFrame, seasons: int = 2) -> pd.DataFrame:
+        """Create per-player historical scoring and consistency features before deduping."""
+        if historical_df.empty or 'player_name' not in historical_df.columns or 'season' not in historical_df.columns:
+            return pd.DataFrame()
+
+        df = historical_df.copy()
+        points_col = 'fantasy_points_ppr' if 'fantasy_points_ppr' in df.columns else 'fantasy_points'
+        if points_col not in df.columns:
+            return pd.DataFrame()
+
+        df[points_col] = pd.to_numeric(df[points_col], errors='coerce').fillna(0)
+        df['season'] = pd.to_numeric(df['season'], errors='coerce')
+        df = df.dropna(subset=['player_name', 'season'])
+        if df.empty:
+            return pd.DataFrame()
+
+        consistency_source = (
+            pd.to_numeric(df.get('consistency_score', 0), errors='coerce').fillna(0)
+            if 'consistency_score' in df.columns
+            else pd.Series(0, index=df.index)
+        )
+        df['_normalized_consistency'] = consistency_source.clip(lower=0, upper=5) * 20
+
+        latest_seasons = sorted(df['season'].dropna().unique(), reverse=True)[:seasons]
+        recent = df[df['season'].isin(latest_seasons)].copy()
+        recent = recent.sort_values(['player_name', 'season'], ascending=[True, False])
+
+        weights = [0.6, 0.4] if seasons == 2 else []
+        feature_rows = []
+        for player_name, player_history in recent.groupby('player_name'):
+            player_history = player_history.sort_values('season', ascending=False).head(seasons)
+            effective_weights = weights[:len(player_history)]
+            if not effective_weights:
+                effective_weights = [1.0 / len(player_history)] * len(player_history)
+            weight_sum = sum(effective_weights)
+            effective_weights = [weight / weight_sum for weight in effective_weights]
+
+            weighted_points = sum(
+                float(row[points_col]) * effective_weights[idx]
+                for idx, (_, row) in enumerate(player_history.iterrows())
+            )
+            weighted_consistency = sum(
+                float(row['_normalized_consistency']) * effective_weights[idx]
+                for idx, (_, row) in enumerate(player_history.iterrows())
+            )
+            feature_row = {
+                'player_name': player_name,
+                'weighted_historical_points': weighted_points,
+                'historical_consistency_score': weighted_consistency,
+                'historical_seasons_count': int(len(player_history)),
+            }
+            for _, row in player_history.iterrows():
+                season = int(row['season'])
+                feature_row[f'points_{season}'] = float(row[points_col])
+            feature_rows.append(feature_row)
+
+        features = pd.DataFrame(feature_rows).fillna(0)
+        logger.info(
+            "Built historical features from seasons %s for %s players",
+            latest_seasons,
+            len(features),
+        )
+        return features
+
+    def load_news_features(self) -> pd.DataFrame:
+        """Load optional player news features produced by news_analyzer.py."""
+        news_file = self.news_dir / "player_features.json"
+        if not news_file.exists():
+            self.news_source = "none"
+            logger.info("No news features found at %s", news_file)
+            return pd.DataFrame()
+
         try:
-            logger.info("Processing 2025 projections data...")
+            with open(news_file, "r", encoding="utf-8") as f:
+                payload = json.load(f)
+        except Exception as e:
+            logger.warning("Could not load news features from %s: %s", news_file, e)
+            return pd.DataFrame()
+
+        player_features = payload.get("player_features", {}) if isinstance(payload, dict) else {}
+        rows = []
+        for player_name, features in player_features.items():
+            if not isinstance(features, dict):
+                continue
+            rows.append(
+                {
+                    "name": str(features.get("player", player_name)),
+                    "news_sentiment_score": float(features.get("avg_sentiment", features.get("sentiment_score", 0)) or 0),
+                    "news_buzz_score": float(features.get("avg_buzz", features.get("buzz_score", 0)) or 0),
+                    "news_headline_count": int(features.get("headline_count", 0) or 0),
+                    "news_injury_flag": bool(features.get("has_injury", features.get("injury_flag", False))),
+                    "news_role_change_flag": bool(features.get("has_role_change", features.get("role_change", False))),
+                    "news_topics": features.get("all_topics", features.get("topics", [])) or [],
+                }
+            )
+
+        if not rows:
+            return pd.DataFrame()
+
+        news_df = pd.DataFrame(rows)
+        news_df["news_key"] = news_df["name"].str.lower().str.strip()
+        self.news_source = str(news_file)
+        logger.info("Loaded news features for %s players from %s", len(news_df), news_file)
+        return news_df
+
+    def merge_news_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Merge optional news features onto the ranking dataframe by player name."""
+        df = df.copy()
+        news_df = self.load_news_features()
+        default_columns = {
+            "news_sentiment_score": 0.0,
+            "news_buzz_score": 0.0,
+            "news_headline_count": 0,
+            "news_injury_flag": False,
+            "news_role_change_flag": False,
+            "news_topics": [],
+        }
+
+        if news_df.empty:
+            for col, default in default_columns.items():
+                df[col] = [default.copy() if isinstance(default, list) else default for _ in range(len(df))]
+            return df
+
+        df["news_key"] = df["name"].astype(str).str.lower().str.strip()
+        merged = pd.merge(
+            df,
+            news_df.drop(columns=["name"]),
+            on="news_key",
+            how="left",
+        ).drop(columns=["news_key"])
+
+        for col, default in default_columns.items():
+            if col not in merged.columns:
+                merged[col] = [default.copy() if isinstance(default, list) else default for _ in range(len(merged))]
+            elif isinstance(default, list):
+                merged[col] = merged[col].apply(lambda value: value if isinstance(value, list) else [])
+            elif isinstance(default, bool):
+                merged[col] = merged[col].fillna(default).astype(bool)
+            else:
+                merged[col] = pd.to_numeric(merged[col], errors="coerce").fillna(default)
+
+        matched_count = int((merged["news_headline_count"] > 0).sum())
+        logger.info("Merged news features onto %s ranked players", matched_count)
+        return merged
+
+    def _process_projection_file(self, projections_df: pd.DataFrame) -> pd.DataFrame:
+        """Process the target-season projections CSV to standardize format"""
+        try:
+            logger.info("Processing target-season projections data...")
             
             # Rename columns to match expected format
             column_mapping = {
-                'RK': 'rank_2025',
-                'TIERS': 'tier_2025', 
+                'RK': 'projection_rank',
+                'TIERS': 'projection_tier', 
                 'PLAYER NAME': 'name',
                 'TEAM': 'team',
-                'FANTASYPTS': 'projected_2025_pts'
+                'FANTASYPTS': 'projected_fantasy_points'
             }
             
             # Rename existing columns
@@ -402,28 +602,74 @@ class PlayerRanker:
             return projections_df
             
         except Exception as e:
-            logger.error(f"Error processing 2025 projections: {e}")
+            logger.error(f"Error processing target-season projections: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             return pd.DataFrame()
 
-    def _process_2025_bye_week_data(self, bye_week_df: pd.DataFrame) -> pd.DataFrame:
-        """Process the 2025 bye week data CSV to standardize format"""
+    def _process_projection_bye_week_data(self, bye_week_df: pd.DataFrame) -> pd.DataFrame:
+        """Process target-season projection/bye week data CSV to standardize format."""
         try:
-            logger.info("Processing 2025 bye week data...")
+            logger.info(f"Processing {self.target_season} projection/bye week data...")
+
+            season_neutral_mapping = {
+                'name': 'PLAYER NAME',
+                'player': 'PLAYER NAME',
+                'player_name': 'PLAYER NAME',
+                'position': 'POS',
+                'pos': 'POS',
+                'team': 'TEAM',
+                'bye_week': 'BYE WEEK',
+                'bye': 'BYE WEEK',
+                'projected_fantasy_points': 'FANTASYPTS',
+                'projected_points': 'FANTASYPTS',
+                'fantasy_points': 'FANTASYPTS',
+                'fpts': 'FANTASYPTS',
+                'tier': 'TIERS',
+                'tiers': 'TIERS',
+                'rank': 'RK',
+                'adp': 'ADP',
+            }
+            legacy_year = self.target_season - 1
+            season_neutral_mapping[f'projected_{legacy_year}_pts'] = 'FANTASYPTS'
+            season_neutral_mapping[f'tier_{legacy_year}'] = 'TIERS'
+            season_neutral_mapping[f'rank_{legacy_year}'] = 'RK'
+            rename_columns = {}
+            for col in bye_week_df.columns:
+                normalized = str(col).strip().lower().replace(' ', '_')
+                if normalized in season_neutral_mapping:
+                    rename_columns[col] = season_neutral_mapping[normalized]
+            bye_week_df = bye_week_df.rename(columns=rename_columns)
             
             # Clean up the data
             bye_week_df = bye_week_df.dropna(subset=['PLAYER NAME'])
+
+            for col, default_value in {
+                'RK': 999,
+                'POS': 'Unknown',
+                'TEAM': 'Unknown',
+                'BYE WEEK': 'N/A',
+                'TIERS': 99,
+                'FANTASYPTS': 0,
+            }.items():
+                if col not in bye_week_df.columns:
+                    bye_week_df[col] = default_value
             
             # Convert bye week to string and handle any non-numeric values
             bye_week_df['BYE WEEK'] = bye_week_df['BYE WEEK'].astype(str)
+            bye_week_df['POS'] = bye_week_df['POS'].astype(str)
+            bye_week_df['TEAM'] = bye_week_df['TEAM'].fillna('Unknown').astype(str)
             
             # Convert tiers to numeric
             bye_week_df['TIERS'] = pd.to_numeric(bye_week_df['TIERS'], errors='coerce').fillna(99)
             
-            # Create a fantasy points column based on rank (since there's no explicit fantasy points)
-            # We'll use the rank to estimate fantasy points (higher rank = more points)
-            bye_week_df['FANTASYPTS'] = 300 - (pd.to_numeric(bye_week_df['RK'], errors='coerce').fillna(500) * 0.5)
+            # Prefer real projected points when present. Legacy bye-only files fall back to a rank estimate.
+            bye_week_df['FANTASYPTS'] = pd.to_numeric(bye_week_df['FANTASYPTS'], errors='coerce')
+            missing_points = bye_week_df['FANTASYPTS'].isna() | (bye_week_df['FANTASYPTS'] <= 0)
+            if missing_points.any():
+                rank_estimate = 300 - (pd.to_numeric(bye_week_df['RK'], errors='coerce').fillna(500) * 0.5)
+                bye_week_df.loc[missing_points, 'FANTASYPTS'] = rank_estimate[missing_points]
+            bye_week_df['FANTASYPTS'] = bye_week_df['FANTASYPTS'].fillna(0)
             
             logger.info(f"Processed {len(bye_week_df)} bye week records")
             logger.info(f"Bye week distribution: {bye_week_df['BYE WEEK'].value_counts().to_dict()}")
@@ -431,7 +677,7 @@ class PlayerRanker:
             return bye_week_df
             
         except Exception as e:
-            logger.error(f"Error processing 2025 bye week data: {e}")
+            logger.error(f"Error processing projection bye week data: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             return pd.DataFrame()
@@ -461,14 +707,16 @@ class PlayerRanker:
             return 'WR'  # Default fallback
     
     def calculate_weighted_historical_average(self, row: pd.Series) -> float:
-        """Calculate weighted average of last 2 seasons (60% last year, 40% year before)"""
+        """Calculate weighted average of recent historical fantasy points."""
+        weighted_historical_points = float(row.get('weighted_historical_points', 0))
+        if weighted_historical_points > 0:
+            return weighted_historical_points
+
+        # Legacy fallback for older test fixtures and ranking files.
         points_2024 = float(row.get('points_2024', 0))
         points_2023 = float(row.get('points_2023', 0))
-        
-        # If we have both years, use weighted average
         if points_2024 > 0 and points_2023 > 0:
             return 0.6 * points_2024 + 0.4 * points_2023
-        # If we only have one year, use that
         elif points_2024 > 0:
             return points_2024
         elif points_2023 > 0:
@@ -477,11 +725,15 @@ class PlayerRanker:
             return 0.0
     
     def calculate_consistency_score(self, row: pd.Series) -> float:
-        """Calculate simple consistency score based on projected points"""
-        projected_pts = float(row.get('projected_2025_pts', 0))
-        if projected_pts > 0:
-            # Simple consistency based on projection quality (placeholder)
-            return 75.0  # Default good consistency
+        """Return a 0-100 consistency score from weekly historical production."""
+        historical_consistency = float(row.get('historical_consistency_score', 0))
+        if historical_consistency > 0:
+            return max(0, min(100, historical_consistency))
+
+        legacy_consistency = float(row.get('consistency_score', 0))
+        if legacy_consistency > 0:
+            return max(0, min(100, legacy_consistency * 20))
+
         return 50.0
     
     def calculate_usage_score(self, row: pd.Series) -> float:
@@ -586,6 +838,29 @@ class PlayerRanker:
         # Convert to 0-100 scale
         team_score = (team_multiplier - 0.85) / (1.15 - 0.85) * 100
         return max(0, min(100, team_score))
+
+    def calculate_news_adjustment(self, row: pd.Series) -> float:
+        """Calculate a small, explainable news adjustment."""
+        sentiment = max(-1.0, min(1.0, float(row.get('news_sentiment_score', 0) or 0)))
+        buzz = max(0.0, min(1.0, float(row.get('news_buzz_score', 0) or 0)))
+        headline_count = max(0, int(row.get('news_headline_count', 0) or 0))
+        injury_flag = bool(row.get('news_injury_flag', False))
+        role_change_flag = bool(row.get('news_role_change_flag', False))
+
+        if headline_count == 0:
+            return 0.0
+
+        adjustment = sentiment * 4.0
+        if sentiment >= 0:
+            adjustment += buzz * 2.0
+        else:
+            adjustment += sentiment * buzz * 2.0
+        if role_change_flag:
+            adjustment += 3.0 if sentiment >= 0 else -3.0
+        if injury_flag:
+            adjustment -= 12.0
+
+        return max(-15.0, min(6.0, adjustment))
     
     def calculate_age_decline_penalty(self, row: pd.Series) -> float:
         """Calculate age-based decline penalty"""
@@ -618,38 +893,44 @@ class PlayerRanker:
         return max(0.5, penalty)  # Cap at 50% penalty
     
     def calculate_raw_score(self, row: pd.Series) -> float:
-        """Calculate raw score using the weighted formula with 2025 projections"""
-        # Get component scores
-        projected_2025_pts = float(row.get('projected_2025_pts', 0))
-        tier_2025 = float(row.get('tier_2025', 99))
-        rank_2025 = float(row.get('rank_2025', 999))
-        
-        # Apply projection dampening to correct inflated projections
-        projected_2025_pts = self.dampen_inflated_projections(row, projected_2025_pts)
-        
-        # Calculate tier-based bonus/penalty
-        tier_score = self.calculate_tier_score(tier_2025)
-        
-        # Calculate rank-based adjustment
-        rank_score = self.calculate_rank_score(rank_2025)
-        
-        weighted_avg_last_2 = self.calculate_weighted_historical_average(row)
+        """Calculate raw score using the weighted formula with target-season projections"""
+        features = self.build_score_features(row)
+        return sum(features[col] for col in self.score_feature_columns)
+
+    def build_score_features(self, row: pd.Series) -> Dict[str, float]:
+        """Build the explicit, weighted score components for one player."""
+        projected_fantasy_points = float(row.get('projected_fantasy_points', 0))
+        projection_tier = float(row.get('projection_tier', 99))
+        projection_rank = float(row.get('projection_rank', 999))
+
+        dampened_projection = self.dampen_inflated_projections(row, projected_fantasy_points)
+        weighted_history = self.calculate_weighted_historical_average(row)
         consistency_score = self.calculate_consistency_score(row)
         usage_score = self.calculate_usage_score(row)
         team_offense_score = self.calculate_team_offense_score(row)
-        
-        # Apply weights with new 2025 projection components
-        raw_score = (
-            self.weights['projected_2025_pts'] * projected_2025_pts +
-            self.weights['weighted_avg_last_2'] * weighted_avg_last_2 +
-            self.weights['consistency_score'] * consistency_score +
-            self.weights['usage_score'] * usage_score +
-            self.weights['team_offense_score'] * team_offense_score +
-            0.15 * tier_score +  # 15% weight for tier
-            0.10 * rank_score    # 10% weight for rank
-        )
-        
-        return raw_score
+        tier_score = self.calculate_tier_score(projection_tier)
+        rank_score = self.calculate_rank_score(projection_rank)
+        news_adjustment = self.calculate_news_adjustment(row)
+
+        return {
+            'projected_points_component': self.weights['projected_fantasy_points'] * dampened_projection,
+            'historical_points_component': self.weights['weighted_avg_last_2'] * weighted_history,
+            'consistency_component': self.weights['consistency_score'] * consistency_score,
+            'usage_component': self.weights['usage_score'] * usage_score,
+            'team_offense_component': self.weights['team_offense_score'] * team_offense_score,
+            'projection_tier_component': 0.15 * tier_score,
+            'projection_rank_component': 0.10 * rank_score,
+            'news_component': news_adjustment,
+        }
+
+    def add_score_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Add score component columns and raw_score to the ranking dataframe."""
+        df = df.copy()
+        feature_rows = df.apply(self.build_score_features, axis=1, result_type='expand')
+        for col in self.score_feature_columns:
+            df[col] = pd.to_numeric(feature_rows[col], errors='coerce').fillna(0)
+        df['raw_score'] = df[self.score_feature_columns].sum(axis=1)
+        return df
     
     def apply_penalty_adjustments(self, row: pd.Series, raw_score: float) -> float:
         """Apply penalty adjustments to raw score"""
@@ -674,7 +955,7 @@ class PlayerRanker:
             adjusted_score *= 0.85  # 15% penalty for rookies/inexperienced young players
         
         # Depth chart penalty (simplified - assume low projected points = not starter)
-        projected_pts = float(row.get('projected_2025_pts', 0))
+        projected_pts = float(row.get('projected_fantasy_points', 0))
         position = str(row.get('position', 'Unknown'))
         
         # Define starter thresholds by position
@@ -796,26 +1077,26 @@ class PlayerRanker:
         return df
     
     def assign_tiers(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Assign tiers based on 2025 projections and VORP percentiles"""
+        """Assign tiers based on target-season projections and VORP percentiles"""
         df = df.copy()
         
-        # First, use 2025 tier information if available
-        if 'tier_2025' in df.columns:
-            logger.info("Using 2025 tier information for initial tier assignment...")
+        # First, use projection tier information if available
+        if 'projection_tier' in df.columns:
+            logger.info("Using projection tier information for initial tier assignment...")
             # Convert numeric tier to tier name
-            df['tier'] = df['tier_2025'].apply(self._convert_tier_number_to_name)
+            df['tier'] = df['projection_tier'].apply(self._convert_tier_number_to_name)
         
-        # Calculate tiers for each position based on VORP for players without 2025 tiers
+        # Calculate tiers for each position based on VORP for players without projection tiers
         for position in ['QB', 'RB', 'WR', 'TE']:
             pos_df = df[df['position'] == position].copy()
             if len(pos_df) == 0:
                 continue
             
-            # For players without 2025 tier info, calculate based on VORP
+            # For players without projection tier info, calculate based on VORP
             pos_df_no_tier = pos_df[pos_df['tier'] == 'Tier 5'].copy()
             if len(pos_df_no_tier) > 0:
                 # Sort by VORP
-                pos_df_no_tier = pos_df_no_tier.sort_values('VORP', ascending=False).reset_index(drop=True)
+                pos_df_no_tier = pos_df_no_tier.sort_values('VORP', ascending=False)
                 
                 # Assign tiers based on percentiles
                 tier_names = ['Tier 1', 'Tier 2', 'Tier 3', 'Tier 4']
@@ -824,12 +1105,10 @@ class PlayerRanker:
                     if percentile > 0:
                         cutoff_idx = int(len(pos_df_no_tier) * percentile)
                         if cutoff_idx > 0:
-                            pos_df_no_tier.loc[:cutoff_idx-1, 'tier'] = tier_name
+                            pos_df_no_tier.iloc[:cutoff_idx, pos_df_no_tier.columns.get_loc('tier')] = tier_name
                 
-                # Update main dataframe for players without 2025 tiers
-                for idx, row in pos_df_no_tier.iterrows():
-                    original_idx = pos_df_no_tier.index[idx]
-                    df.at[original_idx, 'tier'] = row['tier']
+                # Update main dataframe using original row indices.
+                df.loc[pos_df_no_tier.index, 'tier'] = pos_df_no_tier['tier']
         
         return df
     
@@ -851,7 +1130,7 @@ class PlayerRanker:
             return 'Tier 5'
     
     def generate_player_flags(self, row: pd.Series) -> List[str]:
-        """Generate flags for player based on 2025 projections and historical data"""
+        """Generate flags for player based on target-season projections and historical data"""
         flags = []
         
         # Rookie flag
@@ -869,7 +1148,7 @@ class PlayerRanker:
             flags.append("Rookie")
         
         # High upside flag (young players with good projections)
-        projected_pts = float(row.get('projected_2025_pts', 0))
+        projected_pts = float(row.get('projected_fantasy_points', 0))
         if age <= 25 and projected_pts > 200:
             flags.append("High Upside")
         
@@ -877,16 +1156,16 @@ class PlayerRanker:
         if age >= 30:
             flags.append("Age Risk")
         
-        # 2025 projection flags
-        tier_2025 = float(row.get('tier_2025', 99))
-        rank_2025 = float(row.get('rank_2025', 999))
+        # target-season projection flags
+        projection_tier = float(row.get('projection_tier', 99))
+        projection_rank = float(row.get('projection_rank', 999))
         
         # Elite tier flag
-        if tier_2025 <= 1:
+        if projection_tier <= 1:
             flags.append("Elite Tier")
         
         # Top 10 rank flag
-        if rank_2025 <= 10:
+        if projection_rank <= 10:
             flags.append("Top 10 Rank")
         
         # High projection flag
@@ -924,11 +1203,9 @@ class PlayerRanker:
                 logger.error("No current season data available")
                 return pd.DataFrame()
             
-            # Calculate raw scores
-            logger.info("Calculating raw scores...")
-            current_stats_df['raw_score'] = current_stats_df.apply(
-                lambda row: self.calculate_raw_score(row), axis=1
-            )
+            # Calculate raw scores from explicit feature components
+            logger.info("Calculating score features and raw scores...")
+            current_stats_df = self.add_score_features(current_stats_df)
             
             # Apply penalty adjustments
             logger.info("Applying penalty adjustments...")
@@ -951,8 +1228,9 @@ class PlayerRanker:
             # Sort by VORP descending
             current_stats_df = current_stats_df.sort_values('VORP', ascending=False)
             
-            # Select top players
-            if self.max_players > 0:
+            # Select top players. Keep the full projection board by default so the
+            # draft recommender has enough RB/WR depth for position-specific picks.
+            if self.max_players > 0 and len(current_stats_df) > self.max_players:
                 current_stats_df = current_stats_df.head(self.max_players)
             
             logger.info(f"Ranking complete. Generated rankings for {len(current_stats_df)} players.")
@@ -970,6 +1248,12 @@ class PlayerRanker:
             output_data = []
             
             for _, row in df.iterrows():
+                projection_rank = row.get('projection_rank', 999)
+                projection_tier = row.get('projection_tier', 99)
+                age = row.get('age', 0)
+                projection_rank = 999 if pd.isna(projection_rank) else int(projection_rank)
+                projection_tier = 99 if pd.isna(projection_tier) else int(projection_tier)
+                age = 0 if pd.isna(age) else int(age)
                 player_data = {
                     "name": row.get('name', 'Unknown'),
                     "pos": row.get('position', 'Unknown'),
@@ -977,19 +1261,45 @@ class PlayerRanker:
                     "score": round(row.get('adjusted_score', 0), 2),
                     "VORP": round(row.get('VORP', 0), 2),
                     "tier": row.get('tier', 'Tier 5'),
-                    "age": int(row.get('age', 0)),
+                    "age": age,
                     "injury_risk": "Low",  # Simplified for now
                     "flags": row.get('flags', []),
-                    "projected_2025_pts": round(row.get('projected_2025_pts', 0), 1),
+                    "projected_fantasy_points": round(row.get('projected_fantasy_points', 0), 1),
+                    "projection_rank": projection_rank,
+                    "projection_tier": projection_tier,
+                    "weighted_historical_points": round(row.get('weighted_historical_points', 0), 1),
+                    "historical_consistency_score": round(row.get('historical_consistency_score', 0), 1),
+                    "historical_seasons_count": int(row.get('historical_seasons_count', 0) or 0),
+                    "news_sentiment_score": round(row.get('news_sentiment_score', 0), 3),
+                    "news_buzz_score": round(row.get('news_buzz_score', 0), 3),
+                    "news_headline_count": int(row.get('news_headline_count', 0) or 0),
+                    "news_injury_flag": bool(row.get('news_injury_flag', False)),
+                    "news_role_change_flag": bool(row.get('news_role_change_flag', False)),
+                    "news_topics": row.get('news_topics', []),
                     "raw_score": round(row.get('raw_score', 0), 2),
+                    "score_breakdown": {
+                        col: round(row.get(col, 0), 2)
+                        for col in self.score_feature_columns
+                    },
                     "bye_week": str(row.get('BYE WEEK', 'N/A'))
                 }
                 output_data.append(player_data)
             
+            export_payload = {
+                "metadata": {
+                    "generated_at": datetime.now().isoformat(),
+                    "target_season": self.target_season,
+                    "projection_source": self.projection_source,
+                    "news_source": self.news_source,
+                    "ranking_count": len(output_data),
+                },
+                "rankings": output_data,
+            }
+
             # Save to file
             output_file = self.outputs_dir / f"player_rankings.json"
             with open(output_file, 'w') as f:
-                json.dump(output_data, f, indent=2)
+                json.dump(export_payload, f, indent=2)
             
             logger.info(f"Rankings exported to {output_file}")
             

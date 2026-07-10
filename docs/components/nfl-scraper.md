@@ -75,13 +75,13 @@ The scraper generates a CSV file with the following columns:
 | `position` | Position (QB, RB, WR, TE) | String |
 | `team` | Team abbreviation | String |
 | `bye_week` | Team's bye week | Integer |
-| `projected_2025_pts` | 2025 projected fantasy points | Float |
+| `projected_fantasy_points` | Target-season projected fantasy points | Float |
 | `adp` | Average Draft Position (if available) | Float |
 
 ### Sample Output
 
 ```csv
-rank,name,position,team,bye_week,projected_2025_pts,adp
+rank,name,position,team,bye_week,projected_fantasy_points,adp
 1,Patrick Mahomes,QB,KC,10,311.322,1.0
 2,Josh Allen,QB,BUF,13,298.5,2.0
 3,Jalen Hurts,QB,PHI,5,285.2,3.0

@@ -135,15 +135,8 @@ python scripts/test_ranker.py
 
 ## 📁 Output Files
 
-### CSV Files
-- `outputs/ranked_all_players.csv` - Complete rankings
-- `outputs/ranked_QB.csv` - Quarterback rankings
-- `outputs/ranked_RB.csv` - Running back rankings
-- `outputs/ranked_WR.csv` - Wide receiver rankings
-- `outputs/ranked_TE.csv` - Tight end rankings
-
-### JSON Summary
-- `outputs/ranking_summary.json` - Comprehensive summary with:
+### JSON Rankings
+- `outputs/player_rankings.json` - Complete metadata-wrapped rankings with:
   - Total players ranked
   - Position distribution
   - Tier distribution

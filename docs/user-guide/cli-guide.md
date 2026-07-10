@@ -232,12 +232,8 @@ nfl-fantasy-draft-forecast-cli/
 │   ├── raw_headlines.json         # Raw news headlines
 │   └── player_features.json       # Analyzed news features
 └── outputs/
-    ├── ranked_all_players.csv     # All players ranked
-    ├── ranked_QB.csv              # QBs ranked
-    ├── ranked_RB.csv              # RBs ranked
-    ├── ranked_WR.csv              # WRs ranked
-    ├── ranked_TE.csv              # TEs ranked
-    └── ranking_summary.json       # Summary statistics
+    ├── player_rankings.json       # Metadata-wrapped rankings
+    └── draft_recommendations_*.txt # Saved draft plans
 ```
 
 ## 🎯 Best Practices

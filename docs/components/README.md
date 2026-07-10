@@ -18,7 +18,7 @@ This directory contains detailed documentation for each component of the NFL Fan
 
 - **[Draft Recommender](draft-recommender.md)** - `draft_recommender.py`
   - AI-powered draft strategy recommendations
-  - Ollama integration for intelligent suggestions
+  - OpenRouter integration for intelligent suggestions
   - Personalized draft advice
 
 ### Supporting Components

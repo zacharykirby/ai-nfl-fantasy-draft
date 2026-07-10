@@ -37,7 +37,7 @@ The NFL Fantasy Draft Assistant consists of several key components:
 - **Comprehensive Data**: Multi-year player statistics and projections
 - **News Integration**: Real-time news sentiment analysis
 - **VORP Analysis**: Advanced value-based ranking system
-- **AI Recommendations**: Ollama-powered draft strategy suggestions
+- **AI Recommendations**: OpenRouter-powered draft strategy suggestions
 - **Beautiful CLI**: User-friendly command-line interface with color-coded output
 
 ## 🤝 Contributing

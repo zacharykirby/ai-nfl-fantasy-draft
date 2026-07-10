@@ -12,7 +12,7 @@ The NFL Fantasy Draft Assistant is a modular CLI-based tool that combines player
 
 ### Key Value Propositions
 - **Data-Driven Decisions**: Combines historical performance with real-time news sentiment
-- **Local Processing**: Uses local LLM (Ollama) for privacy and speed
+- **Hosted Model Processing**: Uses OpenRouter-hosted LLM (OpenRouter) for model flexibility and reliability
 - **Modular Design**: Each component can be run independently or as a pipeline
 - **Flexible Output**: Supports both CSV exports and interactive CLI queries
 
@@ -23,7 +23,7 @@ The NFL Fantasy Draft Assistant is a modular CLI-based tool that combines player
 ### Primary Functionality
 - [x] **Data Ingestion**: Ingest and normalize open-source fantasy stats (previous season)
 - [x] **News Aggregation**: Fetch and parse live fantasy news headlines from multiple sources
-- [x] **AI Analysis**: Use local LLM (Ollama) to extract features from headlines
+- [x] **AI Analysis**: Use OpenRouter-hosted LLM (OpenRouter) to extract features from headlines
 - [x] **Ranking Algorithm**: Generate combined player ranking scores
 - [x] **Export System**: Generate ranked CSVs per position
 - [x] **CLI Interface**: Support basic filters for player lookup, export, and filtering
@@ -75,7 +75,7 @@ The NFL Fantasy Draft Assistant is a modular CLI-based tool that combines player
 **Purpose**: AI-powered feature extraction from news headlines
 
 **LLM Processing**:
-- [ ] Send each headline to Ollama with structured prompt
+- [ ] Send each headline to OpenRouter with structured prompt
 - [ ] Classify sentiment (-1 to +1 scale)
 - [ ] Flag injury status and role changes
 - [ ] Infer expected usage (e.g., "WR2", "RB1")
@@ -193,7 +193,7 @@ python scripts/cli.py --position RB --top 20
 - **Python**: 3.10+ (for modern type hints and features)
 - **Data Processing**: pandas, numpy
 - **Web Scraping**: feedparser, requests
-- **AI/ML**: ollama (local LLM)
+- **AI/ML**: openrouter (OpenRouter-hosted LLM)
 - **CLI**: argparse, rich (for beautiful tables)
 
 ### Data Sources
@@ -263,7 +263,7 @@ python scripts/cli.py --position RB --top 20
 ## 🔒 Security & Privacy
 
 ### Data Handling
-- **Local Processing**: All AI analysis done locally via Ollama
+- **Hosted Model Processing**: AI analysis routed through OpenRouter
 - **No External APIs**: RSS feeds only for news aggregation
 - **Data Retention**: Configurable cache expiration
 - **Privacy**: No user data collection or transmission

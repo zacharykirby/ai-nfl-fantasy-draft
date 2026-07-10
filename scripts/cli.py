@@ -27,10 +27,15 @@ from news_fetcher import fetch_headlines, save_headlines
 from news_analyzer import analyze_headlines
 from ranker import PlayerRanker
 from draft_recommender import DraftRecommender
+from llm_client import OpenRouterClient
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 class Colors:
     """ANSI color codes for beautiful terminal output"""
@@ -85,7 +90,51 @@ class FantasyCLI:
         """Print an info message"""
         print(f"{Colors.OKCYAN}ℹ️  {message}{Colors.ENDC}")
     
-    def run_full_pipeline(self, years: List[int] = [2022, 2023, 2024], 
+    def _load_rankings_dataframe(self) -> pd.DataFrame:
+        """Load current JSON rankings and normalize legacy display column names."""
+        ranking_file = Path("outputs/player_rankings.json")
+        if not ranking_file.exists():
+            raise FileNotFoundError(f"Ranking file not found: {ranking_file}")
+
+        with open(ranking_file, "r") as f:
+            payload = json.load(f)
+
+        rankings = payload.get("rankings", payload) if isinstance(payload, dict) else payload
+        if not isinstance(rankings, list):
+            raise ValueError("Ranking file must contain a list or a rankings payload")
+
+        df = pd.DataFrame(rankings)
+        column_mapping = {
+            "name": "player",
+            "pos": "position",
+            "score": "total_score",
+            "VORP": "vorp_score",
+        }
+        for old_col, new_col in column_mapping.items():
+            if old_col in df.columns and new_col not in df.columns:
+                df = df.rename(columns={old_col: new_col})
+
+        for col, default in {
+            "player": "Unknown",
+            "position": "Unknown",
+            "team": "Unknown",
+            "total_score": 0.0,
+            "vorp_score": 0.0,
+            "tier": "Tier 5",
+            "age": "N/A",
+            "experience": "N/A",
+            "consistency_score": 0.0,
+            "baseline_score": 0.0,
+        }.items():
+            if col not in df.columns:
+                df[col] = default
+
+        for col in ["total_score", "vorp_score", "consistency_score", "baseline_score"]:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
+        return df
+
+    def run_full_pipeline(self, years: Optional[List[int]] = None, 
                          max_news_age: int = 24, force_refresh: bool = False, skip_news: bool = False):
         """Run the complete fantasy football analysis pipeline"""
         self.print_banner()
@@ -261,18 +310,9 @@ class FantasyCLI:
         self.print_section_header("PLAYER RANKINGS")
         
         try:
-            # Load the appropriate CSV file
+            df = self._load_rankings_dataframe()
             if position:
-                csv_file = f"outputs/ranked_{position.upper()}.csv"
-            else:
-                csv_file = "outputs/ranked_all_players.csv"
-            
-            if not Path(csv_file).exists():
-                self.print_error(f"Ranking file not found: {csv_file}")
-                self.print_info("Run the pipeline first with: python scripts/cli.py --pipeline")
-                return
-            
-            df = pd.read_csv(csv_file)
+                df = df[df["position"] == position.upper()]
             
             # Apply filters
             if exclude_injured:
@@ -318,7 +358,7 @@ class FantasyCLI:
             
             # Table rows with enhanced data
             for i, (_, row) in enumerate(df.iterrows(), 1):
-                tier_emoji = "🥇" if row['tier'] == 1.0 else "🥈" if row['tier'] == 2.0 else "🥉" if row['tier'] == 3.0 else "📊"
+                tier_emoji = "🥇" if row['tier'] == "Tier 1" else "🥈" if row['tier'] == "Tier 2" else "🥉" if row['tier'] == "Tier 3" else "📊"
                 injury_icon = "🚨" if row.get('injury_flag', False) else "✅"
                 
                 line = (f"{i:<4} {row['player']:<20} {row['team']:<4} {row['position']:<3} "
@@ -349,7 +389,6 @@ class FantasyCLI:
             # Load all data sources
             stats_file = Path("data/nfl_player_data.csv")
             news_file = Path("news/player_features.json")
-            ranking_file = Path("outputs/ranked_all_players.csv")
             
             if not stats_file.exists():
                 self.print_error("Player stats not found. Run data ingestion first.")
@@ -413,8 +452,8 @@ class FantasyCLI:
                         print(f"Topics: {', '.join(topics)}")
             
             # Display ranking info with VORP
-            if ranking_file.exists():
-                ranking_df = pd.read_csv(ranking_file)
+            if Path("outputs/player_rankings.json").exists():
+                ranking_df = self._load_rankings_dataframe()
                 player_rank = ranking_df[ranking_df['player'].str.contains(player_name, case=False, na=False)]
                 
                 if not player_rank.empty:
@@ -443,7 +482,7 @@ class FantasyCLI:
         except Exception as e:
             self.print_error(f"Error showing player details: {e}")
     
-    def run_data_ingestion(self, years: List[int] = [2022, 2023, 2024]):
+    def run_data_ingestion(self, years: Optional[List[int]] = None):
         """Run only the data ingestion step"""
         self.print_section_header("DATA INGESTION")
         self.print_info("Fetching and processing player statistics...")
@@ -517,34 +556,33 @@ class FantasyCLI:
             self.print_error(f"Ranking failed: {e}")
             return False
     
-    def run_draft_recommendations(self, top_n: int = 50, draft_rounds: int = 15, 
-                                ollama_url: str = None, model: str = "deepseek-r1", save_output: bool = False):
-        """Run draft recommendations using Ollama LLM"""
-        self.print_section_header("DRAFT RECOMMENDATIONS WITH AI")
+    def run_draft_recommendations(self, top_n: int = 50, pick_position: int = 1,
+                                league_size: int = 8, model: str = None,
+                                save_output: bool = False, allow_stale_rankings: bool = False,
+                                use_ai: bool = False):
+        """Run position-aware draft recommendations."""
+        self.print_section_header("DRAFT RECOMMENDATIONS")
         
         try:
             # Initialize draft recommender if not already done
             if self.draft_recommender is None:
-                self.print_info("Initializing Ollama connection...")
-                self.draft_recommender = DraftRecommender(ollama_url=ollama_url, model=model)
-            
-            # Test connection first
-            self.print_info("Testing Ollama connection...")
-            test_response = self.draft_recommender.query_ollama("Hello")
-            if test_response.startswith("Error:"):
-                self.print_error(f"Failed to connect to Ollama: {test_response}")
-                return False
-            
-            self.print_success("Ollama connection successful!")
+                self.print_info("Initializing OpenRouter client...")
+                self.draft_recommender = DraftRecommender(
+                    model=model,
+                    allow_stale_rankings=allow_stale_rankings
+                )
             
             # Generate recommendations
-            self.print_info(f"Generating draft recommendations for top {top_n} players...")
-            recommendations = self.draft_recommender.generate_draft_recommendations(
-                top_n=top_n, 
-                draft_rounds=draft_rounds
+            mode = "AI-enhanced" if use_ai else "local position-aware"
+            self.print_info(f"Generating {mode} draft recommendations for top {top_n} players...")
+            recommendations = self.draft_recommender.generate_comprehensive_draft_plan(
+                top_n=top_n,
+                pick_position=pick_position,
+                league_size=league_size,
+                use_ai=use_ai
             )
             
-            if recommendations.startswith("Error:"):
+            if recommendations.startswith("Error"):
                 self.print_error(f"Failed to generate recommendations: {recommendations}")
                 return False
             
@@ -566,6 +604,101 @@ class FantasyCLI:
             logger.error(f"Draft recommendations error: {e}")
             return False
 
+    def run_openrouter_smoke_test(self, model: str = None):
+        """Verify OpenRouter env loading and basic chat completion connectivity."""
+        self.print_section_header("OPENROUTER SMOKE TEST")
+
+        client = OpenRouterClient(model=model)
+        self.print_info(f"Model: {client.model}")
+        self.print_info(f"API key visible: {bool(client.api_key)}")
+
+        response = client.chat(
+            messages=[
+                {"role": "system", "content": "You are a terse connectivity test."},
+                {"role": "user", "content": "Reply with exactly: OpenRouter OK"},
+            ],
+            temperature=0,
+            max_tokens=16,
+            timeout=30,
+        )
+        if response.startswith("Error:"):
+            self.print_error(response)
+            return False
+
+        print(response)
+        self.print_success("OpenRouter smoke test completed")
+        return True
+
+    def run_smoke_test(self, pick_position: int = 1, league_size: int = 8):
+        """Run local health checks for rankings and draft recommendations."""
+        self.print_section_header("LOCAL SMOKE TEST")
+
+        try:
+            ranking_file = Path("outputs/player_rankings.json")
+            if not ranking_file.exists():
+                self.print_error("Missing outputs/player_rankings.json. Run --rank-only first.")
+                return False
+
+            with open(ranking_file, "r", encoding="utf-8") as f:
+                payload = json.load(f)
+            metadata = payload.get("metadata", {}) if isinstance(payload, dict) else {}
+            rankings = payload.get("rankings", []) if isinstance(payload, dict) else payload
+            if not rankings:
+                self.print_error("Ranking file has no players")
+                return False
+
+            first_player = rankings[0]
+            required_player_fields = {
+                "name", "pos", "team", "score", "VORP", "projected_fantasy_points",
+                "projection_rank", "score_breakdown",
+            }
+            missing_fields = required_player_fields - set(first_player)
+            if missing_fields:
+                self.print_error(f"Ranking schema missing fields: {', '.join(sorted(missing_fields))}")
+                return False
+            if "news_component" not in first_player.get("score_breakdown", {}):
+                self.print_error("Ranking score_breakdown missing news_component")
+                return False
+
+            recommender = DraftRecommender(allow_stale_rankings=False)
+            rankings_df = recommender.load_ranking_data()
+            board = recommender.prepare_draft_board(rankings_df)
+            if board.empty:
+                self.print_error("Draft board is empty after filtering")
+                return False
+
+            positions = set(board["position"].dropna().unique())
+            missing_positions = {"QB", "RB", "WR", "TE"} - positions
+            if missing_positions:
+                self.print_error(f"Draft board missing positions: {', '.join(sorted(missing_positions))}")
+                return False
+
+            picks = recommender._calculate_snake_picks(pick_position, league_size, rounds=2)
+            if len(picks) != 2 or picks[0] != pick_position:
+                self.print_error("Snake pick calculation failed")
+                return False
+
+            plan = recommender.generate_local_draft_plan(
+                board,
+                pick_position=pick_position,
+                league_size=league_size,
+                rounds=1,
+            )
+            if "Likely available board:" not in plan or "Possible fallers" not in plan:
+                self.print_error("Draft plan did not include availability pools")
+                return False
+
+            self.print_success(f"Ranking metadata target season: {metadata.get('target_season', 'unknown')}")
+            self.print_success(f"Validated {len(rankings_df)} ranked players and {len(board)} draft-board players")
+            self.print_success(f"Snake picks for slot {pick_position}: {', '.join(str(p) for p in picks)}")
+            self.print_success("Local smoke test completed")
+            return True
+
+        except Exception as e:
+            self.print_error(f"Smoke test failed: {e}")
+            logger.error(f"Smoke test error: {e}")
+            return False
+
 def main():
     """Main CLI entry point"""
     parser = argparse.ArgumentParser(
@@ -579,7 +712,8 @@ Examples:
   python scripts/cli.py --player "Patrick Mahomes"    # Show player details
   python scripts/cli.py --data-only                   # Only fetch player data
   python scripts/cli.py --news-only                   # Only fetch and analyze news
-  python scripts/cli.py --draft-recommendations       # Generate AI draft recommendations
+  python scripts/cli.py --draft-recommendations       # Generate fast position-aware draft recommendations
+  python scripts/cli.py --smoke-test                  # Validate local rankings and draft logic
   python scripts/cli.py --draft-recommendations --top 30 --save-recommendations  # Custom recommendations
         """
     )
@@ -599,7 +733,11 @@ Examples:
     action_group.add_argument('--rank-only', action='store_true',
                              help='Run only player ranking (requires existing data)')
     action_group.add_argument('--draft-recommendations', action='store_true',
-                             help='Generate AI-powered draft recommendations using Ollama')
+                             help='Generate position-aware draft recommendations')
+    action_group.add_argument('--smoke-test', action='store_true',
+                             help='Validate local rankings, schema, and draft recommendation logic')
+    action_group.add_argument('--openrouter-smoke-test', action='store_true',
+                             help='Verify OpenRouter env loading and API connectivity')
     
     # Filtering options
     parser.add_argument('--position', type=str, choices=['QB', 'RB', 'WR', 'TE', 'K', 'DST'],
@@ -612,8 +750,8 @@ Examples:
                        help='Sort rankings by (default: vorp for better draft strategy)')
     
     # Pipeline options
-    parser.add_argument('--years', type=int, nargs='+', default=[2022, 2023, 2024],
-                       help='Years of data to analyze (default: 2022 2023 2024)')
+    parser.add_argument('--years', type=int, nargs='+', default=None,
+                       help='Years of data to analyze (default: most recent 3 completed seasons)')
     parser.add_argument('--news-age', type=int, default=24, metavar='HOURS',
                        help='Maximum age of news headlines in hours (default: 24)')
     parser.add_argument('--force-refresh', action='store_true',
@@ -622,12 +760,16 @@ Examples:
                        help='Skip news fetching and analysis (use existing news data if available)')
     
     # Draft recommendations options
-    parser.add_argument('--ollama-url', type=str, default=None,
-                       help='Ollama API URL (default: uses OLLAMA_HOST env var or localhost)')
-    parser.add_argument('--ollama-model', type=str, default='deepseek-r1',
-                       help='Ollama model to use (default: deepseek-r1)')
-    parser.add_argument('--draft-rounds', type=int, default=15,
-                       help='Number of draft rounds to consider (default: 15)')
+    parser.add_argument('--openrouter-model', type=str, default=None,
+                       help='OpenRouter model slug (default: OPENROUTER_MODEL or openai/gpt-4o-mini)')
+    parser.add_argument('--use-ai', action='store_true',
+                       help='Ask OpenRouter to write the draft analysis after building the local board')
+    parser.add_argument('--pick-position', type=int, default=1,
+                       help='Your snake draft position (default: 1)')
+    parser.add_argument('--league-size', type=int, default=8,
+                       help='Number of teams in the league (default: 8)')
+    parser.add_argument('--allow-stale-rankings', action='store_true',
+                       help='Allow legacy/stale rankings for inspection only')
     parser.add_argument('--save-recommendations', action='store_true',
                        help='Save draft recommendations to file')
     
@@ -672,10 +814,23 @@ Examples:
         elif args.draft_recommendations:
             success = cli.run_draft_recommendations(
                 top_n=args.top,
-                draft_rounds=args.draft_rounds,
-                ollama_url=args.ollama_url,
-                model=args.ollama_model,
-                save_output=args.save_recommendations
+                pick_position=args.pick_position,
+                league_size=args.league_size,
+                model=args.openrouter_model,
+                save_output=args.save_recommendations,
+                allow_stale_rankings=args.allow_stale_rankings,
+                use_ai=args.use_ai
+            )
+            sys.exit(0 if success else 1)
+
+        elif args.openrouter_smoke_test:
+            success = cli.run_openrouter_smoke_test(model=args.openrouter_model)
+            sys.exit(0 if success else 1)
+
+        elif args.smoke_test:
+            success = cli.run_smoke_test(
+                pick_position=args.pick_position,
+                league_size=args.league_size,
             )
             sys.exit(0 if success else 1)
             

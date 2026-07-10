@@ -2,7 +2,7 @@
 """
 News Analyzer Module for NFL Fantasy Draft Assistant
 
-This module uses Ollama to analyze fantasy football news headlines and extract
+This module uses OpenRouter models to analyze fantasy football news headlines and extract
 relevant features that impact player fantasy value.
 """
 
@@ -10,18 +10,18 @@ import json
 import logging
 import os
 from typing import Dict, List, Any, Optional
-import ollama
 from datetime import datetime
 import time
 import pandas as pd
+
+from llm_client import OpenRouterClient, parse_json_object
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Ollama configuration
-OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'http://localhost:11434')
-OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'deepseek-r1')  # Default model, can be overridden
+# OpenRouter configuration
+OPENROUTER_MODEL = os.getenv('OPENROUTER_MODEL', 'openai/gpt-4o-mini')
 
 def load_nfl_roster() -> set:
     """Load current NFL roster to validate player names"""
@@ -38,7 +38,8 @@ def load_nfl_roster() -> set:
         roster_file = "data/nfl_player_data.csv"
         if os.path.exists(roster_file):
             df = pd.read_csv(roster_file)
-            roster = set(df['player'].str.lower().tolist())
+            player_col = 'player' if 'player' in df.columns else 'player_name'
+            roster = set(df[player_col].dropna().str.lower().tolist())
             logger.info(f"Loaded {len(roster)} players from base roster")
             return roster
         
@@ -66,23 +67,18 @@ def validate_player_name(player_name: str, nfl_roster: set) -> bool:
     
     return False
 
-def setup_ollama_client():
-    """Setup Ollama client with custom host if needed."""
-    try:
-        # Test connection to Ollama
-        client = ollama.Client(host=OLLAMA_HOST)
-        # Test with a simple request
-        response = client.chat(model=OLLAMA_MODEL, messages=[{'role': 'user', 'content': 'Hello'}])
-        logger.info(f"Successfully connected to Ollama at {OLLAMA_HOST} using model {OLLAMA_MODEL}")
-        return client
-    except Exception as e:
-        logger.error(f"Failed to connect to Ollama at {OLLAMA_HOST}: {str(e)}")
-        logger.info("Make sure Ollama is running and accessible. You can set OLLAMA_HOST environment variable if needed.")
+def setup_llm_client():
+    """Setup OpenRouter client."""
+    client = OpenRouterClient(model=OPENROUTER_MODEL)
+    if not client.api_key:
+        logger.error("OPENROUTER_API_KEY is not set")
         return None
+    logger.info(f"Configured OpenRouter model {client.model}")
+    return client
 
 def create_analysis_prompt(headline: str, summary: str = "") -> str:
     """
-    Create the analysis prompt for Ollama.
+    Create the analysis prompt for OpenRouter.
     
     Args:
         headline: The news headline
@@ -114,12 +110,12 @@ Only return the JSON. No explanation."""
     
     return prompt
 
-def analyze_headline(client: ollama.Client, headline: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def analyze_headline(client: OpenRouterClient, headline: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
-    Analyze a single headline using Ollama.
+    Analyze a single headline using OpenRouter.
     
     Args:
-        client: Ollama client
+        client: OpenRouter client
         headline: Headline dictionary with title, summary, etc.
         
     Returns:
@@ -128,43 +124,21 @@ def analyze_headline(client: ollama.Client, headline: Dict[str, Any]) -> Optiona
     try:
         prompt = create_analysis_prompt(headline['title'], headline.get('summary', ''))
         
-        response = client.chat(
-            model=OLLAMA_MODEL,
-            messages=[{'role': 'user', 'content': prompt}],
-            options={'temperature': 0.1}  # Low temperature for consistent JSON output
+        content = client.chat(
+            messages=[
+                {'role': 'system', 'content': 'Return only valid JSON. No prose.'},
+                {'role': 'user', 'content': prompt},
+            ],
+            temperature=0.1,
+            response_format={"type": "json_object"},
         )
-        
-        # Extract the response content
-        content = response['message']['content'].strip()
+        if content.startswith("Error:"):
+            logger.error(content)
+            return None
         
         # Try to parse JSON from the response
         try:
-            # Remove <think> tags and content
-            if '<think>' in content:
-                start_idx = content.find('</think>')
-                if start_idx != -1:
-                    content = content[start_idx + 8:]  # Skip past </think>
-            
-            # Sometimes the model wraps JSON in code blocks, so we need to extract it
-            if '```json' in content:
-                # Find the start of the JSON content
-                start_idx = content.find('```json') + 7
-                content = content[start_idx:]
-            elif content.startswith('```'):
-                content = content[3:]
-            
-            # Remove closing backticks if present
-            if content.endswith('```'):
-                content = content[:-3]
-            
-            # Clean up any remaining whitespace and newlines
-            content = content.strip()
-            
-            # Debug: log the cleaned content
-            logger.debug(f"Cleaned content: '{content}'")
-            logger.debug(f"Content length: {len(content)}")
-            
-            analysis = json.loads(content)
+            analysis = parse_json_object(content)
             
             # Add metadata
             analysis['original_headline'] = headline['title']
@@ -175,7 +149,7 @@ def analyze_headline(client: ollama.Client, headline: Dict[str, Any]) -> Optiona
             return analysis
             
         except json.JSONDecodeError as e:
-            logger.warning(f"Failed to parse JSON from Ollama response: {e}")
+            logger.warning(f"Failed to parse JSON from OpenRouter response: {e}")
             logger.warning(f"Raw response: {content}")
             return None
             
@@ -306,10 +280,10 @@ def analyze_headlines(input_file: str = 'news/final_quality_headlines.json',
     """
     logger.info("Starting headline analysis...")
     
-    # Setup Ollama client
-    client = setup_ollama_client()
+    # Setup OpenRouter client
+    client = setup_llm_client()
     if not client:
-        logger.error("Cannot proceed without Ollama connection")
+        logger.error("Cannot proceed without OpenRouter configuration")
         return
     
     # Load headlines
@@ -331,7 +305,7 @@ def analyze_headlines(input_file: str = 'news/final_quality_headlines.json',
         if analysis:
             analyses.append(analysis)
         
-        # Small delay to be nice to the Ollama server
+        # Small delay to avoid hammering the API.
         time.sleep(0.1)
     
     logger.info(f"Successfully analyzed {len(analyses)} headlines")
@@ -346,8 +320,8 @@ def analyze_headlines(input_file: str = 'news/final_quality_headlines.json',
             'analyzed_at': datetime.now().isoformat(),
             'total_headlines_analyzed': len(analyses),
             'players_found': len(player_features),
-            'ollama_model': OLLAMA_MODEL,
-            'ollama_host': OLLAMA_HOST
+            'llm_provider': 'openrouter',
+            'openrouter_model': client.model
         },
         'player_features': player_features
     }

@@ -62,8 +62,7 @@ This will:
 - Generate VORP (Value Over Replacement Player) scores
 - Display top 20 players by VORP
 - Show top 7 players for each position (QB, RB, WR, TE)
-- Save detailed rankings to `outputs/ranked_all_players.csv`
-- Generate ranking summary to `outputs/ranking_summary.json`
+- Save detailed rankings and freshness metadata to `outputs/player_rankings.json`
 
 ### Skip News Analysis
 
@@ -75,27 +74,31 @@ python scripts/cli.py --pipeline --skip-news
 
 ### AI-Powered Draft Recommendations
 
-Generate strategic draft recommendations using Ollama LLM:
+Generate strategic draft recommendations using an OpenRouter model:
 
 ```bash
 python scripts/cli.py --draft-recommendations
 ```
 
 This requires:
-- Ollama running locally (default: http://127.0.0.1:11434)
-- A compatible model (default: deepseek-r1)
+- `OPENROUTER_API_KEY` set in your environment
+- A compatible OpenRouter model (default: `OPENROUTER_MODEL` or `openai/gpt-4o-mini`)
+- Fresh rankings with current-season metadata from `python scripts/cli.py --pipeline` or `python scripts/cli.py --rank-only`
 
 #### Custom Draft Recommendations
 
 ```bash
-# Use custom Ollama URL and model
-python scripts/cli.py --draft-recommendations --ollama-url http://localhost:11434 --ollama-model deepseek-r1
+# Use a custom OpenRouter model
+python scripts/cli.py --draft-recommendations --openrouter-model openai/gpt-4o-mini
 
-# Generate recommendations for top 30 players over 12 rounds
-python scripts/cli.py --draft-recommendations --top 30 --draft-rounds 12
+# Generate recommendations for an 8-team league from pick 5
+python scripts/cli.py --draft-recommendations --top 30 --pick-position 5 --league-size 8
 
 # Save recommendations to file
 python scripts/cli.py --draft-recommendations --save-recommendations
+
+# Inspect legacy rankings without treating them as fresh draft advice
+python scripts/cli.py --draft-recommendations --allow-stale-rankings
 ```
 
 ### Individual Components
@@ -160,14 +163,16 @@ python scripts/cli.py --pipeline --team "Kansas City Chiefs"
 
 ### Environment Setup
 
-For Ollama integration, set the environment variable:
+For OpenRouter integration, set the environment variable:
 
 ```bash
 # Windows
-set OLLAMA_HOST=127.0.0.1
+set OPENROUTER_API_KEY=your-api-key
+set OPENROUTER_MODEL=openai/gpt-4o-mini
 
 # macOS/Linux
-export OLLAMA_HOST=127.0.0.1
+export OPENROUTER_API_KEY=your-api-key
+export OPENROUTER_MODEL=openai/gpt-4o-mini
 ```
 
 ### Complete Examples
@@ -180,7 +185,7 @@ python scripts/cli.py --pipeline
 python scripts/cli.py --pipeline --skip-news
 
 # AI draft recommendations with custom settings
-python scripts/cli.py --draft-recommendations --top 40 --draft-rounds 16 --save-recommendations
+python scripts/cli.py --draft-recommendations --top 40 --pick-position 5 --league-size 8 --save-recommendations
 
 # Player-specific analysis
 python scripts/cli.py --player "Christian McCaffrey"
@@ -224,7 +229,7 @@ TE: Brock Bowers (LV): 262.7 points
 - `pandas`: Data manipulation and analysis
 - `requests`: HTTP requests for data fetching
 - `feedparser`: RSS feed parsing for news
-- `ollama`: Local LLM integration
+- OpenRouter-compatible model API via `requests`
 - `python-dotenv`: Environment variable management
 - `tabulate`: Pretty table formatting
 
