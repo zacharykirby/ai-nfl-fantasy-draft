@@ -4,7 +4,7 @@ NFL Fantasy Draft Assistant - Player Ranking Module
 Phase 5: VORP-Based Ranking System
 
 This module creates comprehensive player rankings using:
-- 2022-2024 historical data with proper weighting
+- The two most recent completed seasons with proper weighting
 - target-season projections as primary input
 - Age-based decline penalties
 - Position-specific VORP calculations
@@ -20,6 +20,7 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional
 from pathlib import Path
+from fetch_2026_projections import normalize_player_name
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -164,9 +165,17 @@ class PlayerRanker:
             # Get the most recent season data for each player
             df = df.sort_values(['player_name', 'season'], ascending=[True, False])
             df = df.drop_duplicates(subset=['player_name'], keep='first')
+            df['player_match_name'] = df['player_name'].apply(normalize_player_name)
             logger.info(f"After deduplication: {len(df)} unique players from historical data")
             if not historical_features.empty:
-                df = pd.merge(df, historical_features, on='player_name', how='left')
+                historical_features['player_match_name'] = historical_features['player_name'].apply(
+                    normalize_player_name
+                )
+                historical_features = historical_features.drop(columns=['player_name'])
+                historical_features = historical_features.drop_duplicates(
+                    subset=['player_match_name'], keep='first'
+                )
+                df = pd.merge(df, historical_features, on='player_match_name', how='left')
                 logger.info(f"Merged historical features for {len(historical_features)} players")
             
             # Debug: Check what positions we have
@@ -178,10 +187,13 @@ class PlayerRanker:
                 logger.info("Merging with projection bye week data...")
                 # Handle duplicate player names in projection data by keeping the first occurrence
                 bye_week_df_clean = bye_week_df.drop_duplicates(subset=['PLAYER NAME'], keep='first')
+                bye_week_df_clean['player_match_name'] = bye_week_df_clean['PLAYER NAME'].apply(
+                    normalize_player_name
+                )
                 logger.info(f"Removed {len(bye_week_df) - len(bye_week_df_clean)} duplicate player names from bye week data")
 
                 missing_projection_players = bye_week_df_clean[
-                    ~bye_week_df_clean['PLAYER NAME'].isin(df['player_name'])
+                    ~bye_week_df_clean['player_match_name'].isin(df['player_match_name'])
                 ].copy()
                 if not missing_projection_players.empty:
                     logger.info(f"Adding {len(missing_projection_players)} projection-only players")
@@ -207,18 +219,19 @@ class PlayerRanker:
                         'interceptions': 0,
                         'rushing_fumbles': 0,
                         'rushing_fumbles_lost': 0,
+                        'player_match_name': missing_projection_players['player_match_name'],
                     })
                     df = pd.concat([df, projection_only_rows], ignore_index=True, sort=False)
                 
                 # Create a mapping from player_name to projection data
-                bye_week_mapping = bye_week_df_clean.set_index('PLAYER NAME').to_dict('index')
+                bye_week_mapping = bye_week_df_clean.set_index('player_match_name').to_dict('index')
                 
                 # Add projection data to main dataframe
                 for col in [
                     'BYE WEEK', 'POS', 'TEAM', 'TIERS', 'FANTASYPTS', 'RK',
                     'ADP', 'projection_method', 'source', 'team_conflict',
                 ]:
-                    df[col] = df['player_name'].map(
+                    df[col] = df['player_match_name'].map(
                         lambda x: bye_week_mapping.get(x, {}).get(col, 0)
                     )
                 

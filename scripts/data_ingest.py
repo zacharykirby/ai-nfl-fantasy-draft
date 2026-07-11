@@ -31,6 +31,39 @@ class FantasyDataIngester:
         """Return the most recent completed NFL seasons for historical analysis."""
         last_completed_season = datetime.now().year - 1
         return list(range(last_completed_season - lookback + 1, last_completed_season + 1))
+
+    @staticmethod
+    def _nflverse_player_stats_url(year: int, summary_level: str) -> str:
+        """Return the maintained nflverse player-stats release URL."""
+        return (
+            "https://github.com/nflverse/nflverse-data/releases/download/"
+            f"stats_player/stats_player_{summary_level}_{year}.csv"
+        )
+
+    def _get_nflverse_player_stats(self, year: int, summary_level: str) -> pd.DataFrame:
+        """Fetch current nflverse stats when the archived nfl_data_py URLs fail."""
+        url = self._nflverse_player_stats_url(year, summary_level)
+        logger.info("Fetching %s player stats from nflverse release", summary_level, extra={"url": url})
+        df = pd.read_csv(url, low_memory=False)
+
+        # nflverse's current release uses clearer names than nfl_data_py. Normalize
+        # only the fields whose names changed; the remaining stat columns already
+        # match the historical schema used by the ranker.
+        df = df.rename(
+            columns={
+                "passing_interceptions": "interceptions",
+                "player_display_name": "display_name",
+            }
+        )
+        if summary_level == "week":
+            return df
+
+        # Seasonal identity comes from the roster merge, just as it did with the
+        # legacy provider. Avoid position_x/team_x columns during that merge.
+        return df.drop(
+            columns=["player_name", "display_name", "position", "position_group", "recent_team"],
+            errors="ignore",
+        )
         
     def get_seasonal_data(self, years: List[int] = [2023]) -> pd.DataFrame:
         """
@@ -47,7 +80,14 @@ class FantasyDataIngester:
                     frames.append(df)
                     logger.info(f"Fetched {len(df)} seasonal records for {year}")
             except Exception as e:
-                logger.warning(f"Skipping seasonal data for {year}: {e}")
+                logger.warning(f"Legacy seasonal fetch failed for {year}: {e}")
+                try:
+                    df = self._get_nflverse_player_stats(year, "reg")
+                    if not df.empty:
+                        frames.append(df)
+                        logger.info(f"Fetched {len(df)} seasonal records for {year} from nflverse")
+                except Exception as fallback_error:
+                    logger.warning(f"Skipping seasonal data for {year}: {fallback_error}")
 
         if not frames:
             logger.error("No seasonal data could be fetched")
@@ -74,7 +114,14 @@ class FantasyDataIngester:
                     frames.append(df)
                     logger.info(f"Fetched {len(df)} weekly records for {year}")
             except Exception as e:
-                logger.warning(f"Skipping weekly data for {year}: {e}")
+                logger.warning(f"Legacy weekly fetch failed for {year}: {e}")
+                try:
+                    df = self._get_nflverse_player_stats(year, "week")
+                    if not df.empty:
+                        frames.append(df)
+                        logger.info(f"Fetched {len(df)} weekly records for {year} from nflverse")
+                except Exception as fallback_error:
+                    logger.warning(f"Skipping weekly data for {year}: {fallback_error}")
 
         if not frames:
             logger.error("No weekly data could be fetched")
@@ -424,6 +471,15 @@ class FantasyDataIngester:
         weekly_df = self.get_weekly_data(years)
         roster_df = self.get_roster_data(years)
         combine_df = self.get_combine_data()
+
+        seasonal_years = set(pd.to_numeric(seasonal_df.get('season'), errors='coerce').dropna().astype(int))
+        missing_years = sorted(set(years) - seasonal_years)
+        if missing_years:
+            raise RuntimeError(
+                "Historical ingestion is incomplete; missing seasonal stats for: {}".format(
+                    ", ".join(str(year) for year in missing_years)
+                )
+            )
         
         # Merge and clean data
         final_df = self.merge_data_sources(seasonal_df, weekly_df, roster_df, combine_df)

@@ -12,7 +12,7 @@ A command-line tool for NFL fantasy football draft analysis and player forecasti
   - Consistency metrics and performance analysis
 
 - **Data Sources**:
-  - Seasonal data (2022-2024 seasons)
+  - Seasonal data (most recent three completed seasons)
   - Weekly game-by-game statistics
   - Player roster information
   - NFL Combine athletic measurements
@@ -176,7 +176,7 @@ python scripts/cli.py --pipeline
 ```
 
 This will:
-- Fetch and process NFL player data (2022-2024 historical data)
+- Fetch and process NFL player data (most recent three completed seasons)
 - Analyze player performance and calculate rankings
 - Generate VORP (Value Over Replacement Player) scores
 - Display top 20 players by VORP

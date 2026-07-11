@@ -86,6 +86,25 @@ def test_build_historical_features_weights_recent_seasons():
     assert player["points_2023"] == 100
 
 
+def test_build_historical_features_uses_2025_and_drops_older_season():
+    ranker = PlayerRanker()
+    history = pd.DataFrame(
+        [
+            {"player_name": "Injured Star", "season": 2025, "fantasy_points_ppr": 40},
+            {"player_name": "Injured Star", "season": 2024, "fantasy_points_ppr": 300},
+            {"player_name": "Injured Star", "season": 2023, "fantasy_points_ppr": 350},
+        ]
+    )
+
+    player = ranker.build_historical_features(history).iloc[0]
+
+    assert player["weighted_historical_points"] == pytest.approx(144)
+    assert player["historical_seasons_count"] == 2
+    assert player["points_2025"] == 40
+    assert player["points_2024"] == 300
+    assert "points_2023" not in player.index
+
+
 def test_score_prefers_real_historical_features_over_legacy_points():
     ranker = PlayerRanker()
     row = sample_player_row(
@@ -236,3 +255,39 @@ def test_projection_team_is_preferred_over_historical_team(tmp_path):
     loaded = PlayerRanker(data_dir=data_dir, target_season=2026).load_data()
 
     assert loaded.iloc[0]["team"] == "NEW"
+
+
+def test_projection_suffix_matches_historical_player_name(tmp_path):
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    pd.DataFrame(
+        [
+            {
+                "player_name": "James Cook",
+                "season": 2025,
+                "position": "RB",
+                "team": "BUF",
+                "fantasy_points": 250,
+                "fantasy_points_ppr": 300,
+                "games": 17,
+            }
+        ]
+    ).to_csv(data_dir / "nfl_player_data.csv", index=False)
+    pd.DataFrame(
+        [
+            {
+                "name": "James Cook III",
+                "position": "RB",
+                "team": "BUF",
+                "projected_fantasy_points": 260,
+                "rank": 10,
+            }
+        ]
+    ).to_csv(data_dir / "players_2026_positions_bye.csv", index=False)
+
+    loaded = PlayerRanker(data_dir=data_dir, target_season=2026).load_data()
+    player = loaded.iloc[0]
+
+    assert player["name"] == "James Cook"
+    assert player["projected_fantasy_points"] == 260
+    assert player["weighted_historical_points"] == 300

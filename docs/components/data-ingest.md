@@ -22,19 +22,19 @@ The system uses `nfl_data_py`, which aggregates data from:
    - Comprehensive season-long statistics
    - Fantasy points (PPR scoring)
    - Advanced metrics (target share, air yards, etc.)
-   - Years: 2022-2024
+   - Years: most recent three completed seasons
 
 2. **Weekly Data** (`nfl.import_weekly_data`)
    - Game-by-game statistics
    - Used for consistency analysis
    - Fantasy points per game
-   - Years: 2022-2024
+   - Years: most recent three completed seasons
 
 3. **Roster Data** (`nfl.import_seasonal_rosters`)
    - Player information (name, position, team)
    - Physical attributes (height, weight, age)
    - Experience level (years in league)
-   - Years: 2022-2024
+   - Years: most recent three completed seasons
 
 4. **Combine Data** (`nfl.import_combine_data`)
    - NFL Combine measurements
@@ -71,7 +71,7 @@ python scripts/data_ingest.py
 ```
 
 This will:
-1. Fetch seasonal data for 2022-2024
+1. Fetch seasonal data for the most recent three completed seasons
 2. Download weekly statistics for consistency analysis
 3. Get roster information for player details
 4. Collect NFL Combine data for athletic measurements
@@ -157,7 +157,7 @@ The output dataset includes:
 ## Data Quality Metrics
 
 - **Total Players**: 1,725
-- **Seasons**: 2022-2024
+- **Seasons**: most recent three completed seasons
 - **Positions**: QB (227), RB (445), WR (639), TE (341)
 - **Missing Data**: Minimal (only 60.2% missing combine height data)
 - **Data Completeness**: >95% for core statistics
