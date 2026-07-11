@@ -28,6 +28,7 @@ from news_analyzer import analyze_headlines
 from ranker import PlayerRanker
 from draft_recommender import DraftRecommender
 from llm_client import OpenRouterClient
+from draft_board import DraftBoardBuilder, LeagueConfig, format_board, load_board, validate_board
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -89,6 +90,71 @@ class FantasyCLI:
     def print_info(self, message: str):
         """Print an info message"""
         print(f"{Colors.OKCYAN}ℹ️  {message}{Colors.ENDC}")
+
+    def build_draft_board(self, top_n: int = None, league_size: int = 10, scoring: str = "half_ppr"):
+        """Export the position-first JSON contract used by live draft clients."""
+        self.print_section_header("BUILDING POSITION PRIORITY BOARD")
+        try:
+            limits = None
+            if top_n is not None:
+                limits = {position: top_n for position in ("QB", "RB", "WR", "TE")}
+            builder = DraftBoardBuilder()
+            board = builder.build(
+                league=LeagueConfig(scoring=scoring, league_size=league_size),
+                limits=limits,
+            )
+            output = builder.write(board)
+            counts = board["metadata"]["role_counts"]
+            self.print_success(
+                "Exported {}".format(
+                    ", ".join("{} {}".format(count, position) for position, count in counts.items())
+                )
+            )
+            health = board["health"]
+            if health["status"] == "ready":
+                self.print_success("Board health: READY")
+            else:
+                self.print_warning(
+                    "Board health: NOT READY ({} errors, {} warnings)".format(
+                        health["error_count"], health["warning_count"]
+                    )
+                )
+                for issue in health["issues"]:
+                    print("- [{}] {}".format(issue["code"], issue["message"]))
+            self.print_success("Saved board to {}".format(output))
+            return True
+        except Exception as exc:
+            self.print_error("Board build failed: {}".format(exc))
+            return False
+
+    def validate_draft_board(self):
+        """Validate the exported board and return false when it is unsafe for live advice."""
+        self.print_section_header("DRAFT BOARD HEALTH")
+        try:
+            board = load_board()
+            report = validate_board(board)
+            print("Status: {}".format(report["status"].upper()))
+            print("Errors: {} | Warnings: {}".format(report["error_count"], report["warning_count"]))
+            for issue in report["issues"]:
+                print("- {} [{}]: {}".format(issue["severity"].upper(), issue["code"], issue["message"]))
+            return report["status"] == "ready"
+        except Exception as exc:
+            self.print_error("Board validation failed: {}".format(exc))
+            return False
+
+    def show_draft_board(self, position: str = None, top_n: int = 10):
+        """Print role priorities from the stable board JSON."""
+        self.print_section_header("PLAYER PRIORITIES BY ROLE")
+        try:
+            board = load_board()
+            print(format_board(board, top_n=top_n, position=position))
+            health = board.get("health", {})
+            if health.get("status") != "ready":
+                self.print_warning("This board is marked NOT READY; inspect --validate-board before using it live.")
+            return True
+        except Exception as exc:
+            self.print_error("Unable to show board: {}".format(exc))
+            return False
     
     def _load_rankings_dataframe(self) -> pd.DataFrame:
         """Load current JSON rankings and normalize legacy display column names."""
@@ -738,12 +804,22 @@ Examples:
                              help='Validate local rankings, schema, and draft recommendation logic')
     action_group.add_argument('--openrouter-smoke-test', action='store_true',
                              help='Verify OpenRouter env loading and API connectivity')
+    action_group.add_argument('--build-board', action='store_true',
+                             help='Build position-first outputs/draft_board.json')
+    action_group.add_argument('--validate-board', action='store_true',
+                             help='Validate draft board data health and freshness')
+    action_group.add_argument('--show-board', action='store_true',
+                             help='Show top player priorities by position')
     
     # Filtering options
     parser.add_argument('--position', type=str, choices=['QB', 'RB', 'WR', 'TE', 'K', 'DST'],
                        help='Filter by position (for rankings)')
     parser.add_argument('--top', type=int, default=10, metavar='N',
                        help='Show top N players (default: 10)')
+    parser.add_argument('--board-top', type=int, default=None, metavar='N',
+                       help='Override the default per-position board limits')
+    parser.add_argument('--scoring', choices=['standard', 'half_ppr', 'ppr'], default='half_ppr',
+                       help='League scoring format for board metadata (default: half_ppr)')
     parser.add_argument('--exclude-injured', action='store_true',
                        help='Exclude injured players from rankings')
     parser.add_argument('--sort-by', type=str, choices=['vorp', 'score', 'buzz', 'consistency'], default='vorp',
@@ -832,6 +908,22 @@ Examples:
                 pick_position=args.pick_position,
                 league_size=args.league_size,
             )
+            sys.exit(0 if success else 1)
+
+        elif args.build_board:
+            success = cli.build_draft_board(
+                top_n=args.board_top,
+                league_size=args.league_size,
+                scoring=args.scoring,
+            )
+            sys.exit(0 if success else 1)
+
+        elif args.validate_board:
+            success = cli.validate_draft_board()
+            sys.exit(0 if success else 1)
+
+        elif args.show_board:
+            success = cli.show_draft_board(position=args.position, top_n=args.top)
             sys.exit(0 if success else 1)
             
     except KeyboardInterrupt:

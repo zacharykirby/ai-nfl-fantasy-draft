@@ -21,6 +21,10 @@ This directory contains detailed documentation for each component of the NFL Fan
   - OpenRouter integration for intelligent suggestions
   - Personalized draft advice
 
+- **[Draft Board](draft-board.md)** - `draft_board.py`
+  - Position-first JSON contract for live draft clients
+  - Projection source and schema health validation
+
 ### Supporting Components
 
 - **[News Fetcher](news-fetcher.md)** - `news_fetcher.py`

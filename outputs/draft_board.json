@@ -1,0 +1,6025 @@
+{
+  "schema_version": "1.0",
+  "metadata": {
+    "generated_at": "2026-07-10T19:14:55.799768",
+    "season": 2026,
+    "source_rankings": "outputs/player_rankings.json",
+    "source_generated_at": "2026-07-08T19:38:49.537966",
+    "projection_source": "data\\players_2026_positions_bye.csv",
+    "news_source": "none",
+    "ranking_count": 419,
+    "role_counts": {
+      "QB": 20,
+      "RB": 50,
+      "WR": 60,
+      "TE": 20
+    }
+  },
+  "league": {
+    "name": "Default half-PPR league",
+    "scoring": "half_ppr",
+    "league_size": 10,
+    "starters": {
+      "QB": 1,
+      "RB": 2,
+      "WR": 2,
+      "TE": 1,
+      "FLEX": 1
+    },
+    "bench_size": 6
+  },
+  "roles": {
+    "QB": [
+      {
+        "player": "Josh Allen",
+        "team": "BUF",
+        "position": "QB",
+        "position_rank": 1,
+        "overall_rank": 28,
+        "tier": 2,
+        "projected_points": 372.1,
+        "vorp": 77.53,
+        "score": 280.63,
+        "adp": 28,
+        "age": 28,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 381.3,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 147.51,
+            "historical_points_component": 95.31,
+            "consistency_component": 6.98,
+            "usage_component": 1.07,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Lamar Jackson",
+        "team": "BAL",
+        "position": "QB",
+        "position_rank": 2,
+        "overall_rank": 40,
+        "tier": 2,
+        "projected_points": 324.6,
+        "vorp": 64.43,
+        "score": 267.53,
+        "adp": 40,
+        "age": 27,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 390.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 129.84,
+            "historical_points_component": 97.68,
+            "consistency_component": 8.79,
+            "usage_component": 1.46,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Drake Maye",
+        "team": "NE",
+        "position": "QB",
+        "position_rank": 3,
+        "overall_rank": 41,
+        "tier": 2,
+        "projected_points": 326.9,
+        "vorp": -28.83,
+        "score": 174.27,
+        "adp": 41,
+        "age": 22,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 177.1,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 130.76,
+            "historical_points_component": 44.28,
+            "consistency_component": 6.99,
+            "usage_component": 0.9,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Joe Burrow",
+        "team": "CIN",
+        "position": "QB",
+        "position_rank": 4,
+        "overall_rank": 47,
+        "tier": 2,
+        "projected_points": 310.6,
+        "vorp": 25.77,
+        "score": 228.87,
+        "adp": 47,
+        "age": 27,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 282.6,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 124.24,
+            "historical_points_component": 70.64,
+            "consistency_component": 6.08,
+            "usage_component": 0.49,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jayden Daniels",
+        "team": "WAS",
+        "position": "QB",
+        "position_rank": 5,
+        "overall_rank": 56,
+        "tier": 2,
+        "projected_points": 324.5,
+        "vorp": 44.46,
+        "score": 247.56,
+        "adp": 56,
+        "age": 23,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 355.8,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 129.8,
+            "historical_points_component": 88.95,
+            "consistency_component": 6.75,
+            "usage_component": 1.48,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jalen Hurts",
+        "team": "PHI",
+        "position": "QB",
+        "position_rank": 6,
+        "overall_rank": 61,
+        "tier": 3,
+        "projected_points": 322.5,
+        "vorp": 43.65,
+        "score": 246.75,
+        "adp": 61,
+        "age": 26,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 331.8,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 129.0,
+            "historical_points_component": 82.95,
+            "consistency_component": 7.23,
+            "usage_component": 1.58,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Caleb Williams",
+        "team": "CHI",
+        "position": "QB",
+        "position_rank": 7,
+        "overall_rank": 66,
+        "tier": 3,
+        "projected_points": 299.8,
+        "vorp": 4.85,
+        "score": 207.95,
+        "adp": 66,
+        "age": 22,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 254.5,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 119.92,
+            "historical_points_component": 63.63,
+            "consistency_component": 5.11,
+            "usage_component": 0.95,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Justin Herbert",
+        "team": "LAC",
+        "position": "QB",
+        "position_rank": 8,
+        "overall_rank": 75,
+        "tier": 3,
+        "projected_points": 300.3,
+        "vorp": 8.38,
+        "score": 211.48,
+        "adp": 75,
+        "age": 26,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 264.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 120.12,
+            "historical_points_component": 66.23,
+            "consistency_component": 6.04,
+            "usage_component": 0.77,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Dak Prescott",
+        "team": "DAL",
+        "position": "QB",
+        "position_rank": 9,
+        "overall_rank": 82,
+        "tier": 3,
+        "projected_points": 306.0,
+        "vorp": 1.36,
+        "score": 204.46,
+        "adp": 82,
+        "age": 31,
+        "bye_week": 14,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Age Risk",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 207.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 122.4,
+            "historical_points_component": 51.76,
+            "consistency_component": 5.47,
+            "usage_component": 0.33,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Trevor Lawrence",
+        "team": "JAX",
+        "position": "QB",
+        "position_rank": 10,
+        "overall_rank": 92,
+        "tier": 3,
+        "projected_points": 303.9,
+        "vorp": -7.49,
+        "score": 195.61,
+        "adp": 92,
+        "age": 24,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 192.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 121.56,
+            "historical_points_component": 48.11,
+            "consistency_component": 5.92,
+            "usage_component": 0.52,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jaxson Dart",
+        "team": "NYG",
+        "position": "QB",
+        "position_rank": 11,
+        "overall_rank": 106,
+        "tier": 4,
+        "projected_points": 311.5,
+        "vorp": -79.69,
+        "score": 123.41,
+        "adp": 106,
+        "age": null,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 124.6,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Brock Purdy",
+        "team": "SF",
+        "position": "QB",
+        "position_rank": 12,
+        "overall_rank": 116,
+        "tier": 4,
+        "projected_points": 306.2,
+        "vorp": 16.85,
+        "score": 219.95,
+        "adp": 116,
+        "age": 24,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 278.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 122.48,
+            "historical_points_component": 69.59,
+            "consistency_component": 6.25,
+            "usage_component": 0.88,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Patrick Mahomes II",
+        "team": "KC",
+        "position": "QB",
+        "position_rank": 13,
+        "overall_rank": 119,
+        "tier": 4,
+        "projected_points": 302.7,
+        "vorp": -76.17,
+        "score": 126.93,
+        "adp": 119,
+        "age": null,
+        "bye_week": 5,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 121.08,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Matthew Stafford",
+        "team": "LA",
+        "position": "QB",
+        "position_rank": 14,
+        "overall_rank": 143,
+        "tier": 4,
+        "projected_points": 294.0,
+        "vorp": -17.06,
+        "score": 186.04,
+        "adp": 143,
+        "age": 36,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Age Risk",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 226.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 117.6,
+            "historical_points_component": 56.5,
+            "consistency_component": 6.62,
+            "usage_component": 0.33,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Bo Nix",
+        "team": "DEN",
+        "position": "QB",
+        "position_rank": 15,
+        "overall_rank": 153,
+        "tier": 4,
+        "projected_points": 297.7,
+        "vorp": 17.68,
+        "score": 220.78,
+        "adp": 153,
+        "age": 24,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 317.2,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 119.08,
+            "historical_points_component": 79.3,
+            "consistency_component": 6.63,
+            "usage_component": 1.02,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jared Goff",
+        "team": "DET",
+        "position": "QB",
+        "position_rank": 16,
+        "overall_rank": 170,
+        "tier": 5,
+        "projected_points": 287.3,
+        "vorp": 10.86,
+        "score": 213.96,
+        "adp": 170,
+        "age": 29,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 310.3,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 114.92,
+            "historical_points_component": 77.58,
+            "consistency_component": 5.9,
+            "usage_component": 0.39,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Kyler Murray",
+        "team": "ARI",
+        "position": "QB",
+        "position_rank": 17,
+        "overall_rank": 173,
+        "tier": 5,
+        "projected_points": 276.1,
+        "vorp": -16.85,
+        "score": 186.25,
+        "adp": 173,
+        "age": 27,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 236.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 110.44,
+            "historical_points_component": 59.22,
+            "consistency_component": 8.17,
+            "usage_component": 0.92,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Geno Smith",
+        "team": "SEA",
+        "position": "QB",
+        "position_rank": 18,
+        "overall_rank": 187,
+        "tier": 5,
+        "projected_points": 233.2,
+        "vorp": -32.81,
+        "score": 170.29,
+        "adp": 187,
+        "age": 33,
+        "bye_week": null,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Age Risk"
+        ],
+        "evidence": {
+          "weighted_historical_points": 250.5,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 93.28,
+            "historical_points_component": 62.63,
+            "consistency_component": 6.26,
+            "usage_component": 0.62,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jordan Love",
+        "team": "GB",
+        "position": "QB",
+        "position_rank": 19,
+        "overall_rank": 192,
+        "tier": 5,
+        "projected_points": 267.5,
+        "vorp": -7.1,
+        "score": 196.0,
+        "adp": 192,
+        "age": 25,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 267.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 107.0,
+            "historical_points_component": 66.98,
+            "consistency_component": 6.54,
+            "usage_component": 0.31,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Baker Mayfield",
+        "team": "TB",
+        "position": "QB",
+        "position_rank": 20,
+        "overall_rank": 198,
+        "tier": 5,
+        "projected_points": 282.0,
+        "vorp": 15.16,
+        "score": 218.26,
+        "adp": 198,
+        "age": 29,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 329.1,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 112.8,
+            "historical_points_component": 82.28,
+            "consistency_component": 7.35,
+            "usage_component": 0.67,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      }
+    ],
+    "RB": [
+      {
+        "player": "Jahmyr Gibbs",
+        "team": "DET",
+        "position": "RB",
+        "position_rank": 1,
+        "overall_rank": 1,
+        "tier": 1,
+        "projected_points": 301.6,
+        "vorp": 134.11,
+        "score": 239.9,
+        "adp": 1,
+        "age": 22,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "Elite Tier",
+          "Top 10 Rank",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 309.8,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 120.58,
+            "historical_points_component": 77.44,
+            "consistency_component": 5.86,
+            "usage_component": 3.36,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 10.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Bijan Robinson",
+        "team": "ATL",
+        "position": "RB",
+        "position_rank": 2,
+        "overall_rank": 2,
+        "tier": 1,
+        "projected_points": 290.5,
+        "vorp": 127.29,
+        "score": 233.08,
+        "adp": 2,
+        "age": 22,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "Elite Tier",
+          "Top 10 Rank",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 303.5,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 116.2,
+            "historical_points_component": 75.88,
+            "consistency_component": 6.7,
+            "usage_component": 4.29,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 10.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jonathan Taylor",
+        "team": "IND",
+        "position": "RB",
+        "position_rank": 3,
+        "overall_rank": 6,
+        "tier": 1,
+        "projected_points": 265.9,
+        "vorp": 95.87,
+        "score": 201.66,
+        "adp": 6,
+        "age": 25,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "Elite Tier",
+          "Top 10 Rank",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 210.6,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 106.36,
+            "historical_points_component": 52.64,
+            "consistency_component": 5.4,
+            "usage_component": 4.59,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 10.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Christian McCaffrey",
+        "team": "SF",
+        "position": "RB",
+        "position_rank": 4,
+        "overall_rank": 7,
+        "tier": 1,
+        "projected_points": 263.1,
+        "vorp": 91.01,
+        "score": 196.8,
+        "adp": 7,
+        "age": 28,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Elite Tier",
+          "Top 10 Rank",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 185.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 105.24,
+            "historical_points_component": 46.3,
+            "consistency_component": 7.01,
+            "usage_component": 3.25,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 10.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "James Cook III",
+        "team": "BUF",
+        "position": "RB",
+        "position_rank": 5,
+        "overall_rank": 10,
+        "tier": 1,
+        "projected_points": 236.9,
+        "vorp": 10.88,
+        "score": 116.67,
+        "adp": 10,
+        "age": null,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside",
+          "Elite Tier",
+          "Top 10 Rank"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 94.76,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 10.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Ashton Jeanty",
+        "team": "LV",
+        "position": "RB",
+        "position_rank": 6,
+        "overall_rank": 12,
+        "tier": 1,
+        "projected_points": 216.4,
+        "vorp": -3.88,
+        "score": 101.91,
+        "adp": 12,
+        "age": null,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside",
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 86.56,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Saquon Barkley",
+        "team": "PHI",
+        "position": "RB",
+        "position_rank": 7,
+        "overall_rank": 13,
+        "tier": 1,
+        "projected_points": 224.0,
+        "vorp": 102.16,
+        "score": 207.95,
+        "adp": 13,
+        "age": 27,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 302.5,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 89.6,
+            "historical_points_component": 75.62,
+            "consistency_component": 5.46,
+            "usage_component": 3.78,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Derrick Henry",
+        "team": "BAL",
+        "position": "RB",
+        "position_rank": 8,
+        "overall_rank": 17,
+        "tier": 1,
+        "projected_points": 255.1,
+        "vorp": 87.92,
+        "score": 193.71,
+        "adp": 17,
+        "age": 30,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Age Risk",
+          "Elite Tier",
+          "High Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 300.5,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 102.04,
+            "historical_points_component": 75.13,
+            "consistency_component": 5.84,
+            "usage_component": 3.62,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "De'Von Achane",
+        "team": "MIA",
+        "position": "RB",
+        "position_rank": 9,
+        "overall_rank": 18,
+        "tier": 1,
+        "projected_points": 240.1,
+        "vorp": 95.5,
+        "score": 201.29,
+        "adp": 18,
+        "age": 22,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 256.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 96.04,
+            "historical_points_component": 64.05,
+            "consistency_component": 4.39,
+            "usage_component": 3.31,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Omarion Hampton",
+        "team": "LAC",
+        "position": "RB",
+        "position_rank": 10,
+        "overall_rank": 19,
+        "tier": 1,
+        "projected_points": 239.0,
+        "vorp": 3.81,
+        "score": 109.59,
+        "adp": 19,
+        "age": null,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside",
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 95.6,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Kenneth Walker III",
+        "team": "SEA",
+        "position": "RB",
+        "position_rank": 11,
+        "overall_rank": 21,
+        "tier": 1,
+        "projected_points": 235.0,
+        "vorp": 40.62,
+        "score": 146.4,
+        "adp": 21,
+        "age": 23,
+        "bye_week": 5,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside",
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 181.2,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 94.0,
+            "historical_points_component": 45.3,
+            "consistency_component": 5.82,
+            "usage_component": 3.62,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Chase Brown",
+        "team": "CIN",
+        "position": "RB",
+        "position_rank": 12,
+        "overall_rank": 23,
+        "tier": 1,
+        "projected_points": 231.0,
+        "vorp": 69.26,
+        "score": 175.04,
+        "adp": 23,
+        "age": 24,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 174.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 92.4,
+            "historical_points_component": 43.6,
+            "consistency_component": 4.34,
+            "usage_component": 3.54,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jeremiyah Love",
+        "team": "ARI",
+        "position": "RB",
+        "position_rank": 13,
+        "overall_rank": 27,
+        "tier": 2,
+        "projected_points": 227.0,
+        "vorp": -5.45,
+        "score": 100.34,
+        "adp": 27,
+        "age": null,
+        "bye_week": 14,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 90.8,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Kyren Williams",
+        "team": "LA",
+        "position": "RB",
+        "position_rank": 14,
+        "overall_rank": 31,
+        "tier": 2,
+        "projected_points": 223.0,
+        "vorp": 80.07,
+        "score": 185.86,
+        "adp": 31,
+        "age": 24,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside"
+        ],
+        "evidence": {
+          "weighted_historical_points": 265.3,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 89.2,
+            "historical_points_component": 66.31,
+            "consistency_component": 6.71,
+            "usage_component": 3.89,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Breece Hall",
+        "team": "NYJ",
+        "position": "RB",
+        "position_rank": 15,
+        "overall_rank": 32,
+        "tier": 2,
+        "projected_points": 219.0,
+        "vorp": 79.75,
+        "score": 185.54,
+        "adp": 32,
+        "age": 23,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside"
+        ],
+        "evidence": {
+          "weighted_historical_points": 260.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 87.6,
+            "historical_points_component": 65.19,
+            "consistency_component": 4.68,
+            "usage_component": 3.33,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Josh Jacobs",
+        "team": "GB",
+        "position": "RB",
+        "position_rank": 16,
+        "overall_rank": 34,
+        "tier": 2,
+        "projected_points": 221.2,
+        "vorp": 82.25,
+        "score": 188.04,
+        "adp": 34,
+        "age": 26,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 248.3,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 88.48,
+            "historical_points_component": 62.08,
+            "consistency_component": 6.32,
+            "usage_component": 3.74,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Javonte Williams",
+        "team": "DEN",
+        "position": "RB",
+        "position_rank": 17,
+        "overall_rank": 36,
+        "tier": 2,
+        "projected_points": 211.0,
+        "vorp": 51.39,
+        "score": 157.18,
+        "adp": 36,
+        "age": 24,
+        "bye_week": 14,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside"
+        ],
+        "evidence": {
+          "weighted_historical_points": 166.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 84.4,
+            "historical_points_component": 41.6,
+            "consistency_component": 4.3,
+            "usage_component": 2.12,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Travis Etienne Jr.",
+        "team": "NO",
+        "position": "RB",
+        "position_rank": 18,
+        "overall_rank": 38,
+        "tier": 2,
+        "projected_points": 207.0,
+        "vorp": -8.0,
+        "score": 97.79,
+        "adp": 38,
+        "age": null,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 82.8,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Cam Skattebo",
+        "team": "NYG",
+        "position": "RB",
+        "position_rank": 19,
+        "overall_rank": 44,
+        "tier": 2,
+        "projected_points": 203.0,
+        "vorp": -11.62,
+        "score": 94.17,
+        "adp": 44,
+        "age": null,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 81.2,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Bucky Irving",
+        "team": "TB",
+        "position": "RB",
+        "position_rank": 20,
+        "overall_rank": 46,
+        "tier": 2,
+        "projected_points": 199.0,
+        "vorp": 70.33,
+        "score": 176.12,
+        "adp": 46,
+        "age": 22,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 244.4,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 79.6,
+            "historical_points_component": 61.1,
+            "consistency_component": 5.18,
+            "usage_component": 2.82,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "David Montgomery",
+        "team": "DET",
+        "position": "RB",
+        "position_rank": 21,
+        "overall_rank": 48,
+        "tier": 2,
+        "projected_points": 195.0,
+        "vorp": 62.98,
+        "score": 168.77,
+        "adp": 48,
+        "age": 27,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 215.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 78.0,
+            "historical_points_component": 53.98,
+            "consistency_component": 6.43,
+            "usage_component": 2.95,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Quinshon Judkins",
+        "team": "CLE",
+        "position": "RB",
+        "position_rank": 22,
+        "overall_rank": 49,
+        "tier": 2,
+        "projected_points": 191.0,
+        "vorp": -13.44,
+        "score": 92.35,
+        "adp": 49,
+        "age": null,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 76.4,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "TreVeyon Henderson",
+        "team": "NE",
+        "position": "RB",
+        "position_rank": 23,
+        "overall_rank": 51,
+        "tier": 2,
+        "projected_points": 187.0,
+        "vorp": -18.34,
+        "score": 87.45,
+        "adp": 51,
+        "age": null,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 74.8,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "D'Andre Swift",
+        "team": "CHI",
+        "position": "RB",
+        "position_rank": 24,
+        "overall_rank": 52,
+        "tier": 2,
+        "projected_points": 183.0,
+        "vorp": 48.46,
+        "score": 154.25,
+        "adp": 52,
+        "age": 25,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 208.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 73.2,
+            "historical_points_component": 52.11,
+            "consistency_component": 4.89,
+            "usage_component": 3.47,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Bhayshul Tuten",
+        "team": "JAC",
+        "position": "RB",
+        "position_rank": 25,
+        "overall_rank": 58,
+        "tier": 2,
+        "projected_points": 179.0,
+        "vorp": -18.79,
+        "score": 87.0,
+        "adp": 58,
+        "age": null,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 71.6,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jadarian Price",
+        "team": "SEA",
+        "position": "RB",
+        "position_rank": 26,
+        "overall_rank": 62,
+        "tier": 3,
+        "projected_points": 175.0,
+        "vorp": -26.31,
+        "score": 79.47,
+        "adp": 62,
+        "age": null,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 70.0,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Tony Pollard",
+        "team": "TEN",
+        "position": "RB",
+        "position_rank": 27,
+        "overall_rank": 67,
+        "tier": 3,
+        "projected_points": 171.0,
+        "vorp": 42.8,
+        "score": 148.58,
+        "adp": 67,
+        "age": 27,
+        "bye_week": 9,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 209.5,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 68.4,
+            "historical_points_component": 52.36,
+            "consistency_component": 5.72,
+            "usage_component": 3.76,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jaylen Warren",
+        "team": "PIT",
+        "position": "RB",
+        "position_rank": 28,
+        "overall_rank": 68,
+        "tier": 3,
+        "projected_points": 167.0,
+        "vorp": 27.15,
+        "score": 132.94,
+        "adp": 68,
+        "age": 25,
+        "bye_week": 9,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 153.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 66.8,
+            "historical_points_component": 38.25,
+            "consistency_component": 4.91,
+            "usage_component": 1.98,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Chuba Hubbard",
+        "team": "CAR",
+        "position": "RB",
+        "position_rank": 29,
+        "overall_rank": 70,
+        "tier": 3,
+        "projected_points": 163.0,
+        "vorp": 38.82,
+        "score": 144.61,
+        "adp": 70,
+        "age": 25,
+        "bye_week": 5,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 218.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 65.2,
+            "historical_points_component": 54.49,
+            "consistency_component": 5.01,
+            "usage_component": 3.91,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Rico Dowdle",
+        "team": "DAL",
+        "position": "RB",
+        "position_rank": 30,
+        "overall_rank": 72,
+        "tier": 3,
+        "projected_points": 159.0,
+        "vorp": 30.76,
+        "score": 136.55,
+        "adp": 72,
+        "age": 26,
+        "bye_week": 9,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 155.3,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 63.6,
+            "historical_points_component": 38.82,
+            "consistency_component": 4.7,
+            "usage_component": 3.43,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Rhamondre Stevenson",
+        "team": "NE",
+        "position": "RB",
+        "position_rank": 31,
+        "overall_rank": 73,
+        "tier": 3,
+        "projected_points": 155.0,
+        "vorp": 22.93,
+        "score": 128.72,
+        "adp": 73,
+        "age": 26,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 163.8,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 62.0,
+            "historical_points_component": 40.96,
+            "consistency_component": 4.23,
+            "usage_component": 3.2,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "RJ Harvey",
+        "team": "DEN",
+        "position": "RB",
+        "position_rank": 32,
+        "overall_rank": 74,
+        "tier": 3,
+        "projected_points": 151.0,
+        "vorp": -30.22,
+        "score": 75.56,
+        "adp": 74,
+        "age": null,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 60.4,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Blake Corum",
+        "team": "LA",
+        "position": "RB",
+        "position_rank": 33,
+        "overall_rank": 76,
+        "tier": 3,
+        "projected_points": 147.0,
+        "vorp": -32.24,
+        "score": 73.55,
+        "adp": 76,
+        "age": 23,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 33.5,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 58.8,
+            "historical_points_component": 8.38,
+            "consistency_component": 3.77,
+            "usage_component": 1.08,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Kyle Monangai",
+        "team": "CHI",
+        "position": "RB",
+        "position_rank": 34,
+        "overall_rank": 77,
+        "tier": 3,
+        "projected_points": 143.0,
+        "vorp": -36.48,
+        "score": 69.3,
+        "adp": 77,
+        "age": null,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 57.2,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "J.K. Dobbins",
+        "team": "LAC",
+        "position": "RB",
+        "position_rank": 35,
+        "overall_rank": 79,
+        "tier": 3,
+        "projected_points": 139.0,
+        "vorp": 3.16,
+        "score": 108.95,
+        "adp": 79,
+        "age": 25,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 119.8,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 55.6,
+            "historical_points_component": 29.94,
+            "consistency_component": 3.33,
+            "usage_component": 3.24,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Kenny Gainwell",
+        "team": "TB",
+        "position": "RB",
+        "position_rank": 36,
+        "overall_rank": 87,
+        "tier": 3,
+        "projected_points": 135.0,
+        "vorp": -34.67,
+        "score": 71.12,
+        "adp": 87,
+        "age": null,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 54.0,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jacory Croskey-Merritt",
+        "team": "WAS",
+        "position": "RB",
+        "position_rank": 37,
+        "overall_rank": 88,
+        "tier": 3,
+        "projected_points": 131.0,
+        "vorp": -40.56,
+        "score": 65.22,
+        "adp": 88,
+        "age": null,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 52.4,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Rachaad White",
+        "team": "TB",
+        "position": "RB",
+        "position_rank": 38,
+        "overall_rank": 90,
+        "tier": 3,
+        "projected_points": 127.0,
+        "vorp": 31.75,
+        "score": 137.54,
+        "adp": 90,
+        "age": 25,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 226.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 50.8,
+            "historical_points_component": 56.73,
+            "consistency_component": 5.4,
+            "usage_component": 2.44,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Aaron Jones Sr.",
+        "team": "MIN",
+        "position": "RB",
+        "position_rank": 39,
+        "overall_rank": 91,
+        "tier": 3,
+        "projected_points": 123.0,
+        "vorp": -41.02,
+        "score": 64.77,
+        "adp": 91,
+        "age": null,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 49.2,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jonathon Brooks",
+        "team": "CAR",
+        "position": "RB",
+        "position_rank": 40,
+        "overall_rank": 94,
+        "tier": 3,
+        "projected_points": 119.0,
+        "vorp": -48.59,
+        "score": 57.2,
+        "adp": 94,
+        "age": 21,
+        "bye_week": 5,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 7.5,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 47.6,
+            "historical_points_component": 1.88,
+            "consistency_component": 2.12,
+            "usage_component": 1.2,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jordan Mason",
+        "team": "SF",
+        "position": "RB",
+        "position_rank": 41,
+        "overall_rank": 95,
+        "tier": 3,
+        "projected_points": 115.0,
+        "vorp": -7.83,
+        "score": 97.96,
+        "adp": 95,
+        "age": 25,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 86.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 46.0,
+            "historical_points_component": 21.72,
+            "consistency_component": 3.0,
+            "usage_component": 2.73,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Chris Rodriguez Jr.",
+        "team": "WAS",
+        "position": "RB",
+        "position_rank": 42,
+        "overall_rank": 99,
+        "tier": 3,
+        "projected_points": 111.0,
+        "vorp": -33.31,
+        "score": 72.48,
+        "adp": 99,
+        "age": 24,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 31.5,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 44.4,
+            "historical_points_component": 7.88,
+            "consistency_component": 2.17,
+            "usage_component": 1.2,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Tyrone Tracy Jr.",
+        "team": "NYG",
+        "position": "RB",
+        "position_rank": 43,
+        "overall_rank": 103,
+        "tier": 4,
+        "projected_points": 107.0,
+        "vorp": 2.36,
+        "score": 108.15,
+        "adp": 103,
+        "age": 24,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 182.3,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 42.8,
+            "historical_points_component": 45.58,
+            "consistency_component": 3.98,
+            "usage_component": 2.71,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Woody Marks",
+        "team": "HOU",
+        "position": "RB",
+        "position_rank": 44,
+        "overall_rank": 105,
+        "tier": 4,
+        "projected_points": 103.0,
+        "vorp": -48.74,
+        "score": 57.05,
+        "adp": 105,
+        "age": null,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 41.2,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Zach Charbonnet",
+        "team": "SEA",
+        "position": "RB",
+        "position_rank": 45,
+        "overall_rank": 110,
+        "tier": 4,
+        "projected_points": 99.0,
+        "vorp": -40.06,
+        "score": 65.73,
+        "adp": 110,
+        "age": 23,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 152.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 39.6,
+            "historical_points_component": 38.16,
+            "consistency_component": 3.3,
+            "usage_component": 2.08,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Tyler Allgeier",
+        "team": "ATL",
+        "position": "RB",
+        "position_rank": 46,
+        "overall_rank": 111,
+        "tier": 4,
+        "projected_points": 95.0,
+        "vorp": -43.79,
+        "score": 61.99,
+        "adp": 111,
+        "age": 24,
+        "bye_week": 14,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 118.8,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 38.0,
+            "historical_points_component": 29.69,
+            "consistency_component": 3.36,
+            "usage_component": 1.76,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Keaton Mitchell",
+        "team": "BAL",
+        "position": "RB",
+        "position_rank": 47,
+        "overall_rank": 115,
+        "tier": 4,
+        "projected_points": 91.0,
+        "vorp": -64.23,
+        "score": 41.56,
+        "adp": 115,
+        "age": 22,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 32.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 36.4,
+            "historical_points_component": 8.01,
+            "consistency_component": 3.09,
+            "usage_component": 1.6,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Isiah Pacheco",
+        "team": "KC",
+        "position": "RB",
+        "position_rank": 48,
+        "overall_rank": 117,
+        "tier": 4,
+        "projected_points": 87.0,
+        "vorp": -41.63,
+        "score": 64.16,
+        "adp": 117,
+        "age": 25,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 119.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 34.8,
+            "historical_points_component": 29.93,
+            "consistency_component": 4.28,
+            "usage_component": 1.9,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jonah Coleman",
+        "team": "DEN",
+        "position": "RB",
+        "position_rank": 49,
+        "overall_rank": 123,
+        "tier": 4,
+        "projected_points": 83.0,
+        "vorp": -72.2,
+        "score": 33.59,
+        "adp": 123,
+        "age": null,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 33.2,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Tyjae Spears",
+        "team": "TEN",
+        "position": "RB",
+        "position_rank": 50,
+        "overall_rank": 129,
+        "tier": 4,
+        "projected_points": 79.0,
+        "vorp": -56.67,
+        "score": 49.12,
+        "adp": 129,
+        "age": 23,
+        "bye_week": 9,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 129.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 31.6,
+            "historical_points_component": 32.42,
+            "consistency_component": 3.55,
+            "usage_component": 1.9,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      }
+    ],
+    "WR": [
+      {
+        "player": "Ja'Marr Chase",
+        "team": "CIN",
+        "position": "WR",
+        "position_rank": 1,
+        "overall_rank": 3,
+        "tier": 1,
+        "projected_points": 214.4,
+        "vorp": 77.63,
+        "score": 212.77,
+        "adp": 3,
+        "age": 24,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "Elite Tier",
+          "Top 10 Rank"
+        ],
+        "evidence": {
+          "weighted_historical_points": 346.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 85.76,
+            "historical_points_component": 86.72,
+            "consistency_component": 4.54,
+            "usage_component": 3.09,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 10.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Puka Nacua",
+        "team": "LA",
+        "position": "WR",
+        "position_rank": 2,
+        "overall_rank": 4,
+        "tier": 1,
+        "projected_points": 233.2,
+        "vorp": 23.6,
+        "score": 158.74,
+        "adp": 4,
+        "age": 23,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "High Upside",
+          "Elite Tier",
+          "Top 10 Rank"
+        ],
+        "evidence": {
+          "weighted_historical_points": 243.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 93.28,
+            "historical_points_component": 60.84,
+            "consistency_component": 5.19,
+            "usage_component": 2.45,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 10.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jaxon Smith-Njigba",
+        "team": "SEA",
+        "position": "WR",
+        "position_rank": 3,
+        "overall_rank": 5,
+        "tier": 1,
+        "projected_points": 213.1,
+        "vorp": 35.22,
+        "score": 170.36,
+        "adp": 5,
+        "age": 22,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "Elite Tier",
+          "Top 10 Rank"
+        ],
+        "evidence": {
+          "weighted_historical_points": 211.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 85.24,
+            "historical_points_component": 52.93,
+            "consistency_component": 4.77,
+            "usage_component": 2.42,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 10.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Amon-Ra St. Brown",
+        "team": "DET",
+        "position": "WR",
+        "position_rank": 4,
+        "overall_rank": 8,
+        "tier": 1,
+        "projected_points": 202.4,
+        "vorp": 68.08,
+        "score": 203.22,
+        "adp": 8,
+        "age": 24,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "Elite Tier",
+          "Top 10 Rank"
+        ],
+        "evidence": {
+          "weighted_historical_points": 322.1,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 80.96,
+            "historical_points_component": 80.52,
+            "consistency_component": 6.73,
+            "usage_component": 2.35,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 10.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "CeeDee Lamb",
+        "team": "DAL",
+        "position": "WR",
+        "position_rank": 5,
+        "overall_rank": 9,
+        "tier": 1,
+        "projected_points": 175.8,
+        "vorp": 59.06,
+        "score": 194.2,
+        "adp": 9,
+        "age": 25,
+        "bye_week": 14,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Elite Tier",
+          "Top 10 Rank"
+        ],
+        "evidence": {
+          "weighted_historical_points": 320.1,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 70.32,
+            "historical_points_component": 80.03,
+            "consistency_component": 5.81,
+            "usage_component": 3.04,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 10.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Justin Jefferson",
+        "team": "MIN",
+        "position": "WR",
+        "position_rank": 6,
+        "overall_rank": 11,
+        "tier": 1,
+        "projected_points": 170.9,
+        "vorp": 38.19,
+        "score": 173.33,
+        "adp": 11,
+        "age": 25,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 272.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 68.36,
+            "historical_points_component": 68.04,
+            "consistency_component": 5.87,
+            "usage_component": 2.57,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Nico Collins",
+        "team": "HOU",
+        "position": "WR",
+        "position_rank": 7,
+        "overall_rank": 14,
+        "tier": 1,
+        "projected_points": 215.6,
+        "vorp": 47.84,
+        "score": 182.98,
+        "adp": 14,
+        "age": 25,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside",
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 230.5,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 86.24,
+            "historical_points_component": 57.63,
+            "consistency_component": 5.83,
+            "usage_component": 2.12,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Drake London",
+        "team": "ATL",
+        "position": "WR",
+        "position_rank": 8,
+        "overall_rank": 15,
+        "tier": 1,
+        "projected_points": 187.8,
+        "vorp": 35.48,
+        "score": 170.63,
+        "adp": 15,
+        "age": 23,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 238.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 75.12,
+            "historical_points_component": 59.56,
+            "consistency_component": 4.66,
+            "usage_component": 2.79,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "A.J. Brown",
+        "team": "PHI",
+        "position": "WR",
+        "position_rank": 9,
+        "overall_rank": 16,
+        "tier": 1,
+        "projected_points": 168.7,
+        "vorp": 34.29,
+        "score": 169.43,
+        "adp": 16,
+        "age": 27,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 246.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 67.48,
+            "historical_points_component": 61.5,
+            "consistency_component": 5.24,
+            "usage_component": 1.71,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "George Pickens",
+        "team": "PIT",
+        "position": "WR",
+        "position_rank": 10,
+        "overall_rank": 20,
+        "tier": 1,
+        "projected_points": 169.7,
+        "vorp": -8.93,
+        "score": 126.21,
+        "adp": 20,
+        "age": 23,
+        "bye_week": 14,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 182.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 67.88,
+            "historical_points_component": 45.54,
+            "consistency_component": 4.5,
+            "usage_component": 2.06,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Rashee Rice",
+        "team": "KC",
+        "position": "WR",
+        "position_rank": 11,
+        "overall_rank": 24,
+        "tier": 1,
+        "projected_points": 174.5,
+        "vorp": 9.5,
+        "score": 144.65,
+        "adp": 24,
+        "age": 24,
+        "bye_week": 5,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 123.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 69.8,
+            "historical_points_component": 30.98,
+            "consistency_component": 7.46,
+            "usage_component": 2.9,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Chris Olave",
+        "team": "NO",
+        "position": "WR",
+        "position_rank": 12,
+        "overall_rank": 26,
+        "tier": 2,
+        "projected_points": 203.6,
+        "vorp": 12.32,
+        "score": 147.46,
+        "adp": 26,
+        "age": 24,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside"
+        ],
+        "evidence": {
+          "weighted_historical_points": 138.5,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 81.44,
+            "historical_points_component": 34.64,
+            "consistency_component": 4.75,
+            "usage_component": 1.89,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "DeVonta Smith",
+        "team": "PHI",
+        "position": "WR",
+        "position_rank": 13,
+        "overall_rank": 29,
+        "tier": 2,
+        "projected_points": 201.2,
+        "vorp": 34.32,
+        "score": 169.46,
+        "adp": 29,
+        "age": 25,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "High Upside"
+        ],
+        "evidence": {
+          "weighted_historical_points": 210.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 80.48,
+            "historical_points_component": 52.67,
+            "consistency_component": 4.99,
+            "usage_component": 1.57,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Malik Nabers",
+        "team": "NYG",
+        "position": "WR",
+        "position_rank": 14,
+        "overall_rank": 30,
+        "tier": 2,
+        "projected_points": 198.8,
+        "vorp": 17.43,
+        "score": 152.57,
+        "adp": 30,
+        "age": 21,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 273.6,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 79.52,
+            "historical_points_component": 68.4,
+            "consistency_component": 6.09,
+            "usage_component": 3.4,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Tee Higgins",
+        "team": "CIN",
+        "position": "WR",
+        "position_rank": 15,
+        "overall_rank": 33,
+        "tier": 2,
+        "projected_points": 196.4,
+        "vorp": 24.97,
+        "score": 160.12,
+        "adp": 33,
+        "age": 25,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 188.3,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 78.56,
+            "historical_points_component": 47.07,
+            "consistency_component": 4.34,
+            "usage_component": 2.73,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Zay Flowers",
+        "team": "BAL",
+        "position": "WR",
+        "position_rank": 16,
+        "overall_rank": 35,
+        "tier": 2,
+        "projected_points": 194.0,
+        "vorp": 30.88,
+        "score": 166.02,
+        "adp": 35,
+        "age": 23,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 208.3,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 77.6,
+            "historical_points_component": 52.06,
+            "consistency_component": 4.56,
+            "usage_component": 2.05,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Tetairoa McMillan",
+        "team": "CAR",
+        "position": "WR",
+        "position_rank": 17,
+        "overall_rank": 37,
+        "tier": 2,
+        "projected_points": 191.6,
+        "vorp": -46.84,
+        "score": 88.31,
+        "adp": 37,
+        "age": null,
+        "bye_week": 5,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 76.64,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Emeka Egbuka",
+        "team": "TB",
+        "position": "WR",
+        "position_rank": 18,
+        "overall_rank": 39,
+        "tier": 2,
+        "projected_points": 189.2,
+        "vorp": -41.14,
+        "score": 94.01,
+        "adp": 39,
+        "age": null,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 75.68,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Ladd McConkey",
+        "team": "LAC",
+        "position": "WR",
+        "position_rank": 19,
+        "overall_rank": 43,
+        "tier": 2,
+        "projected_points": 186.8,
+        "vorp": 29.01,
+        "score": 164.16,
+        "adp": 43,
+        "age": 22,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 240.9,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 74.72,
+            "historical_points_component": 60.23,
+            "consistency_component": 5.15,
+            "usage_component": 1.98,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Garrett Wilson",
+        "team": "NYJ",
+        "position": "WR",
+        "position_rank": 20,
+        "overall_rank": 45,
+        "tier": 2,
+        "projected_points": 184.4,
+        "vorp": 30.74,
+        "score": 165.88,
+        "adp": 45,
+        "age": 24,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 236.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 73.76,
+            "historical_points_component": 59.1,
+            "consistency_component": 5.57,
+            "usage_component": 2.7,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Davante Adams",
+        "team": "NYJ",
+        "position": "WR",
+        "position_rank": 21,
+        "overall_rank": 50,
+        "tier": 2,
+        "projected_points": 182.0,
+        "vorp": 32.53,
+        "score": 167.67,
+        "adp": 50,
+        "age": 31,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Age Risk"
+        ],
+        "evidence": {
+          "weighted_historical_points": 250.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 72.8,
+            "historical_points_component": 62.74,
+            "consistency_component": 4.37,
+            "usage_component": 3.02,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Terry McLaurin",
+        "team": "WAS",
+        "position": "WR",
+        "position_rank": 22,
+        "overall_rank": 53,
+        "tier": 2,
+        "projected_points": 179.6,
+        "vorp": 25.46,
+        "score": 160.6,
+        "adp": 53,
+        "age": 28,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 242.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 71.84,
+            "historical_points_component": 60.49,
+            "consistency_component": 5.93,
+            "usage_component": 1.75,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jameson Williams",
+        "team": "DET",
+        "position": "WR",
+        "position_rank": 23,
+        "overall_rank": 54,
+        "tier": 2,
+        "projected_points": 177.2,
+        "vorp": 7.64,
+        "score": 142.79,
+        "adp": 54,
+        "age": 23,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 159.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 70.88,
+            "historical_points_component": 39.86,
+            "consistency_component": 4.42,
+            "usage_component": 1.71,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Luther Burden III",
+        "team": "CHI",
+        "position": "WR",
+        "position_rank": 24,
+        "overall_rank": 55,
+        "tier": 2,
+        "projected_points": 174.8,
+        "vorp": -51.84,
+        "score": 83.3,
+        "adp": 55,
+        "age": null,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 69.92,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jaylen Waddle",
+        "team": "MIA",
+        "position": "WR",
+        "position_rank": 25,
+        "overall_rank": 57,
+        "tier": 2,
+        "projected_points": 172.4,
+        "vorp": 10.78,
+        "score": 145.92,
+        "adp": 57,
+        "age": 25,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 169.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 68.96,
+            "historical_points_component": 42.3,
+            "consistency_component": 4.63,
+            "usage_component": 1.78,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Mike Evans",
+        "team": "TB",
+        "position": "WR",
+        "position_rank": 26,
+        "overall_rank": 59,
+        "tier": 2,
+        "projected_points": 170.0,
+        "vorp": 30.26,
+        "score": 165.4,
+        "adp": 59,
+        "age": 31,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Age Risk"
+        ],
+        "evidence": {
+          "weighted_historical_points": 257.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 68.0,
+            "historical_points_component": 64.31,
+            "consistency_component": 4.97,
+            "usage_component": 2.2,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Christian Watson",
+        "team": "GB",
+        "position": "WR",
+        "position_rank": 27,
+        "overall_rank": 60,
+        "tier": 2,
+        "projected_points": 167.6,
+        "vorp": -11.26,
+        "score": 123.88,
+        "adp": 60,
+        "age": 25,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 103.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 67.04,
+            "historical_points_component": 25.92,
+            "consistency_component": 3.67,
+            "usage_component": 1.33,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "DJ Moore",
+        "team": "CHI",
+        "position": "WR",
+        "position_rank": 28,
+        "overall_rank": 64,
+        "tier": 3,
+        "projected_points": 165.2,
+        "vorp": 16.45,
+        "score": 151.6,
+        "adp": 64,
+        "age": 27,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 238.1,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 66.08,
+            "historical_points_component": 59.52,
+            "consistency_component": 5.19,
+            "usage_component": 2.47,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Rome Odunze",
+        "team": "CHI",
+        "position": "WR",
+        "position_rank": 29,
+        "overall_rank": 69,
+        "tier": 3,
+        "projected_points": 162.8,
+        "vorp": -10.13,
+        "score": 125.01,
+        "adp": 69,
+        "age": 22,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 144.9,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 65.12,
+            "historical_points_component": 36.23,
+            "consistency_component": 3.55,
+            "usage_component": 1.78,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Carnell Tate",
+        "team": "TEN",
+        "position": "WR",
+        "position_rank": 30,
+        "overall_rank": 71,
+        "tier": 3,
+        "projected_points": 160.4,
+        "vorp": -58.65,
+        "score": 76.49,
+        "adp": 71,
+        "age": null,
+        "bye_week": 9,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 64.16,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Alec Pierce",
+        "team": "IND",
+        "position": "WR",
+        "position_rank": 31,
+        "overall_rank": 78,
+        "tier": 3,
+        "projected_points": 158.0,
+        "vorp": -10.83,
+        "score": 124.32,
+        "adp": 78,
+        "age": 24,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 135.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 63.2,
+            "historical_points_component": 33.75,
+            "consistency_component": 3.72,
+            "usage_component": 1.48,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Brian Thomas Jr.",
+        "team": "JAX",
+        "position": "WR",
+        "position_rank": 32,
+        "overall_rank": 80,
+        "tier": 3,
+        "projected_points": 155.6,
+        "vorp": 25.47,
+        "score": 160.61,
+        "adp": 80,
+        "age": 21,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 284.0,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 62.24,
+            "historical_points_component": 71.0,
+            "consistency_component": 5.53,
+            "usage_component": 2.35,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Marvin Harrison Jr.",
+        "team": "ARI",
+        "position": "WR",
+        "position_rank": 33,
+        "overall_rank": 81,
+        "tier": 3,
+        "projected_points": 153.2,
+        "vorp": -3.86,
+        "score": 131.28,
+        "adp": 81,
+        "age": 22,
+        "bye_week": 14,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 196.5,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 61.28,
+            "historical_points_component": 49.12,
+            "consistency_component": 4.2,
+            "usage_component": 2.18,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jordyn Tyson",
+        "team": "NO",
+        "position": "WR",
+        "position_rank": 34,
+        "overall_rank": 83,
+        "tier": 3,
+        "projected_points": 150.8,
+        "vorp": -60.92,
+        "score": 74.22,
+        "adp": 83,
+        "age": null,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 60.32,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "DK Metcalf",
+        "team": "SEA",
+        "position": "WR",
+        "position_rank": 35,
+        "overall_rank": 84,
+        "tier": 3,
+        "projected_points": 148.4,
+        "vorp": -2.91,
+        "score": 132.23,
+        "adp": 84,
+        "age": 26,
+        "bye_week": 9,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 204.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 59.36,
+            "historical_points_component": 51.22,
+            "consistency_component": 4.99,
+            "usage_component": 2.16,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Courtland Sutton",
+        "team": "DEN",
+        "position": "WR",
+        "position_rank": 36,
+        "overall_rank": 85,
+        "tier": 3,
+        "projected_points": 146.0,
+        "vorp": 6.2,
+        "score": 141.34,
+        "adp": 85,
+        "age": 28,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 220.3,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 58.4,
+            "historical_points_component": 55.06,
+            "consistency_component": 5.99,
+            "usage_component": 2.38,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Parker Washington",
+        "team": "JAX",
+        "position": "WR",
+        "position_rank": 37,
+        "overall_rank": 86,
+        "tier": 3,
+        "projected_points": 143.6,
+        "vorp": -50.32,
+        "score": 84.82,
+        "adp": 86,
+        "age": 22,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 73.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 57.44,
+            "historical_points_component": 18.47,
+            "consistency_component": 3.11,
+            "usage_component": 1.28,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Makai Lemon",
+        "team": "PHI",
+        "position": "WR",
+        "position_rank": 38,
+        "overall_rank": 89,
+        "tier": 3,
+        "projected_points": 141.2,
+        "vorp": -59.94,
+        "score": 75.21,
+        "adp": 89,
+        "age": null,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 56.48,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Quentin Johnston",
+        "team": "LAC",
+        "position": "WR",
+        "position_rank": 39,
+        "overall_rank": 93,
+        "tier": 3,
+        "projected_points": 138.8,
+        "vorp": -38.47,
+        "score": 96.67,
+        "adp": 93,
+        "age": 22,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 142.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 55.52,
+            "historical_points_component": 35.61,
+            "consistency_component": 3.82,
+            "usage_component": 1.95,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Chris Godwin Jr.",
+        "team": "TB",
+        "position": "WR",
+        "position_rank": 40,
+        "overall_rank": 97,
+        "tier": 3,
+        "projected_points": 136.4,
+        "vorp": -63.55,
+        "score": 71.59,
+        "adp": 97,
+        "age": null,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 54.56,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Michael Wilson",
+        "team": "ARI",
+        "position": "WR",
+        "position_rank": 41,
+        "overall_rank": 100,
+        "tier": 3,
+        "projected_points": 134.0,
+        "vorp": -30.93,
+        "score": 104.21,
+        "adp": 100,
+        "age": 24,
+        "bye_week": 14,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 120.5,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 53.6,
+            "historical_points_component": 30.12,
+            "consistency_component": 4.57,
+            "usage_component": 1.42,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jayden Reed",
+        "team": "GB",
+        "position": "WR",
+        "position_rank": 42,
+        "overall_rank": 101,
+        "tier": 4,
+        "projected_points": 131.6,
+        "vorp": -7.07,
+        "score": 128.07,
+        "adp": 101,
+        "age": 24,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 205.1,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 52.64,
+            "historical_points_component": 51.27,
+            "consistency_component": 4.42,
+            "usage_component": 1.32,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jordan Addison",
+        "team": "MIN",
+        "position": "WR",
+        "position_rank": 43,
+        "overall_rank": 102,
+        "tier": 4,
+        "projected_points": 129.2,
+        "vorp": -7.88,
+        "score": 127.26,
+        "adp": 102,
+        "age": 22,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 216.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 51.68,
+            "historical_points_component": 54.01,
+            "consistency_component": 3.97,
+            "usage_component": 1.86,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Ricky Pearsall",
+        "team": "SF",
+        "position": "WR",
+        "position_rank": 44,
+        "overall_rank": 107,
+        "tier": 4,
+        "projected_points": 126.8,
+        "vorp": -50.19,
+        "score": 84.95,
+        "adp": 107,
+        "age": 23,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 93.5,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 50.72,
+            "historical_points_component": 23.38,
+            "consistency_component": 3.37,
+            "usage_component": 1.73,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jakobi Meyers",
+        "team": "LV",
+        "position": "WR",
+        "position_rank": 45,
+        "overall_rank": 108,
+        "tier": 4,
+        "projected_points": 124.4,
+        "vorp": -9.52,
+        "score": 125.63,
+        "adp": 108,
+        "age": 27,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 218.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 49.76,
+            "historical_points_component": 54.56,
+            "consistency_component": 5.65,
+            "usage_component": 2.58,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Michael Pittman Jr.",
+        "team": "PIT",
+        "position": "WR",
+        "position_rank": 46,
+        "overall_rank": 109,
+        "tier": 4,
+        "projected_points": 122.0,
+        "vorp": -73.9,
+        "score": 61.24,
+        "adp": 109,
+        "age": null,
+        "bye_week": 9,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 48.8,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Xavier Worthy",
+        "team": "KC",
+        "position": "WR",
+        "position_rank": 47,
+        "overall_rank": 112,
+        "tier": 4,
+        "projected_points": 119.6,
+        "vorp": -50.1,
+        "score": 85.04,
+        "adp": 112,
+        "age": 21,
+        "bye_week": 5,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 187.2,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 47.84,
+            "historical_points_component": 46.8,
+            "consistency_component": 4.47,
+            "usage_component": 1.63,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Josh Downs",
+        "team": "IND",
+        "position": "WR",
+        "position_rank": 48,
+        "overall_rank": 113,
+        "tier": 4,
+        "projected_points": 117.2,
+        "vorp": -66.54,
+        "score": 68.6,
+        "adp": 113,
+        "age": 23,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 172.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 46.88,
+            "historical_points_component": 43.04,
+            "consistency_component": 4.67,
+            "usage_component": 2.29,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Wan'Dale Robinson",
+        "team": "NYG",
+        "position": "WR",
+        "position_rank": 49,
+        "overall_rank": 114,
+        "tier": 4,
+        "projected_points": 114.8,
+        "vorp": -59.95,
+        "score": 75.19,
+        "adp": 114,
+        "age": 23,
+        "bye_week": 9,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 162.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 45.92,
+            "historical_points_component": 40.72,
+            "consistency_component": 5.22,
+            "usage_component": 2.47,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Matthew Golden",
+        "team": "GB",
+        "position": "WR",
+        "position_rank": 50,
+        "overall_rank": 122,
+        "tier": 4,
+        "projected_points": 112.4,
+        "vorp": -92.97,
+        "score": 42.17,
+        "adp": 122,
+        "age": null,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 44.96,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jayden Higgins",
+        "team": "HOU",
+        "position": "WR",
+        "position_rank": 51,
+        "overall_rank": 124,
+        "tier": 4,
+        "projected_points": 110.0,
+        "vorp": -93.54,
+        "score": 41.6,
+        "adp": 124,
+        "age": null,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 44.0,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "KC Concepcion",
+        "team": "CLE",
+        "position": "WR",
+        "position_rank": 52,
+        "overall_rank": 125,
+        "tier": 4,
+        "projected_points": 107.6,
+        "vorp": -95.7,
+        "score": 39.44,
+        "adp": 125,
+        "age": null,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 43.04,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Romeo Doubs",
+        "team": "GB",
+        "position": "WR",
+        "position_rank": 53,
+        "overall_rank": 126,
+        "tier": 4,
+        "projected_points": 105.2,
+        "vorp": -62.56,
+        "score": 72.58,
+        "adp": 126,
+        "age": 24,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 149.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 42.08,
+            "historical_points_component": 37.25,
+            "consistency_component": 4.4,
+            "usage_component": 1.54,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Khalil Shakir",
+        "team": "BUF",
+        "position": "WR",
+        "position_rank": 54,
+        "overall_rank": 135,
+        "tier": 4,
+        "projected_points": 102.8,
+        "vorp": -60.01,
+        "score": 75.14,
+        "adp": 135,
+        "age": 24,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 154.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 41.12,
+            "historical_points_component": 38.69,
+            "consistency_component": 5.12,
+            "usage_component": 1.67,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jalen Coker",
+        "team": "CAR",
+        "position": "WR",
+        "position_rank": 55,
+        "overall_rank": 139,
+        "tier": 4,
+        "projected_points": 100.4,
+        "vorp": -88.04,
+        "score": 47.1,
+        "adp": 139,
+        "age": 22,
+        "bye_week": 5,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 92.6,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 40.16,
+            "historical_points_component": 23.14,
+            "consistency_component": 3.74,
+            "usage_component": 1.38,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Rashid Shaheed",
+        "team": "NO",
+        "position": "WR",
+        "position_rank": 56,
+        "overall_rank": 147,
+        "tier": 4,
+        "projected_points": 98.0,
+        "vorp": -70.69,
+        "score": 64.46,
+        "adp": 147,
+        "age": 26,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 112.1,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 39.2,
+            "historical_points_component": 28.03,
+            "consistency_component": 6.64,
+            "usage_component": 2.46,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Stefon Diggs",
+        "team": "HOU",
+        "position": "WR",
+        "position_rank": 57,
+        "overall_rank": 154,
+        "tier": 4,
+        "projected_points": 95.6,
+        "vorp": -58.26,
+        "score": 76.88,
+        "adp": 154,
+        "age": 30,
+        "bye_week": null,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Age Risk",
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 182.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 38.24,
+            "historical_points_component": 45.67,
+            "consistency_component": 6.1,
+            "usage_component": 2.4,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jauan Jennings",
+        "team": "SF",
+        "position": "WR",
+        "position_rank": 58,
+        "overall_rank": 159,
+        "tier": 4,
+        "projected_points": 93.2,
+        "vorp": -65.61,
+        "score": 69.54,
+        "adp": 159,
+        "age": 27,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 146.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 37.28,
+            "historical_points_component": 36.73,
+            "consistency_component": 3.32,
+            "usage_component": 2.26,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Omar Cooper Jr.",
+        "team": "NYJ",
+        "position": "WR",
+        "position_rank": 59,
+        "overall_rank": 163,
+        "tier": 5,
+        "projected_points": 90.8,
+        "vorp": -101.63,
+        "score": 33.51,
+        "adp": 163,
+        "age": null,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 36.32,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Denzel Boston",
+        "team": "CLE",
+        "position": "WR",
+        "position_rank": 60,
+        "overall_rank": 165,
+        "tier": 5,
+        "projected_points": 88.4,
+        "vorp": -102.2,
+        "score": 32.94,
+        "adp": 165,
+        "age": null,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 35.36,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      }
+    ],
+    "TE": [
+      {
+        "player": "Brock Bowers",
+        "team": "LV",
+        "position": "TE",
+        "position_rank": 1,
+        "overall_rank": 22,
+        "tier": 1,
+        "projected_points": 147.3,
+        "vorp": 63.7,
+        "score": 158.34,
+        "adp": 22,
+        "age": 21,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Elite Tier"
+        ],
+        "evidence": {
+          "weighted_historical_points": 262.7,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 58.92,
+            "historical_points_component": 65.67,
+            "consistency_component": 5.21,
+            "usage_component": 2.7,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 15.0,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Trey McBride",
+        "team": "ARI",
+        "position": "TE",
+        "position_rank": 2,
+        "overall_rank": 25,
+        "tier": 2,
+        "projected_points": 150.6,
+        "vorp": 49.19,
+        "score": 143.83,
+        "adp": 25,
+        "age": 24,
+        "bye_week": 14,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 218.9,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 60.24,
+            "historical_points_component": 54.72,
+            "consistency_component": 4.86,
+            "usage_component": 2.76,
+            "team_offense_component": 0.0,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 8.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Colston Loveland",
+        "team": "CHI",
+        "position": "TE",
+        "position_rank": 3,
+        "overall_rank": 42,
+        "tier": 2,
+        "projected_points": 130.4,
+        "vorp": -25.16,
+        "score": 69.48,
+        "adp": 42,
+        "age": null,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 52.16,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 12.75,
+            "projection_rank_component": 7.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Tyler Warren",
+        "team": "IND",
+        "position": "TE",
+        "position_rank": 4,
+        "overall_rank": 63,
+        "tier": 3,
+        "projected_points": 118.8,
+        "vorp": -27.76,
+        "score": 66.88,
+        "adp": 63,
+        "age": null,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 47.52,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Tucker Kraft",
+        "team": "GB",
+        "position": "TE",
+        "position_rank": 5,
+        "overall_rank": 65,
+        "tier": 3,
+        "projected_points": 110.4,
+        "vorp": 11.27,
+        "score": 105.91,
+        "adp": 65,
+        "age": 23,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 129.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 44.16,
+            "historical_points_component": 32.34,
+            "consistency_component": 4.51,
+            "usage_component": 1.24,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 5.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Sam LaPorta",
+        "team": "DET",
+        "position": "TE",
+        "position_rank": 6,
+        "overall_rank": 96,
+        "tier": 3,
+        "projected_points": 113.2,
+        "vorp": 29.64,
+        "score": 124.28,
+        "adp": 96,
+        "age": 23,
+        "bye_week": 6,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 200.5,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 45.28,
+            "historical_points_component": 50.12,
+            "consistency_component": 5.25,
+            "usage_component": 1.46,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Harold Fannin Jr.",
+        "team": "CLE",
+        "position": "TE",
+        "position_rank": 7,
+        "overall_rank": 98,
+        "tier": 3,
+        "projected_points": 112.3,
+        "vorp": -33.51,
+        "score": 61.13,
+        "adp": 98,
+        "age": null,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 44.92,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 10.5,
+            "projection_rank_component": 4.0,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Kyle Pitts Sr.",
+        "team": "ATL",
+        "position": "TE",
+        "position_rank": 8,
+        "overall_rank": 104,
+        "tier": 4,
+        "projected_points": 116.4,
+        "vorp": -35.3,
+        "score": 59.34,
+        "adp": 104,
+        "age": null,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 46.56,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "George Kittle",
+        "team": "SF",
+        "position": "TE",
+        "position_rank": 9,
+        "overall_rank": 118,
+        "tier": 4,
+        "projected_points": 105.2,
+        "vorp": 31.02,
+        "score": 125.66,
+        "adp": 118,
+        "age": 30,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Age Risk"
+        ],
+        "evidence": {
+          "weighted_historical_points": 223.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 42.08,
+            "historical_points_component": 55.81,
+            "consistency_component": 5.14,
+            "usage_component": 1.88,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Dalton Kincaid",
+        "team": "BUF",
+        "position": "TE",
+        "position_rank": 10,
+        "overall_rank": 121,
+        "tier": 4,
+        "projected_points": 102.6,
+        "vorp": 3.56,
+        "score": 98.2,
+        "adp": 121,
+        "age": 24,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 120.6,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 41.04,
+            "historical_points_component": 30.15,
+            "consistency_component": 4.85,
+            "usage_component": 1.41,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Travis Kelce",
+        "team": "KC",
+        "position": "TE",
+        "position_rank": 11,
+        "overall_rank": 127,
+        "tier": 4,
+        "projected_points": 108.8,
+        "vorp": 20.29,
+        "score": 114.93,
+        "adp": 127,
+        "age": 34,
+        "bye_week": 5,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Age Risk"
+        ],
+        "evidence": {
+          "weighted_historical_points": 205.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 43.52,
+            "historical_points_component": 51.25,
+            "consistency_component": 4.65,
+            "usage_component": 2.1,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Pat Freiermuth",
+        "team": "PIT",
+        "position": "TE",
+        "position_rank": 12,
+        "overall_rank": 132,
+        "tier": 4,
+        "projected_points": 80.9,
+        "vorp": -8.28,
+        "score": 86.36,
+        "adp": 132,
+        "age": 25,
+        "bye_week": null,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 131.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 32.36,
+            "historical_points_component": 32.92,
+            "consistency_component": 4.02,
+            "usage_component": 1.3,
+            "team_offense_component": 5.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Mark Andrews",
+        "team": "BAL",
+        "position": "TE",
+        "position_rank": 13,
+        "overall_rank": 149,
+        "tier": 4,
+        "projected_points": 106.5,
+        "vorp": 17.01,
+        "score": 111.65,
+        "adp": 149,
+        "age": 28,
+        "bye_week": 13,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 167.4,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 42.6,
+            "historical_points_component": 41.86,
+            "consistency_component": 5.22,
+            "usage_component": 1.22,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 2.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Isaiah Likely",
+        "team": "BAL",
+        "position": "TE",
+        "position_rank": 14,
+        "overall_rank": 151,
+        "tier": 4,
+        "projected_points": 102.4,
+        "vorp": -0.63,
+        "score": 94.01,
+        "adp": 151,
+        "age": 24,
+        "bye_week": 8,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 114.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 40.96,
+            "historical_points_component": 28.66,
+            "consistency_component": 3.55,
+            "usage_component": 1.09,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 8.25,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Dallas Goedert",
+        "team": "PHI",
+        "position": "TE",
+        "position_rank": 15,
+        "overall_rank": 161,
+        "tier": 5,
+        "projected_points": 113.7,
+        "vorp": 3.49,
+        "score": 98.13,
+        "adp": 161,
+        "age": 29,
+        "bye_week": 10,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [],
+        "evidence": {
+          "weighted_historical_points": 116.7,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 45.48,
+            "historical_points_component": 29.17,
+            "consistency_component": 4.78,
+            "usage_component": 1.2,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Jake Ferguson",
+        "team": "DAL",
+        "position": "TE",
+        "position_rank": 16,
+        "overall_rank": 164,
+        "tier": 5,
+        "projected_points": 93.6,
+        "vorp": -0.55,
+        "score": 94.09,
+        "adp": 164,
+        "age": 25,
+        "bye_week": 14,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 133.5,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 37.44,
+            "historical_points_component": 33.37,
+            "consistency_component": 3.94,
+            "usage_component": 1.84,
+            "team_offense_component": 10.0,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Cade Otton",
+        "team": "TB",
+        "position": "TE",
+        "position_rank": 17,
+        "overall_rank": 168,
+        "tier": 5,
+        "projected_points": 75.7,
+        "vorp": -36.05,
+        "score": 58.59,
+        "adp": 168,
+        "age": 25,
+        "bye_week": null,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 131.0,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 30.28,
+            "historical_points_component": 32.74,
+            "consistency_component": 3.65,
+            "usage_component": 1.86,
+            "team_offense_component": 7.67,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Oronde Gadsden II",
+        "team": "LAC",
+        "position": "TE",
+        "position_rank": 18,
+        "overall_rank": 178,
+        "tier": 5,
+        "projected_points": 76.6,
+        "vorp": -66.1,
+        "score": 28.54,
+        "adp": 178,
+        "age": null,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Rookie",
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 0.0,
+          "historical_seasons": 0,
+          "score_breakdown": {
+            "projected_points_component": 30.64,
+            "historical_points_component": 0.0,
+            "consistency_component": 7.5,
+            "usage_component": 0.0,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Chig Okonkwo",
+        "team": "TEN",
+        "position": "TE",
+        "position_rank": 19,
+        "overall_rank": 189,
+        "tier": 5,
+        "projected_points": 72.9,
+        "vorp": -44.13,
+        "score": 50.51,
+        "adp": 189,
+        "age": 24,
+        "bye_week": 7,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 113.6,
+          "historical_seasons": 1,
+          "score_breakdown": {
+            "projected_points_component": 29.16,
+            "historical_points_component": 28.4,
+            "consistency_component": 3.45,
+            "usage_component": 1.31,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      },
+      {
+        "player": "Hunter Henry",
+        "team": "NE",
+        "position": "TE",
+        "position_rank": 20,
+        "overall_rank": 190,
+        "tier": 5,
+        "projected_points": 97.4,
+        "vorp": -5.86,
+        "score": 88.78,
+        "adp": 190,
+        "age": 29,
+        "bye_week": 11,
+        "risk": {
+          "level": "Low",
+          "injury_flag": false
+        },
+        "news": {
+          "sentiment": 0.0,
+          "buzz": 0.0,
+          "headline_count": 0
+        },
+        "flags": [
+          "Low Projection"
+        ],
+        "evidence": {
+          "weighted_historical_points": 135.2,
+          "historical_seasons": 2,
+          "score_breakdown": {
+            "projected_points_component": 38.96,
+            "historical_points_component": 33.8,
+            "consistency_component": 4.25,
+            "usage_component": 1.94,
+            "team_offense_component": 2.33,
+            "projection_tier_component": 6.0,
+            "projection_rank_component": 1.5,
+            "news_component": 0.0
+          }
+        }
+      }
+    ]
+  },
+  "health": {
+    "status": "not_ready",
+    "error_count": 1,
+    "warning_count": 0,
+    "issues": [
+      {
+        "severity": "error",
+        "code": "projection_source_not_found",
+        "message": "Projection source does not exist locally: data/players_2026_positions_bye.csv"
+      }
+    ]
+  }
+}

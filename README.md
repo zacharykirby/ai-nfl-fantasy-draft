@@ -48,6 +48,32 @@ pip install -r requirements.txt
 
 The CLI provides comprehensive fantasy football analysis with multiple modes and options:
 
+### Position Priority Board (Primary Workflow)
+
+Build a model-friendly JSON board with independently ranked QB, RB, WR, and TE lists:
+
+```bash
+python scripts/cli.py --build-board --league-size 10 --scoring half_ppr
+```
+
+This writes `outputs/draft_board.json`. Default list sizes are 20 QB, 50 RB,
+60 WR, and 20 TE. Override every position with `--board-top N`.
+
+Inspect priorities or validate whether the underlying inputs are safe for live advice:
+
+```bash
+python scripts/cli.py --show-board --position RB --top 10
+python scripts/cli.py --validate-board
+```
+
+Validation exits nonzero when projections are missing, historical results are being
+used as projections, role lists are empty, or the board schema is internally invalid.
+The JSON remains available for inspection but its `health.status` will be `not_ready`.
+
+The board is deliberately factual rather than conversational. A live draft client or
+model should consume this JSON together with draft state instead of generating its own
+player facts.
+
 ### Full Pipeline (Recommended)
 
 Run the complete fantasy football analysis pipeline:
