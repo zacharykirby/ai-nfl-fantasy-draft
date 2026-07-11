@@ -53,4 +53,5 @@ Thumbs.db
 data/*.csv
 outputs/*.csv
 news/*.json
+sessions/*.json
 *.log 

@@ -48,6 +48,32 @@ pip install -r requirements.txt
 
 The CLI provides comprehensive fantasy football analysis with multiple modes and options:
 
+### Live Draft Sessions
+
+Create a crash-safe session from a ready draft board:
+
+```bash
+python scripts/live_draft.py new home-league \
+  --league-size 10 --rounds 15 --user-team 5
+```
+
+Record picks, inspect availability, and correct the latest selection:
+
+```bash
+python scripts/live_draft.py draft home-league "Jahmyr Gibbs"
+python scripts/live_draft.py available home-league --position RB --top 10
+python scripts/live_draft.py status home-league
+python scripts/live_draft.py roster home-league --team 5
+python scripts/live_draft.py undo home-league
+```
+
+Sessions autosave to `sessions/<name>.json` after every mutation. They snapshot the
+board used at creation, track all teams in snake order, and preserve selection/undo
+events for recovery and auditing. The model is not involved in state changes.
+
+Player matching accepts exact names, unique prefixes, and conservative fuzzy matches.
+Ambiguous names return an error and candidate list instead of drafting silently.
+
 ### Position Priority Board (Primary Workflow)
 
 Build a model-friendly JSON board with independently ranked QB, RB, WR, and TE lists:

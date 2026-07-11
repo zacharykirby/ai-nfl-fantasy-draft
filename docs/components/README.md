@@ -25,6 +25,10 @@ This directory contains detailed documentation for each component of the NFL Fan
   - Position-first JSON contract for live draft clients
   - Projection source and schema health validation
 
+- **[Live Draft Session](live-draft-session.md)** - `draft_session.py`, `live_draft.py`
+  - Crash-safe selection, undo, roster, and availability state
+  - Event-backed persistence with safe player matching
+
 ### Supporting Components
 
 - **[News Fetcher](news-fetcher.md)** - `news_fetcher.py`

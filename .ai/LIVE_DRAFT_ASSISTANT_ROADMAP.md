@@ -233,6 +233,11 @@ Acceptance criteria:
 
 ## Phase 3 — Live Draft State Engine
 
+**Status: Core engine implemented.** Ready-board snapshots, event-backed selections,
+undo, snake ownership, all-team rosters, safe player matching, atomic autosave,
+resume, and noninteractive CLI queries are operational. Bulk entry and arbitrary
+historical correction remain later usability enhancements.
+
 **Goal:** Reliably record and recover an entire draft without a model.
 
 Work:
@@ -267,6 +272,17 @@ Acceptance criteria:
 - Ambiguous or unknown player names never silently select the wrong player.
 - Duplicate drafting is prevented.
 - State operations have focused unit tests and full-draft simulations.
+
+Delivered:
+
+- Versioned draft-session JSON contract
+- Immutable board snapshot per session
+- Atomic persistence and load-time event validation
+- Draft, undo, status, roster, availability, and session-list commands
+- Exact, prefix, and conservative fuzzy player matching
+- Explicit ambiguity and unavailable-player errors
+- Snake-order pick ownership and next-user-pick calculation
+- Board depth validation against planned draft size
 
 ## Phase 4 — Deterministic Recommendation Engine
 
