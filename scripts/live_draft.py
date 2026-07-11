@@ -10,6 +10,7 @@ from draft_session import AmbiguousPlayerError, DraftSession, DraftSessionError
 from draft_recommendation_engine import DraftRecommendationEngine, MODES
 from draft_assistant import LiveDraftAssistant
 from llm_client import OpenRouterClient
+from draft_night_cli import DraftNightShell
 
 
 DEFAULT_SESSIONS_DIR = Path("sessions")
@@ -47,7 +48,7 @@ def build_parser() -> argparse.ArgumentParser:
     new.add_argument("--rounds", type=int, default=15)
     new.add_argument("--user-team", type=int, required=True)
 
-    for command in ("status", "undo", "available", "roster", "recommend", "ask"):
+    for command in ("status", "undo", "available", "roster", "recommend", "ask", "interactive"):
         sub = commands.add_parser(command)
         sub.add_argument("session")
         if command == "available":
@@ -65,6 +66,8 @@ def build_parser() -> argparse.ArgumentParser:
             sub.add_argument("--model", default=None)
             sub.add_argument("--timeout", type=int, default=25)
             sub.add_argument("--json", action="store_true", dest="as_json")
+        if command == "interactive":
+            sub.add_argument("--model", default=None)
 
     draft = commands.add_parser("draft", help="Record the next selection")
     draft.add_argument("session")
@@ -104,6 +107,9 @@ def main() -> int:
             return 0
 
         session = DraftSession.load(session_path(args.session))
+        if args.command == "interactive":
+            DraftNightShell(session, client=OpenRouterClient(model=args.model)).run()
+            return 0
         if args.command == "draft":
             event = session.draft(args.player, team=args.team, position=args.position)
             print("Pick {overall_pick}: Team {team} drafted {player} ({position})".format(**event))

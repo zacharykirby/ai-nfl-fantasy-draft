@@ -393,6 +393,10 @@ Acceptance criteria:
 
 ## Phase 6 — Draft-Night CLI
 
+**Status: Implemented.** A compact interactive dashboard combines session state,
+best available players, tier alerts, offline recommendations, and controlled model
+questions. Mutations remain explicit, errors are recoverable, and EOF/Ctrl-C saves.
+
 **Goal:** Combine board, state, recommendations, and chat into a fast terminal UI.
 
 Desired display:
@@ -431,6 +435,18 @@ Acceptance criteria:
 - The screen remains readable on a laptop at a live draft.
 - The user can continue when the model or network is unavailable.
 - Mistakes can be corrected in seconds.
+
+Delivered:
+
+- Interactive `live_draft.py interactive SESSION` entry point
+- Pick/round/team, next-pick, roster, recent-pick, and autosave display
+- Best-available and imminent-tier-drop dashboard panels
+- Visible online/offline model status
+- Draft, undo, recommendation, availability, roster, status, help, and quit commands
+- Bare-question conversational input with deterministic fallback
+- Automatic dashboard redraw after state mutations
+- Graceful error handling and save-on-interrupt behavior
+- Scripted terminal workflow and mutation-safety tests
 
 ## Phase 7 — Draft Simulation and Hardening
 

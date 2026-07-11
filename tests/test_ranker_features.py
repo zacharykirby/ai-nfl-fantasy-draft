@@ -200,3 +200,39 @@ def test_vorp_baseline_uses_replacement_range_average():
     baseline = ranker.calculate_vorp_baseline(df, "QB")
 
     assert baseline == pytest.approx(30.0)
+
+
+def test_projection_team_is_preferred_over_historical_team(tmp_path):
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    pd.DataFrame(
+        [
+            {
+                "player_name": "Current Player",
+                "season": 2025,
+                "position": "WR",
+                "team": "OLD",
+                "fantasy_points": 100,
+                "fantasy_points_ppr": 120,
+                "games": 17,
+                "consistency_score": 1,
+            }
+        ]
+    ).to_csv(data_dir / "nfl_player_data.csv", index=False)
+    pd.DataFrame(
+        [
+            {
+                "name": "Current Player",
+                "position": "WR",
+                "team": "NEW",
+                "bye_week": 7,
+                "projected_fantasy_points": 200,
+                "tier": 1,
+                "rank": 10,
+            }
+        ]
+    ).to_csv(data_dir / "players_2026_positions_bye.csv", index=False)
+
+    loaded = PlayerRanker(data_dir=data_dir, target_season=2026).load_data()
+
+    assert loaded.iloc[0]["team"] == "NEW"

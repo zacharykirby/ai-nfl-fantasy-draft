@@ -37,6 +37,10 @@ This directory contains detailed documentation for each component of the NFL Fan
   - Bounded live-draft context and candidate allowlist
   - Structured validation with deterministic fallback
 
+- **[Draft-Night CLI](draft-night-cli.md)** - `draft_night_cli.py`
+  - Integrated interactive dashboard and keyboard workflow
+  - Explicit mutations with natural-language read-only questions
+
 ### Supporting Components
 
 - **[News Fetcher](news-fetcher.md)** - `news_fetcher.py`

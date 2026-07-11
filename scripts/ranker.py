@@ -215,7 +215,7 @@ class PlayerRanker:
                 
                 # Add projection data to main dataframe
                 for col in [
-                    'BYE WEEK', 'POS', 'TIERS', 'FANTASYPTS', 'RK',
+                    'BYE WEEK', 'POS', 'TEAM', 'TIERS', 'FANTASYPTS', 'RK',
                     'ADP', 'projection_method', 'source', 'team_conflict',
                 ]:
                     df[col] = df['player_name'].map(
@@ -225,6 +225,7 @@ class PlayerRanker:
                 # Fill missing values
                 df['BYE WEEK'] = df['BYE WEEK'].fillna('N/A')
                 df['POS'] = df['POS'].fillna('Unknown')
+                df['TEAM'] = df['TEAM'].fillna('Unknown').astype(str)
                 df['TIERS'] = df['TIERS'].fillna(99)
                 df['FANTASYPTS'] = df['FANTASYPTS'].fillna(0)
                 
@@ -232,6 +233,8 @@ class PlayerRanker:
                 # Clean up position column to remove rank numbers (e.g., "WR1" -> "WR")
                 df['POS'] = df['POS'].str.replace(r'\d+', '', regex=True)
                 df['position'] = df['POS'].where(df['POS'] != 'Unknown', df['position'])
+                projection_team_available = ~df['TEAM'].isin(['', '0', 'Unknown', 'nan'])
+                df['team'] = df['TEAM'].where(projection_team_available, df['team'])
                 
                 # Convert fantasy points to numeric
                 df['FANTASYPTS'] = pd.to_numeric(df['FANTASYPTS'], errors='coerce').fillna(0)

@@ -75,6 +75,18 @@ events for recovery and auditing. The model is not involved in state changes.
 Player matching accepts exact names, unique prefixes, and conservative fuzzy matches.
 Ambiguous names return an error and candidate list instead of drafting silently.
 
+Launch the integrated draft-night terminal after creating a session:
+
+```bash
+python scripts/live_draft.py interactive home-league
+```
+
+The interactive shell shows the current pick, your next pick, roster, recent
+selections, tier alerts, best available players, autosave path, and model/offline
+status. Type `help` inside the shell for its keyboard-friendly commands. Bare
+sentences are treated as read-only assistant questions; state changes always require
+explicit `draft` or `undo` commands.
+
 Recommendations work without a model or network call. Use `--mode safe`,
 `--mode balanced`, or `--mode upside`; add `--json` to receive the full structured
 response with score components, roster needs, tier state, position runs, and estimated
