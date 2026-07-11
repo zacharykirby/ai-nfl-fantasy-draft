@@ -15,6 +15,8 @@ from fetch_2026_projections import (
     parse_position_rank,
     parse_position_rank_number,
     split_player_team,
+    TEAM_NORMALIZATION,
+    normalize_player_name,
 )
 
 
@@ -27,6 +29,18 @@ def test_parse_position_rank_helpers():
     assert parse_position_rank("WR12") == "WR"
     assert parse_position_rank_number("WR12") == 12
     assert parse_position_rank_number("DST") == 999
+
+
+def test_team_normalization_covers_provider_aliases():
+    assert TEAM_NORMALIZATION["JAC"] == "JAX"
+    assert TEAM_NORMALIZATION["LA"] == "LAR"
+
+
+def test_player_name_normalization_matches_provider_suffixes():
+    assert normalize_player_name("James Cook III") == normalize_player_name("James Cook")
+    assert normalize_player_name("Kyle Pitts Sr.") == normalize_player_name("Kyle Pitts")
+    assert normalize_player_name("D.J. Moore") == normalize_player_name("DJ Moore")
+    assert normalize_player_name("Kenny Gainwell") == normalize_player_name("Kenneth Gainwell")
 
 
 def test_estimates_points_and_overall_rank_from_position_curves():

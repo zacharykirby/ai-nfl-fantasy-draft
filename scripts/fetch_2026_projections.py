@@ -11,6 +11,8 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
+from espn_projection_provider import fetch_espn_projection_rows, projection_url
+
 
 FANTASYPROS_PROJECTION_URLS: Dict[str, str] = {
     "QB": "https://www.fantasypros.com/nfl/projections/qb.php?week=draft",
@@ -21,6 +23,12 @@ FANTASYPROS_PROJECTION_URLS: Dict[str, str] = {
 FANTASYPROS_ADP_URL = "https://draftwizard.fantasypros.com/football/adp/mock-drafts/"
 
 DEFAULT_SEASON = datetime.now().year
+TEAM_NORMALIZATION = {"JAC": "JAX", "LA": "LAR", "ARZ": "ARI", "BLT": "BAL", "CLV": "CLE", "HST": "HOU"}
+NAME_SUFFIX_PATTERN = re.compile(r"\s+(?:JR\.?|SR\.?|II|III|IV|V)$", re.IGNORECASE)
+PLAYER_NAME_ALIASES = {
+    "kenny gainwell": "kenneth gainwell",
+    "chig okonkwo": "chigoziem okonkwo",
+}
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -64,6 +72,14 @@ def parse_position_rank(value: object) -> str:
 def parse_position_rank_number(value: object) -> int:
     match = re.search(r"(\d+)", str(value).strip())
     return int(match.group(1)) if match else 999
+
+
+def normalize_player_name(value: object) -> str:
+    """Create a conservative cross-provider identity key."""
+    text = re.sub(r"\s+", " ", str(value).strip())
+    text = NAME_SUFFIX_PATTERN.sub("", text)
+    normalized = text.replace("’", "'").replace(".", "").casefold()
+    return PLAYER_NAME_ALIASES.get(normalized, normalized)
 
 
 def estimate_points_from_adp(row: pd.Series) -> float:
@@ -114,6 +130,8 @@ def fetch_projection_rows() -> pd.DataFrame:
                     "team": team,
                     "projected_fantasy_points": row.get("MISC_FPTS", row.get("FPTS", 0)),
                     "projection_rank": idx + 1,
+                    "projection_method": "published",
+                    "projection_source": url,
                 }
             )
     projections = pd.DataFrame(rows)
@@ -137,6 +155,7 @@ def fetch_adp_rows() -> pd.DataFrame:
     )
     parsed_team_bye = adp["team_bye"].astype(str).str.extract(r"(?P<team>[A-Z]{2,3})\s+\((?P<bye_week>[^)]+)\)")
     adp["team"] = parsed_team_bye["team"].fillna("")
+    adp["team"] = adp["team"].replace(TEAM_NORMALIZATION)
     adp["bye_week"] = parsed_team_bye["bye_week"].fillna("N/A")
     adp["position"] = adp["position_rank"].apply(parse_position_rank)
     adp["adp"] = pd.to_numeric(adp["adp"], errors="coerce")
@@ -155,16 +174,34 @@ def assign_tiers(df: pd.DataFrame) -> pd.Series:
     ).astype(int)
 
 
-def build_projection_file() -> pd.DataFrame:
-    projections = fetch_projection_rows()
+def build_projection_file(
+    season: int = DEFAULT_SEASON,
+    scoring: str = "half_ppr",
+    provider: str = "espn",
+) -> pd.DataFrame:
+    if provider == "espn":
+        logger.info("Fetching ESPN Mike Clay %s projections for %s", scoring, season)
+        projections = fetch_espn_projection_rows(season, scoring=scoring)
+        projection_sources = [projection_url(season)]
+    elif provider == "fantasypros":
+        projections = fetch_projection_rows()
+        projection_sources = list(FANTASYPROS_PROJECTION_URLS.values())
+    else:
+        raise ValueError("provider must be espn or fantasypros")
     adp = fetch_adp_rows()
+
+    projections = projections.copy()
+    adp = adp.copy()
+    projections["match_name"] = projections["name"].apply(normalize_player_name)
+    adp["match_name"] = adp["name"].apply(normalize_player_name)
 
     merged = adp.merge(
         projections,
-        on=["name", "position"],
+        on=["match_name", "position"],
         how="outer",
         suffixes=("_adp", "_proj"),
     )
+    merged["name"] = merged["name_adp"].fillna(merged["name_proj"])
     merged["team"] = merged["team_adp"].fillna("").where(
         merged["team_adp"].fillna("") != "", merged["team_proj"].fillna("")
     )
@@ -182,13 +219,13 @@ def build_projection_file() -> pd.DataFrame:
         merged["projected_fantasy_points"], errors="coerce"
     )
     missing_projection = merged["projected_fantasy_points"].isna() | (merged["projected_fantasy_points"] <= 0)
-    merged["projection_method"] = "published"
+    merged["projection_method"] = merged["projection_method"].fillna("adp_estimate")
     merged.loc[missing_projection, "projection_method"] = "adp_estimate"
     merged.loc[missing_projection, "projected_fantasy_points"] = merged[missing_projection].apply(
         estimate_points_from_adp, axis=1
     )
     merged["tier"] = assign_tiers(merged)
-    merged["source"] = "FantasyPros"
+    merged["source"] = merged["projection_source"].fillna("Local ADP estimate")
 
     output = merged[
         [
@@ -211,6 +248,9 @@ def build_projection_file() -> pd.DataFrame:
     output["rank"] = output["rank"].round(0).astype(int)
     output["projected_fantasy_points"] = output["projected_fantasy_points"].round(1)
     output["adp"] = output["adp"].round(2)
+    output.attrs["provider"] = provider
+    output.attrs["scoring"] = scoring
+    output.attrs["projection_sources"] = projection_sources
     return output
 
 
@@ -224,9 +264,11 @@ def build_metadata(output: pd.DataFrame, season: int, output_file: Path) -> Dict
         "retrieved_at": datetime.now(timezone.utc).isoformat(),
         "output_file": str(output_file),
         "sources": {
-            "projections": list(FANTASYPROS_PROJECTION_URLS.values()),
+            "projections": output.attrs.get("projection_sources", sorted(output["source"].unique().tolist())),
             "adp": FANTASYPROS_ADP_URL,
         },
+        "provider": output.attrs.get("provider", "unknown"),
+        "scoring": output.attrs.get("scoring", "unknown"),
         "row_count": len(output),
         "position_counts": {str(key): int(value) for key, value in position_counts.items()},
         "projection_method_counts": {str(key): int(value) for key, value in method_counts.items()},
@@ -261,13 +303,15 @@ def write_projection_artifacts(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fetch FantasyPros projections and DraftWizard ADP")
+    parser = argparse.ArgumentParser(description="Fetch full-season projections and DraftWizard ADP")
     parser.add_argument("--season", type=int, default=DEFAULT_SEASON)
+    parser.add_argument("--scoring", choices=["standard", "half_ppr", "ppr"], default="half_ppr")
+    parser.add_argument("--provider", choices=["espn", "fantasypros"], default="espn")
     parser.add_argument("--output", type=Path, default=None)
     parser.add_argument("--metadata-output", type=Path, default=None)
     args = parser.parse_args()
 
-    output = build_projection_file()
+    output = build_projection_file(season=args.season, scoring=args.scoring, provider=args.provider)
     output_file = args.output or Path("data") / f"players_{args.season}_positions_bye.csv"
     metadata_file = args.metadata_output or Path("data") / f"projection_metadata_{args.season}.json"
     output_file.parent.mkdir(parents=True, exist_ok=True)

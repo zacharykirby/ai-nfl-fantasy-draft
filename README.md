@@ -79,7 +79,7 @@ player facts.
 Fetch the current-season projection/ADP inputs and write a provenance manifest:
 
 ```bash
-python scripts/cli.py --fetch-projections --season 2026
+python scripts/cli.py --fetch-projections --season 2026 --scoring half_ppr
 python scripts/cli.py --validate-projections --season 2026
 ```
 
@@ -92,6 +92,22 @@ share of estimated projections.
 The command intentionally exits nonzero when the source does not provide enough real
 projections. Do not bypass this result for live advice; either configure a fuller
 projection source or treat the generated file as diagnostic data.
+
+The default provider combines full-season ESPN Mike Clay projections with
+FantasyPros DraftWizard ADP and bye weeks. ESPN PPR totals are converted to the
+selected scoring format using each player's projected receptions. The legacy partial
+FantasyPros projection tables remain available for diagnostics with
+`--projection-provider fantasypros`.
+
+Licensed or manually maintained projections can be imported without changing code:
+
+```bash
+python scripts/cli.py --import-projections path/to/projections.csv \
+  --season 2026 --scoring half_ppr
+```
+
+The importer accepts common aliases such as `player_name`, `pos`, `fpts`, `rk`, and
+`bye`. Player name, position, and projected fantasy points are required.
 
 ### Full Pipeline (Recommended)
 

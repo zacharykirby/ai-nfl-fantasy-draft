@@ -188,10 +188,10 @@ Remaining exit criterion:
 
 ## Phase 2 — Projection and Data Reliability
 
-**Status: In progress.** The acquisition path is reproducible and attributable, but
-the current anonymous FantasyPros tables publish only 10 RB and 10 WR projections.
-The remaining ADP-only rows are explicitly marked as estimates, causing the health
-gate to correctly keep the board `not_ready`.
+**Status: Core work complete.** The primary provider now parses the full official
+ESPN Mike Clay projection guide and merges it with FantasyPros ADP/bye context.
+Scoring conversion is explicit, source metadata is attributable, a provider-neutral
+CSV importer is available, and the generated board passes readiness validation.
 
 **Goal:** Make the position board reproducible and trustworthy.
 
@@ -218,6 +218,10 @@ Delivered so far:
 - Projection health propagated into draft-board health
 - Projection provenance exported through rankings into player board records
 - Tests for good, stale, estimated, and malformed inputs
+- Full ESPN PDF adapter for QB, RB, WR, and TE projections
+- Deterministic PPR, half-PPR, and standard conversion from projected receptions
+- Conservative cross-provider player identity normalization and aliases
+- Licensed/user-supplied CSV import fallback
 
 Acceptance criteria:
 

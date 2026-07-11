@@ -100,7 +100,20 @@ def validate_projection_file(
     if "projection_method" in frame:
         methods = frame["projection_method"].value_counts(dropna=False).to_dict()
         metrics["projection_method_counts"] = {str(key): int(value) for key, value in methods.items()}
-        estimated = int((frame["projection_method"] != "published").sum())
+        known_methods = {"published", "user_supplied", "adp_estimate"}
+        unknown_methods = sorted(set(frame["projection_method"].dropna().astype(str)) - known_methods)
+        if unknown_methods:
+            issues.append(_issue(
+                "error", "unknown_projection_method",
+                "Unknown projection methods: {}".format(", ".join(unknown_methods)),
+            ))
+        user_supplied = int((frame["projection_method"] == "user_supplied").sum())
+        if user_supplied:
+            issues.append(_issue(
+                "warning", "user_supplied_projections",
+                "{} projections came from a user-supplied CSV".format(user_supplied),
+            ))
+        estimated = int((frame["projection_method"] == "adp_estimate").sum())
         estimated_rate = estimated / len(frame) if len(frame) else 1.0
         metrics["estimated_projection_count"] = estimated
         metrics["estimated_projection_rate"] = round(estimated_rate, 4)

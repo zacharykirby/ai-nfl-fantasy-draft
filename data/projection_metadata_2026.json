@@ -1,31 +1,30 @@
 {
   "schema_version": "1.0",
   "season": 2026,
-  "retrieved_at": "2026-07-11T00:24:23.295933+00:00",
+  "retrieved_at": "2026-07-11T00:36:22.675470+00:00",
   "output_file": "data/players_2026_positions_bye.csv",
   "sources": {
     "projections": [
-      "https://www.fantasypros.com/nfl/projections/qb.php?week=draft",
-      "https://www.fantasypros.com/nfl/projections/rb.php?week=draft",
-      "https://www.fantasypros.com/nfl/projections/wr.php?week=draft",
-      "https://www.fantasypros.com/nfl/projections/te.php?week=draft"
+      "https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf"
     ],
     "adp": "https://draftwizard.fantasypros.com/football/adp/mock-drafts/"
   },
-  "row_count": 412,
+  "provider": "espn",
+  "scoring": "half_ppr",
+  "row_count": 446,
   "position_counts": {
-    "TE": 115,
-    "RB": 108,
-    "WR": 108,
-    "QB": 81
+    "WR": 192,
+    "RB": 133,
+    "TE": 80,
+    "QB": 41
   },
   "projection_method_counts": {
-    "published": 209,
-    "adp_estimate": 203
+    "published": 405,
+    "adp_estimate": 41
   },
   "missing_team_count": 8,
-  "missing_bye_week_count": 146,
-  "missing_adp_count": 138,
+  "missing_bye_week_count": 180,
+  "missing_adp_count": 172,
   "duplicate_player_position_count": 0,
   "team_conflict_count": 0,
   "team_conflict_examples": []

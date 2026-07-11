@@ -51,3 +51,9 @@ python scripts/cli.py --validate-projections --season 2026
 The projection manifest records source URLs, retrieval time, coverage, estimates,
 missing values, duplicates, and player/team conflicts. Projection quality issues are
 copied into board health so downstream clients have one readiness decision.
+
+The primary provider parses the official ESPN Mike Clay projection guide and merges
+it with FantasyPros ADP/bye context. Its PPR totals can be converted to PPR,
+half-PPR, or standard scoring using projected receptions. A provider-neutral CSV
+import is available through `--import-projections CSV` for licensed exports or
+manually curated projections.
