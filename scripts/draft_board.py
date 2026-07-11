@@ -132,11 +132,11 @@ class DraftBoardBuilder:
         }
 
     @staticmethod
-    def _sort_key(player: Dict[str, Any]) -> Tuple[int, float, float]:
-        rank = DraftBoardBuilder._integer(player.get("projection_rank"), 999)
-        vorp = DraftBoardBuilder._number(player.get("VORP", player.get("vorp_score")))
+    def _sort_key(player: Dict[str, Any]) -> Tuple[float, float, int]:
         score = DraftBoardBuilder._number(player.get("score", player.get("total_score")))
-        return rank, -vorp, -score
+        vorp = DraftBoardBuilder._number(player.get("VORP", player.get("vorp_score")))
+        rank = DraftBoardBuilder._integer(player.get("projection_rank"), 999)
+        return -score, -vorp, rank
 
     def build(
         self,
@@ -173,6 +173,7 @@ class DraftBoardBuilder:
                 "source_generated_at": metadata.get("generated_at"),
                 "projection_source": metadata.get("projection_source"),
                 "news_source": metadata.get("news_source", "none"),
+                "ranking_method": "blended_score_then_vorp_then_source_rank",
                 "ranking_count": len(rankings),
                 "role_counts": {position: len(players) for position, players in roles.items()},
             },

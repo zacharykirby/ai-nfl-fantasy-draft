@@ -89,21 +89,35 @@ def test_build_groups_and_ranks_players_by_position(tmp_path):
         limits={"QB": 1, "RB": 2, "WR": 1, "TE": 1}
     )
 
-    assert [player["player"] for player in board["roles"]["RB"]] == ["Running Back", "RB Two"]
+    assert [player["player"] for player in board["roles"]["RB"]] == ["RB Two", "Running Back"]
     assert [player["position_rank"] for player in board["roles"]["RB"]] == [1, 2]
     assert board["metadata"]["role_counts"] == {"QB": 1, "RB": 2, "WR": 1, "TE": 1}
     assert board["health"]["status"] == "ready"
 
 
-def test_adp_rank_controls_priority_then_vorp_breaks_ties(tmp_path):
+def test_blended_score_controls_priority_before_source_rank(tmp_path):
     players = complete_players() + [
-        ranking("Same Rank Low", "WR", 8, 5, 180),
-        ranking("Same Rank High", "WR", 8, 50, 180),
+        ranking("Better Source Rank", "WR", 3, 50, 180, score=60),
+        ranking("Better Blended Score", "WR", 80, 5, 180, score=90),
     ]
     board = DraftBoardBuilder(write_rankings(tmp_path, players)).build()
     names = [player["player"] for player in board["roles"]["WR"]]
 
-    assert names.index("Same Rank High") < names.index("Same Rank Low")
+    assert names.index("Better Blended Score") < names.index("Better Source Rank")
+    assert board["metadata"]["ranking_method"] == "blended_score_then_vorp_then_source_rank"
+
+
+def test_vorp_then_source_rank_break_blended_score_ties(tmp_path):
+    players = complete_players() + [
+        ranking("Lower VORP", "WR", 3, 5, 180, score=60),
+        ranking("Higher VORP", "WR", 80, 50, 180, score=60),
+        ranking("Same VORP Worse Rank", "WR", 90, 50, 180, score=60),
+    ]
+    board = DraftBoardBuilder(write_rankings(tmp_path, players)).build()
+    names = [player["player"] for player in board["roles"]["WR"]]
+
+    assert names.index("Higher VORP") < names.index("Same VORP Worse Rank")
+    assert names.index("Same VORP Worse Rank") < names.index("Lower VORP")
 
 
 def test_historical_fallback_marks_board_not_ready(tmp_path):
