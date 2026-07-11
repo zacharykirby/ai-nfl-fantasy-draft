@@ -33,6 +33,10 @@ This directory contains detailed documentation for each component of the NFL Fan
   - Offline safe, balanced, and upside recommendations
   - Auditable roster, tier, run, risk, and survival signals
 
+- **[Model Reasoning Layer](model-reasoning-layer.md)** - `draft_assistant.py`
+  - Bounded live-draft context and candidate allowlist
+  - Structured validation with deterministic fallback
+
 ### Supporting Components
 
 - **[News Fetcher](news-fetcher.md)** - `news_fetcher.py`

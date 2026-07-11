@@ -336,6 +336,11 @@ Delivered:
 
 ## Phase 5 — Model Reasoning Layer
 
+**Status: Core layer implemented.** OpenRouter receives a bounded evidence packet and
+candidate allowlist, returns versioned JSON, and cannot mutate draft state. Invalid,
+unavailable-player, timeout, and API responses fail immediately to deterministic
+advice. A real configured-model request passed the contract.
+
 **Goal:** Add conversational judgment without giving the model ownership of facts.
 
 Work:
@@ -365,6 +370,19 @@ The model must not:
 - Change draft state through unvalidated prose.
 - Recommend a drafted player.
 - conceal that the board is not ready.
+
+Delivered:
+
+- Compact context builder with deterministic signals and recent live state
+- Candidate allowlist instead of full-board context
+- Strict structured prompt and versioned response contract
+- Recommendation and alternative availability validation
+- Confidence, type, schema, and deterministic-agreement validation
+- Low-temperature, bounded-token, explicit-timeout OpenRouter requests
+- Deterministic fallback for connectivity and validation failures
+- Read-only `ask` command with human-readable and JSON output
+- Mocked failure, hallucination, mutation-safety, and schema tests
+- Successful real-model contract smoke test
 
 Acceptance criteria:
 

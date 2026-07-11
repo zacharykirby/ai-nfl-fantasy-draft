@@ -8,6 +8,8 @@ from typing import Dict, List
 
 from draft_session import AmbiguousPlayerError, DraftSession, DraftSessionError
 from draft_recommendation_engine import DraftRecommendationEngine, MODES
+from draft_assistant import LiveDraftAssistant
+from llm_client import OpenRouterClient
 
 
 DEFAULT_SESSIONS_DIR = Path("sessions")
@@ -45,7 +47,7 @@ def build_parser() -> argparse.ArgumentParser:
     new.add_argument("--rounds", type=int, default=15)
     new.add_argument("--user-team", type=int, required=True)
 
-    for command in ("status", "undo", "available", "roster", "recommend"):
+    for command in ("status", "undo", "available", "roster", "recommend", "ask"):
         sub = commands.add_parser(command)
         sub.add_argument("session")
         if command == "available":
@@ -56,6 +58,12 @@ def build_parser() -> argparse.ArgumentParser:
         if command == "recommend":
             sub.add_argument("--mode", choices=MODES, default="balanced")
             sub.add_argument("--alternatives", type=int, default=4)
+            sub.add_argument("--json", action="store_true", dest="as_json")
+        if command == "ask":
+            sub.add_argument("question")
+            sub.add_argument("--mode", choices=MODES, default="balanced")
+            sub.add_argument("--model", default=None)
+            sub.add_argument("--timeout", type=int, default=25)
             sub.add_argument("--json", action="store_true", dest="as_json")
 
     draft = commands.add_parser("draft", help="Record the next selection")
@@ -149,6 +157,26 @@ def main() -> int:
                     print("- {} ({}) — {:.1f}".format(
                         candidate["player"], candidate["position"], candidate["recommendation_score"]
                     ))
+        elif args.command == "ask":
+            response = LiveDraftAssistant(
+                session, client=OpenRouterClient(model=args.model)
+            ).ask(args.question, mode=args.mode, timeout=args.timeout)
+            if args.as_json:
+                print(json.dumps(response, indent=2))
+            else:
+                if response["source"] == "deterministic_fallback":
+                    print("OFFLINE/VALIDATION FALLBACK")
+                else:
+                    print("MODEL: {}".format(response["model"]))
+                print(response["answer"])
+                if response.get("recommendation"):
+                    print("Recommendation: {} | Confidence: {:.0%}".format(
+                        response["recommendation"], response["confidence"]
+                    ))
+                if response.get("alternatives"):
+                    print("Alternatives: {}".format(", ".join(response["alternatives"])))
+                for caution in response.get("cautions", []):
+                    print("Caution: {}".format(caution))
         return 0
     except AmbiguousPlayerError as exc:
         print("ERROR: {}".format(exc))

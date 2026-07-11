@@ -80,6 +80,20 @@ Recommendations work without a model or network call. Use `--mode safe`,
 response with score components, roster needs, tier state, position runs, and estimated
 survival to the next pick.
 
+Ask the controlled model reasoning layer a draft question:
+
+```bash
+python scripts/live_draft.py ask home-league \
+  "Who should I take, and can I wait at quarterback?" \
+  --mode balanced
+```
+
+Add `--json` for the validated response contract or `--model` to override the
+configured OpenRouter model. The model receives only a bounded candidate pool, recent
+picks, your roster, league settings, and deterministic signals. It cannot mutate the
+session. API errors, timeouts, malformed JSON, or unavailable-player recommendations
+immediately return deterministic fallback advice.
+
 ### Position Priority Board (Primary Workflow)
 
 Build a model-friendly JSON board with independently ranked QB, RB, WR, and TE lists:
