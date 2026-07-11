@@ -65,6 +65,7 @@ python scripts/live_draft.py available home-league --position RB --top 10
 python scripts/live_draft.py status home-league
 python scripts/live_draft.py roster home-league --team 5
 python scripts/live_draft.py undo home-league
+python scripts/live_draft.py recommend home-league --mode balanced
 ```
 
 Sessions autosave to `sessions/<name>.json` after every mutation. They snapshot the
@@ -73,6 +74,11 @@ events for recovery and auditing. The model is not involved in state changes.
 
 Player matching accepts exact names, unique prefixes, and conservative fuzzy matches.
 Ambiguous names return an error and candidate list instead of drafting silently.
+
+Recommendations work without a model or network call. Use `--mode safe`,
+`--mode balanced`, or `--mode upside`; add `--json` to receive the full structured
+response with score components, roster needs, tier state, position runs, and estimated
+survival to the next pick.
 
 ### Position Priority Board (Primary Workflow)
 

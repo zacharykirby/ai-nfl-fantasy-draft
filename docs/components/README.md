@@ -29,6 +29,10 @@ This directory contains detailed documentation for each component of the NFL Fan
   - Crash-safe selection, undo, roster, and availability state
   - Event-backed persistence with safe player matching
 
+- **[Draft Recommendation Engine](draft-recommendation-engine.md)** - `draft_recommendation_engine.py`
+  - Offline safe, balanced, and upside recommendations
+  - Auditable roster, tier, run, risk, and survival signals
+
 ### Supporting Components
 
 - **[News Fetcher](news-fetcher.md)** - `news_fetcher.py`

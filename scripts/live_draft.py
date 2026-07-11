@@ -2,10 +2,12 @@
 """Noninteractive CLI for live draft session state."""
 
 import argparse
+import json
 from pathlib import Path
 from typing import Dict, List
 
 from draft_session import AmbiguousPlayerError, DraftSession, DraftSessionError
+from draft_recommendation_engine import DraftRecommendationEngine, MODES
 
 
 DEFAULT_SESSIONS_DIR = Path("sessions")
@@ -43,7 +45,7 @@ def build_parser() -> argparse.ArgumentParser:
     new.add_argument("--rounds", type=int, default=15)
     new.add_argument("--user-team", type=int, required=True)
 
-    for command in ("status", "undo", "available", "roster"):
+    for command in ("status", "undo", "available", "roster", "recommend"):
         sub = commands.add_parser(command)
         sub.add_argument("session")
         if command == "available":
@@ -51,6 +53,10 @@ def build_parser() -> argparse.ArgumentParser:
             sub.add_argument("--top", type=int, default=10)
         if command == "roster":
             sub.add_argument("--team", type=int)
+        if command == "recommend":
+            sub.add_argument("--mode", choices=MODES, default="balanced")
+            sub.add_argument("--alternatives", type=int, default=4)
+            sub.add_argument("--json", action="store_true", dest="as_json")
 
     draft = commands.add_parser("draft", help="Record the next selection")
     draft.add_argument("session")
@@ -116,6 +122,33 @@ def main() -> int:
         elif args.command == "roster":
             roster = session.roster(args.team)
             print_players(roster, len(roster))
+        elif args.command == "recommend":
+            recommendation = DraftRecommendationEngine(session).recommend(
+                mode=args.mode, alternatives=args.alternatives
+            )
+            if args.as_json:
+                print(json.dumps(recommendation, indent=2))
+            else:
+                context = recommendation["generated_for"]
+                if not context["is_user_pick"]:
+                    print("NOTE: Current pick belongs to team {}; your next pick is {}.".format(
+                        context["current_team"], context["next_user_pick"]
+                    ))
+                primary = recommendation["primary"]
+                print("{} recommendation: {} ({}, {})".format(
+                    recommendation["mode"].upper(), primary["player"],
+                    primary["position"], primary["team"],
+                ))
+                print("Confidence: {:.0%} | Score: {:.1f}".format(
+                    recommendation["confidence"], primary["recommendation_score"]
+                ))
+                for reason in primary["reasons"]:
+                    print("- {}".format(reason))
+                print("Alternatives:")
+                for candidate in recommendation["alternatives"]:
+                    print("- {} ({}) — {:.1f}".format(
+                        candidate["player"], candidate["position"], candidate["recommendation_score"]
+                    ))
         return 0
     except AmbiguousPlayerError as exc:
         print("ERROR: {}".format(exc))

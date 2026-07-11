@@ -286,6 +286,11 @@ Delivered:
 
 ## Phase 4 — Deterministic Recommendation Engine
 
+**Status: Core engine implemented.** Safe, balanced, and upside recommendations are
+available as human-readable CLI output or versioned JSON. Board value, VORP, roster
+need, tiers, position runs, source confidence, risk, and next-pick survival remain
+separate auditable signals.
+
 **Goal:** Produce useful draft-night choices even when no model is available.
 
 Capabilities:
@@ -315,6 +320,19 @@ Acceptance criteria:
 - Results remain deterministic for the same board, config, and draft state.
 - Tests cover early, middle, and late picks across league formats.
 - The fallback experience is useful enough to finish a draft offline.
+
+Delivered:
+
+- Versioned deterministic recommendation response
+- Best available candidate scoring with alternatives
+- Safe, balanced, and upside modes
+- Base starter and FLEX-aware roster need reporting
+- Remaining-tier counts and imminent tier-drop detection
+- Recent position-run detection
+- ADP-based next-pick survival heuristic
+- Projection-source confidence penalties
+- Human-readable and JSON CLI output
+- Scenario tests for risk, scarcity, runs, roster state, and survival
 
 ## Phase 5 — Model Reasoning Layer
 
