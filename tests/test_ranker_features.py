@@ -184,6 +184,8 @@ def test_export_rankings_includes_score_breakdown(tmp_path):
     assert sum(player["score_breakdown"].values()) == pytest.approx(player["raw_score"], abs=0.02)
     assert "news_component" in player["score_breakdown"]
     assert "news_headline_count" in player
+    assert "projection_method" in player
+    assert "projection_data_source" in player
 
 
 def test_vorp_baseline_uses_replacement_range_average():

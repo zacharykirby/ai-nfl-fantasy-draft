@@ -28,7 +28,31 @@ def ranking(name, position, rank, vorp=10, points=100, **extra):
 
 def write_rankings(tmp_path, players, projection_source=None):
     projection_source = projection_source or tmp_path / "projections.csv"
-    Path(projection_source).write_text("player,points\n", encoding="utf-8")
+    projection_source = Path(projection_source)
+    rows = []
+    minimums = {"QB": 20, "RB": 40, "WR": 50, "TE": 15}
+    for position, count in minimums.items():
+        for number in range(count):
+            rows.append(
+                "{rank},Source {position} {number},{position},TST,7,100,1,{rank},published,False,Test".format(
+                    rank=len(rows) + 1, position=position, number=number
+                )
+            )
+    projection_source.write_text(
+        "rank,name,position,team,bye_week,projected_fantasy_points,tier,adp,projection_method,team_conflict,source\n"
+        + "\n".join(rows) + "\n",
+        encoding="utf-8",
+    )
+    (projection_source.parent / "projection_metadata_2026.json").write_text(
+        json.dumps(
+            {
+                "season": 2026,
+                "retrieved_at": "2026-07-10T00:00:00+00:00",
+                "sources": {"projections": ["https://example.test"]},
+            }
+        ),
+        encoding="utf-8",
+    )
     path = tmp_path / "outputs" / "player_rankings.json"
     path.parent.mkdir()
     path.write_text(

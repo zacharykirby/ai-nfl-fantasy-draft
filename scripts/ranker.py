@@ -214,7 +214,10 @@ class PlayerRanker:
                 bye_week_mapping = bye_week_df_clean.set_index('PLAYER NAME').to_dict('index')
                 
                 # Add projection data to main dataframe
-                for col in ['BYE WEEK', 'POS', 'TIERS', 'FANTASYPTS', 'RK']:
+                for col in [
+                    'BYE WEEK', 'POS', 'TIERS', 'FANTASYPTS', 'RK',
+                    'ADP', 'projection_method', 'source', 'team_conflict',
+                ]:
                     df[col] = df['player_name'].map(
                         lambda x: bye_week_mapping.get(x, {}).get(col, 0)
                     )
@@ -651,6 +654,10 @@ class PlayerRanker:
                 'BYE WEEK': 'N/A',
                 'TIERS': 99,
                 'FANTASYPTS': 0,
+                'ADP': 999,
+                'projection_method': 'unknown',
+                'source': 'unknown',
+                'team_conflict': False,
             }.items():
                 if col not in bye_week_df.columns:
                     bye_week_df[col] = default_value
@@ -1267,6 +1274,10 @@ class PlayerRanker:
                     "projected_fantasy_points": round(row.get('projected_fantasy_points', 0), 1),
                     "projection_rank": projection_rank,
                     "projection_tier": projection_tier,
+                    "adp": round(float(row.get('ADP', 999)), 2) if not pd.isna(row.get('ADP', 999)) else None,
+                    "projection_method": str(row.get('projection_method', 'unknown')),
+                    "projection_data_source": str(row.get('source', 'unknown')),
+                    "team_conflict": bool(row.get('team_conflict', False)),
                     "weighted_historical_points": round(row.get('weighted_historical_points', 0), 1),
                     "historical_consistency_score": round(row.get('historical_consistency_score', 0), 1),
                     "historical_seasons_count": int(row.get('historical_seasons_count', 0) or 0),

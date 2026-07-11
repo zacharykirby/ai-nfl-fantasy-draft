@@ -40,3 +40,14 @@ duplicate players, position mismatches, and rank gaps.
 
 Board generation still writes diagnostic output when health checks fail. The
 separate validation command exits with status 1 so automation can enforce readiness.
+
+Projection validation is also available independently:
+
+```bash
+python scripts/cli.py --fetch-projections --season 2026
+python scripts/cli.py --validate-projections --season 2026
+```
+
+The projection manifest records source URLs, retrieval time, coverage, estimates,
+missing values, duplicates, and player/team conflicts. Projection quality issues are
+copied into board health so downstream clients have one readiness decision.

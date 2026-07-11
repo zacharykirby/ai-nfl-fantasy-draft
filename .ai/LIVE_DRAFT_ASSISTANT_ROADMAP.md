@@ -188,6 +188,11 @@ Remaining exit criterion:
 
 ## Phase 2 — Projection and Data Reliability
 
+**Status: In progress.** The acquisition path is reproducible and attributable, but
+the current anonymous FantasyPros tables publish only 10 RB and 10 WR projections.
+The remaining ADP-only rows are explicitly marked as estimates, causing the health
+gate to correctly keep the board `not_ready`.
+
 **Goal:** Make the position board reproducible and trustworthy.
 
 Work:
@@ -203,6 +208,16 @@ Work:
 - Keep historical fallback diagnostic-only.
 - Add a concise data-health command and report.
 - Make scoring-format transformations explicit and testable.
+
+Delivered so far:
+
+- Season-aware projection fetch CLI
+- Source and retrieval-time manifest
+- Published-versus-estimated provenance on every row
+- Coverage, duplicate, missing field, staleness, and team-conflict checks
+- Projection health propagated into draft-board health
+- Projection provenance exported through rankings into player board records
+- Tests for good, stale, estimated, and malformed inputs
 
 Acceptance criteria:
 

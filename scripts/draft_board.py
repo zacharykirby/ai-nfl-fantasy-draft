@@ -11,6 +11,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+from projection_validator import validate_projection_file
+
 
 POSITIONS = ("QB", "RB", "WR", "TE")
 DEFAULT_POSITION_LIMITS = {"QB": 20, "RB": 50, "WR": 60, "TE": 20}
@@ -103,7 +105,11 @@ class DraftBoardBuilder:
             "projected_points": round(self._number(raw.get("projected_fantasy_points")), 2),
             "vorp": round(self._number(raw.get("VORP", raw.get("vorp_score"))), 2),
             "score": round(self._number(raw.get("score", raw.get("total_score"))), 2),
-            "adp": projection_rank if projection_rank < 999 else None,
+            "adp": round(self._number(raw.get("adp")), 2) if raw.get("adp") is not None else (
+                projection_rank if projection_rank < 999 else None
+            ),
+            "projection_method": str(raw.get("projection_method", "unknown")),
+            "projection_source": str(raw.get("projection_data_source", "unknown")),
             "age": self._integer(raw.get("age")) or None,
             "bye_week": self._integer(raw.get("bye_week")) or None,
             "risk": {
@@ -218,6 +224,27 @@ def validate_board(board: Dict[str, Any], project_root: Path = Path(".")) -> Dic
                 "error", "projection_source_not_found",
                 "Projection source does not exist locally: {}".format(source_path),
             ))
+        else:
+            resolved_source = source_path if source_path.is_absolute() else Path(project_root) / source_path
+            season = metadata.get("season")
+            try:
+                expected_season = int(season)
+            except (TypeError, ValueError):
+                expected_season = None
+            manifest = resolved_source.with_name(
+                "projection_metadata_{}.json".format(expected_season or datetime.now().year)
+            )
+            projection_report = validate_projection_file(
+                resolved_source,
+                metadata_path=manifest,
+                expected_season=expected_season,
+            )
+            for issue in projection_report["issues"]:
+                issues.append(ValidationIssue(
+                    issue["severity"],
+                    issue["code"],
+                    issue["message"],
+                ))
 
     seen = set()
     for position in POSITIONS:

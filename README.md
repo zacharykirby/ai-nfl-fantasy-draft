@@ -74,6 +74,25 @@ The board is deliberately factual rather than conversational. A live draft clien
 model should consume this JSON together with draft state instead of generating its own
 player facts.
 
+### Projection Data Health
+
+Fetch the current-season projection/ADP inputs and write a provenance manifest:
+
+```bash
+python scripts/cli.py --fetch-projections --season 2026
+python scripts/cli.py --validate-projections --season 2026
+```
+
+The fetch writes `data/players_<season>_positions_bye.csv` and
+`data/projection_metadata_<season>.json`. Each row identifies whether its projected
+points were published by the source or estimated locally from ADP. Validation checks
+source age, positional coverage, duplicates, team conflicts, missing fields, and the
+share of estimated projections.
+
+The command intentionally exits nonzero when the source does not provide enough real
+projections. Do not bypass this result for live advice; either configure a fuller
+projection source or treat the generated file as diagnostic data.
+
 ### Full Pipeline (Recommended)
 
 Run the complete fantasy football analysis pipeline:

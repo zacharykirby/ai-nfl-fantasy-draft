@@ -29,6 +29,8 @@ from ranker import PlayerRanker
 from draft_recommender import DraftRecommender
 from llm_client import OpenRouterClient
 from draft_board import DraftBoardBuilder, LeagueConfig, format_board, load_board, validate_board
+from fetch_2026_projections import build_projection_file, write_projection_artifacts
+from projection_validator import validate_projection_file
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -155,6 +157,37 @@ class FantasyCLI:
         except Exception as exc:
             self.print_error("Unable to show board: {}".format(exc))
             return False
+
+    def fetch_projections(self, season: int):
+        """Fetch projections with a provenance manifest and report data health."""
+        self.print_section_header("FETCHING PROJECTIONS AND ADP")
+        try:
+            output = build_projection_file()
+            csv_path, metadata_path = write_projection_artifacts(output, season)
+            self.print_success("Wrote {} players to {}".format(len(output), csv_path))
+            self.print_success("Wrote source manifest to {}".format(metadata_path))
+            return self.validate_projections(season)
+        except Exception as exc:
+            self.print_error("Projection fetch failed: {}".format(exc))
+            return False
+
+    def validate_projections(self, season: int):
+        """Show projection provenance, coverage, and identity health."""
+        self.print_section_header("PROJECTION DATA HEALTH")
+        path = Path("data") / "players_{}_positions_bye.csv".format(season)
+        report = validate_projection_file(path, expected_season=season)
+        print("Status: {}".format(report["status"].upper()))
+        print("Errors: {} | Warnings: {}".format(report["error_count"], report["warning_count"]))
+        metrics = report.get("metrics", {})
+        if metrics.get("position_counts"):
+            print("Coverage: {}".format(
+                ", ".join("{} {}".format(count, position) for position, count in metrics["position_counts"].items())
+            ))
+        if "estimated_projection_rate" in metrics:
+            print("Estimated projections: {:.1%}".format(metrics["estimated_projection_rate"]))
+        for issue in report["issues"]:
+            print("- {} [{}]: {}".format(issue["severity"].upper(), issue["code"], issue["message"]))
+        return report["status"] == "ready"
     
     def _load_rankings_dataframe(self) -> pd.DataFrame:
         """Load current JSON rankings and normalize legacy display column names."""
@@ -810,6 +843,10 @@ Examples:
                              help='Validate draft board data health and freshness')
     action_group.add_argument('--show-board', action='store_true',
                              help='Show top player priorities by position')
+    action_group.add_argument('--fetch-projections', action='store_true',
+                             help='Fetch current projections/ADP and write source metadata')
+    action_group.add_argument('--validate-projections', action='store_true',
+                             help='Validate projection provenance, coverage, and identity')
     
     # Filtering options
     parser.add_argument('--position', type=str, choices=['QB', 'RB', 'WR', 'TE', 'K', 'DST'],
@@ -820,6 +857,8 @@ Examples:
                        help='Override the default per-position board limits')
     parser.add_argument('--scoring', choices=['standard', 'half_ppr', 'ppr'], default='half_ppr',
                        help='League scoring format for board metadata (default: half_ppr)')
+    parser.add_argument('--season', type=int, default=datetime.now().year,
+                       help='Target fantasy season (default: current year)')
     parser.add_argument('--exclude-injured', action='store_true',
                        help='Exclude injured players from rankings')
     parser.add_argument('--sort-by', type=str, choices=['vorp', 'score', 'buzz', 'consistency'], default='vorp',
@@ -924,6 +963,14 @@ Examples:
 
         elif args.show_board:
             success = cli.show_draft_board(position=args.position, top_n=args.top)
+            sys.exit(0 if success else 1)
+
+        elif args.fetch_projections:
+            success = cli.fetch_projections(season=args.season)
+            sys.exit(0 if success else 1)
+
+        elif args.validate_projections:
+            success = cli.validate_projections(season=args.season)
             sys.exit(0 if success else 1)
             
     except KeyboardInterrupt:
