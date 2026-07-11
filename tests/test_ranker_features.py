@@ -46,6 +46,7 @@ def test_build_score_features_uses_explicit_weighted_components():
             "projection_tier_component": 15.0,
             "projection_rank_component": 10.0,
             "news_component": 0.0,
+            "availability_component": 0.0,
         }
     )
     assert ranker.calculate_raw_score(sample_player_row()) == pytest.approx(sum(features.values()))
@@ -103,6 +104,54 @@ def test_build_historical_features_uses_2025_and_drops_older_season():
     assert player["points_2025"] == 40
     assert player["points_2024"] == 300
     assert "points_2023" not in player.index
+
+
+def test_historical_production_separates_per_game_output_from_availability():
+    ranker = PlayerRanker()
+    history = pd.DataFrame(
+        [
+            {
+                "player_name": "Injured Veteran",
+                "season": 2025,
+                "fantasy_points_ppr": 120,
+                "games": 8,
+            },
+            {
+                "player_name": "Injured Veteran",
+                "season": 2024,
+                "fantasy_points_ppr": 255,
+                "games": 17,
+            },
+        ]
+    )
+
+    player = ranker.build_historical_features(history).iloc[0]
+
+    assert player["weighted_historical_points_per_game"] == pytest.approx(15)
+    assert player["historical_availability_rate"] == pytest.approx(0.6823529)
+    assert ranker.calculate_historical_production(player) == pytest.approx(255)
+    assert ranker.calculate_availability_adjustment(player) == pytest.approx(-4.7647059)
+
+
+def test_injured_young_veteran_is_not_treated_as_rookie():
+    ranker = PlayerRanker()
+    veteran = sample_player_row(
+        age=22,
+        games_played=12,
+        historical_seasons_count=2,
+        historical_availability_rate=0.8,
+    )
+    no_history = sample_player_row(
+        age=22,
+        games_played=0,
+        historical_seasons_count=0,
+    )
+
+    assert "No NFL History" not in ranker.generate_player_flags(veteran)
+    assert "Availability Risk" in ranker.generate_player_flags(veteran)
+    assert ranker.apply_penalty_adjustments(veteran, 100) == pytest.approx(100)
+    assert "No NFL History" in ranker.generate_player_flags(no_history)
+    assert ranker.apply_penalty_adjustments(no_history, 100) == pytest.approx(90)
 
 
 def test_score_prefers_real_historical_features_over_legacy_points():

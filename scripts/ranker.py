@@ -99,6 +99,7 @@ class PlayerRanker:
             'projection_tier_component',
             'projection_rank_component',
             'news_component',
+            'availability_component',
         ]
         
     def load_data(self) -> pd.DataFrame:
@@ -343,6 +344,8 @@ class PlayerRanker:
                 'projection_tier': 99,
                 'projection_rank': 999,
                 'weighted_historical_points': 0.0,
+                'weighted_historical_points_per_game': 0.0,
+                'historical_availability_rate': 0.0,
                 'historical_consistency_score': 50.0,
                 'historical_seasons_count': 0,
                 'games_played': 0,
@@ -367,7 +370,8 @@ class PlayerRanker:
             
             # Convert numeric columns
             numeric_columns = ['age', 'projected_fantasy_points', 'projection_tier', 'projection_rank',
-                              'weighted_historical_points', 'historical_consistency_score',
+                              'weighted_historical_points', 'weighted_historical_points_per_game',
+                              'historical_availability_rate', 'historical_consistency_score',
                               'historical_seasons_count',
                               'games_played', 'targets', 'receptions', 'carries', 'rush_yards', 'rec_yards',
                               'pass_yards', 'pass_tds', 'rush_tds', 'rec_tds', 'int', 'fumbles', 'fumbles_lost',
@@ -452,6 +456,15 @@ class PlayerRanker:
                 float(row[points_col]) * effective_weights[idx]
                 for idx, (_, row) in enumerate(player_history.iterrows())
             )
+            weighted_points_per_game = sum(
+                (float(row[points_col]) / max(float(row.get('games', 17) or 17), 1.0))
+                * effective_weights[idx]
+                for idx, (_, row) in enumerate(player_history.iterrows())
+            )
+            weighted_availability = sum(
+                min(float(row.get('games', 17) or 17), 17.0) / 17.0 * effective_weights[idx]
+                for idx, (_, row) in enumerate(player_history.iterrows())
+            )
             weighted_consistency = sum(
                 float(row['_normalized_consistency']) * effective_weights[idx]
                 for idx, (_, row) in enumerate(player_history.iterrows())
@@ -459,6 +472,8 @@ class PlayerRanker:
             feature_row = {
                 'player_name': player_name,
                 'weighted_historical_points': weighted_points,
+                'weighted_historical_points_per_game': weighted_points_per_game,
+                'historical_availability_rate': weighted_availability,
                 'historical_consistency_score': weighted_consistency,
                 'historical_seasons_count': int(len(player_history)),
             }
@@ -746,6 +761,27 @@ class PlayerRanker:
             return points_2023
         else:
             return 0.0
+
+    def calculate_historical_production(self, row: pd.Series) -> float:
+        """Return per-game historical production expressed as a 17-game season."""
+        points_per_game = float(row.get('weighted_historical_points_per_game', 0) or 0)
+        if points_per_game > 0:
+            return points_per_game * 17.0
+        return self.calculate_weighted_historical_average(row)
+
+    @staticmethod
+    def calculate_availability_adjustment(row: pd.Series) -> float:
+        """Apply a modest, separate penalty for missed historical games."""
+        availability = float(row.get('historical_availability_rate', 0) or 0)
+        if availability <= 0:
+            return 0.0
+        availability = max(0.0, min(1.0, availability))
+        return -15.0 * (1.0 - availability)
+
+    @staticmethod
+    def has_no_nfl_history(row: pd.Series) -> bool:
+        """Identify projection-only players without calling injured veterans rookies."""
+        return int(float(row.get('historical_seasons_count', 0) or 0)) == 0
     
     def calculate_consistency_score(self, row: pd.Series) -> float:
         """Return a 0-100 consistency score from weekly historical production."""
@@ -927,7 +963,7 @@ class PlayerRanker:
         projection_rank = float(row.get('projection_rank', 999))
 
         dampened_projection = self.dampen_inflated_projections(row, projected_fantasy_points)
-        weighted_history = self.calculate_weighted_historical_average(row)
+        weighted_history = self.calculate_historical_production(row)
         consistency_score = self.calculate_consistency_score(row)
         usage_score = self.calculate_usage_score(row)
         team_offense_score = self.calculate_team_offense_score(row)
@@ -944,6 +980,7 @@ class PlayerRanker:
             'projection_tier_component': 0.15 * tier_score,
             'projection_rank_component': 0.10 * rank_score,
             'news_component': news_adjustment,
+            'availability_component': self.calculate_availability_adjustment(row),
         }
 
     def add_score_features(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -963,19 +1000,10 @@ class PlayerRanker:
         age_penalty = self.calculate_age_decline_penalty(row)
         adjusted_score *= age_penalty
         
-        # Rookie penalty (dampen hype for young players with minimal experience)
-        age = float(row.get('age', 0))
-        try:
-            games_played_val = row.get('games_played', 0)
-            if isinstance(games_played_val, (pd.DataFrame, pd.Series)):
-                games_played = 0  # Default to 0 if it's a DataFrame/Series
-            else:
-                games_played = float(games_played_val)
-        except:
-            games_played = 0  # Default to 0 if conversion fails
-        
-        if age <= 23 and games_played < 16:
-            adjusted_score *= 0.85  # 15% penalty for rookies/inexperienced young players
+        # Projection-only players carry uncertainty, but missed games alone do not
+        # make an established young player a rookie.
+        if self.has_no_nfl_history(row):
+            adjusted_score *= 0.90
         
         # Depth chart penalty (simplified - assume low projected points = not starter)
         projected_pts = float(row.get('projected_fantasy_points', 0))
@@ -1156,19 +1184,15 @@ class PlayerRanker:
         """Generate flags for player based on target-season projections and historical data"""
         flags = []
         
-        # Rookie flag
+        # Experience flag. This deliberately avoids inferring rookie status from
+        # age and games played because an injury-shortened season is not inexperience.
         age = float(row.get('age', 0))
-        try:
-            games_played_val = row.get('games_played', 0)
-            if isinstance(games_played_val, (pd.DataFrame, pd.Series)):
-                games_played = 0  # Default to 0 if it's a DataFrame/Series
-            else:
-                games_played = float(games_played_val)
-        except:
-            games_played = 0  # Default to 0 if conversion fails
-            
-        if age <= 23 and games_played < 16:
-            flags.append("Rookie")
+        if self.has_no_nfl_history(row):
+            flags.append("No NFL History")
+
+        availability = float(row.get('historical_availability_rate', 0) or 0)
+        if 0 < availability < 0.85:
+            flags.append("Availability Risk")
         
         # High upside flag (young players with good projections)
         projected_pts = float(row.get('projected_fantasy_points', 0))
@@ -1295,6 +1319,12 @@ class PlayerRanker:
                     "projection_data_source": str(row.get('source', 'unknown')),
                     "team_conflict": bool(row.get('team_conflict', False)),
                     "weighted_historical_points": round(row.get('weighted_historical_points', 0), 1),
+                    "weighted_historical_points_per_game": round(
+                        row.get('weighted_historical_points_per_game', 0), 2
+                    ),
+                    "historical_availability_rate": round(
+                        row.get('historical_availability_rate', 0), 3
+                    ),
                     "historical_consistency_score": round(row.get('historical_consistency_score', 0), 1),
                     "historical_seasons_count": int(row.get('historical_seasons_count', 0) or 0),
                     "news_sentiment_score": round(row.get('news_sentiment_score', 0), 3),

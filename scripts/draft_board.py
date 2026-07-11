@@ -126,6 +126,12 @@ class DraftBoardBuilder:
                 "weighted_historical_points": round(
                     self._number(raw.get("weighted_historical_points")), 2
                 ),
+                "weighted_historical_points_per_game": round(
+                    self._number(raw.get("weighted_historical_points_per_game")), 2
+                ),
+                "historical_availability_rate": round(
+                    self._number(raw.get("historical_availability_rate")), 3
+                ),
                 "historical_seasons": self._integer(raw.get("historical_seasons_count")),
                 "score_breakdown": raw.get("score_breakdown", {}),
             },
