@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -40,6 +41,10 @@ def test_health_board_and_frontend(web_draft):
     assert "Catch up" in frontend.text
     assert "Who should I take here?" in frontend.text
     assert "assistant-cancel" in frontend.text
+    assert "Choose or create a draft" in frontend.text
+    assert "new-session-form" in frontend.text
+    assert "Delete session" in frontend.text
+    assert "sessions/.trash" in frontend.text
     assert frontend.headers["x-frame-options"] == "DENY"
 
 
@@ -59,6 +64,118 @@ def test_session_reads_match_domain_state(web_draft):
     assert cockpit.status_code == 200
     assert cockpit.json()["session"]["current_pick"] == 2
     assert cockpit.json()["recent_picks"][0]["player"] == "Jahmyr Gibbs"
+
+
+def test_create_list_and_resume_session_from_browser_contract(web_draft):
+    client = make_client(web_draft)
+    request = {
+        "name": "sunday-league",
+        "league_size": 4,
+        "rounds": 2,
+        "user_team": 3,
+        "request_id": "api-create-session-0001",
+    }
+
+    created = client.post("/api/v1/sessions", json=request)
+    assert created.status_code == 201
+    assert created.json()["replayed"] is False
+    assert created.json()["session"]["name"] == "sunday-league"
+    assert created.json()["session"]["user_team"] == 3
+    assert created.json()["cockpit"]["session"]["current_pick"] == 1
+
+    replay = client.post("/api/v1/sessions", json=request)
+    assert replay.status_code == 200
+    assert replay.json()["replayed"] is True
+
+    sessions = client.get("/api/v1/sessions").json()["sessions"]
+    assert sessions[0]["name"] == "sunday-league"
+    assert sessions[0]["league_size"] == 4
+    resumed = client.get("/api/v1/sessions/sunday-league/cockpit")
+    assert resumed.status_code == 200
+    assert resumed.json()["session"]["name"] == "sunday-league"
+
+    duplicate = client.post(
+        "/api/v1/sessions",
+        json={**request, "request_id": "api-create-session-0002"},
+    )
+    assert duplicate.status_code == 409
+    assert duplicate.json()["error"]["code"] == "session_exists"
+
+
+def test_session_creation_rejects_invalid_name_depth_and_unready_board(web_draft, tmp_path):
+    client = make_client(web_draft)
+    base = {
+        "league_size": 4,
+        "rounds": 2,
+        "user_team": 1,
+        "request_id": "api-create-invalid-0001",
+    }
+
+    invalid_name = client.post(
+        "/api/v1/sessions", json={**base, "name": "bad session name"}
+    )
+    assert invalid_name.status_code == 400
+    assert invalid_name.json()["error"]["code"] == "invalid_session_name"
+
+    too_deep = client.post(
+        "/api/v1/sessions",
+        json={**base, "name": "too-deep", "rounds": 4},
+    )
+    assert too_deep.status_code == 409
+    assert not (web_draft["sessions_dir"] / "too-deep.json").exists()
+
+    board = json.loads(web_draft["board_path"].read_text(encoding="utf-8"))
+    board["health"]["status"] = "not_ready"
+    unready_path = tmp_path / "unready-board.json"
+    unready_path.write_text(json.dumps(board), encoding="utf-8")
+    unready_client = TestClient(
+        create_app(
+            sessions_dir=tmp_path / "unready-sessions",
+            board_path=unready_path,
+            frontend_dir=ROOT / "frontend",
+        )
+    )
+    unready = unready_client.post(
+        "/api/v1/sessions", json={**base, "name": "not-ready"}
+    )
+    assert unready.status_code == 409
+    assert "not ready" in unready.json()["error"]["message"]
+
+
+def test_delete_session_is_confirmable_recoverable_and_idempotent(web_draft):
+    client = make_client(web_draft)
+
+    deleted = client.request(
+        "DELETE",
+        "/api/v1/sessions/phone-test",
+        json={"request_id": "api-delete-session-0001"},
+    )
+    assert deleted.status_code == 200
+    assert deleted.json() == {
+        "name": "phone-test",
+        "deleted": True,
+        "recoverable": True,
+        "replayed": False,
+    }
+    assert client.get("/api/v1/sessions").json()["sessions"] == []
+    assert not web_draft["session"].path.exists()
+    assert len(list((web_draft["sessions_dir"] / ".trash").glob("phone-test.*.json"))) == 1
+
+    replay = client.request(
+        "DELETE",
+        "/api/v1/sessions/phone-test",
+        json={"request_id": "api-delete-session-0001"},
+    )
+    assert replay.status_code == 200
+    assert replay.json()["replayed"] is True
+
+    missing = client.request(
+        "DELETE",
+        "/api/v1/sessions/missing",
+        json={"request_id": "api-delete-session-0002"},
+    )
+    assert missing.status_code == 404
+    assert missing.json()["error"]["code"] == "session_not_found"
 
 
 def test_available_search_and_recommendation_routes(web_draft):
@@ -81,6 +198,25 @@ def test_available_search_and_recommendation_routes(web_draft):
     assert recommendation.status_code == 200
     assert recommendation.json()["recommendation"]["mode"] == "upside"
     assert len(recommendation.json()["recommendation"]["alternatives"]) == 2
+
+
+def test_board_summary_reports_canonical_session_capacity(web_draft, tmp_path):
+    board = json.loads(web_draft["board_path"].read_text(encoding="utf-8"))
+    board["roles"]["RB"].append(dict(board["roles"]["RB"][0]))
+    duplicate_path = tmp_path / "duplicate-board.json"
+    duplicate_path.write_text(json.dumps(board), encoding="utf-8")
+    client = TestClient(
+        create_app(
+            sessions_dir=web_draft["sessions_dir"],
+            board_path=duplicate_path,
+            frontend_dir=ROOT / "frontend",
+        )
+    )
+
+    summary = client.get("/api/v1/board/summary")
+    assert summary.status_code == 200
+    assert summary.json()["role_counts"]["RB"] == 3
+    assert sum(summary.json()["role_counts"].values()) == 12
 
 
 def test_text_command_requires_confirmation_then_records_pick(web_draft):
@@ -254,6 +390,7 @@ def test_api_errors_are_structured_and_mutations_are_explicit(web_draft, tmp_pat
     paths = client.get("/openapi.json").json()["paths"]
     post_paths = {path for path, methods in paths.items() if "post" in methods}
     assert post_paths == {
+        "/api/v1/sessions",
         "/api/v1/sessions/{session_name}/assistant/ask",
         "/api/v1/sessions/{session_name}/commands/interpret",
         "/api/v1/sessions/{session_name}/picks",
@@ -261,3 +398,5 @@ def test_api_errors_are_structured_and_mutations_are_explicit(web_draft, tmp_pat
         "/api/v1/sessions/{session_name}/picks/bulk/preview",
         "/api/v1/sessions/{session_name}/undo",
     }
+    delete_paths = {path for path, methods in paths.items() if "delete" in methods}
+    assert delete_paths == {"/api/v1/sessions/{session_name}"}

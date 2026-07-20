@@ -6,6 +6,7 @@ clients. It intentionally contains facts and evidence, not round-by-round picks.
 """
 
 import json
+import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -17,6 +18,11 @@ from fantasy_draft.validation.projections import validate_projection_file
 POSITIONS = ("QB", "RB", "WR", "TE")
 DEFAULT_POSITION_LIMITS = {"QB": 20, "RB": 50, "WR": 60, "TE": 20}
 SCHEMA_VERSION = "1.0"
+
+
+def normalize_player_identity(value: Any) -> str:
+    text = str(value or "").strip().casefold().replace("’", "'").replace(".", "")
+    return re.sub(r"[^a-z0-9']+", " ", text).strip()
 
 
 @dataclass
@@ -164,10 +170,20 @@ class DraftBoardBuilder:
                 and self._number(player.get("projected_fantasy_points")) > 0
             ]
             candidates.sort(key=self._sort_key)
+            unique_candidates = []
+            seen_names = set()
+            for player in candidates:
+                identity = normalize_player_identity(
+                    player.get("name", player.get("player", ""))
+                )
+                if not identity or identity in seen_names:
+                    continue
+                seen_names.add(identity)
+                unique_candidates.append(player)
             limit = max(0, int(limits.get(position, 0)))
             roles[position] = [
                 self._player(player, index)
-                for index, player in enumerate(candidates[:limit], 1)
+                for index, player in enumerate(unique_candidates[:limit], 1)
             ]
 
         board = {
@@ -263,7 +279,7 @@ def validate_board(board: Dict[str, Any], project_root: Path = Path(".")) -> Dic
             name = str(player.get("player", "")).strip()
             if not name or name == "Unknown":
                 issues.append(ValidationIssue("error", "missing_player_name", "A {} player has no name".format(position)))
-            identity = (name.casefold(), position)
+            identity = (normalize_player_identity(name), position)
             if identity in seen:
                 issues.append(ValidationIssue("error", "duplicate_player", "Duplicate player: {} ({})".format(name, position)))
             seen.add(identity)

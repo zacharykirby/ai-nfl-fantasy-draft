@@ -15,7 +15,10 @@
           <p class="eyebrow">LIVE DRAFT COCKPIT</p>
           <h1 id="session-name">Loading session…</h1>
         </div>
-        <button id="refresh" class="icon-button" type="button" aria-label="Refresh draft state">↻</button>
+        <div class="topbar-actions">
+          <button id="session-switcher" class="text-button" type="button">Drafts</button>
+          <button id="refresh" class="icon-button" type="button" aria-label="Refresh draft state">↻</button>
+        </div>
       </header>
 
       <section id="notice" class="notice" hidden></section>
@@ -131,6 +134,44 @@
       <button id="command-send" type="submit">Send</button>
     </form>
 
+    <dialog id="session-dialog" class="confirmation-dialog session-dialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">DRAFT SESSIONS</p>
+          <h2>Choose or create a draft</h2>
+        </div>
+        <button id="session-dialog-close" class="icon-button" type="button" aria-label="Close session picker">×</button>
+      </div>
+      <div id="session-list" class="session-list empty-state">No saved drafts yet</div>
+      <p id="session-form-notice" class="notice" hidden></p>
+      <form id="new-session-form" class="new-session-form" autocomplete="off">
+        <div class="card-heading">
+          <h2>New draft</h2>
+          <span id="session-board-status" class="pill muted">Checking board</span>
+        </div>
+        <label>
+          <span>Name</span>
+          <input id="new-session-name" name="name" maxlength="80" placeholder="home-league" required>
+        </label>
+        <div class="form-grid">
+          <label>
+            <span>Teams</span>
+            <input id="new-league-size" name="league_size" type="number" min="2" max="32" required>
+          </label>
+          <label>
+            <span>Rounds</span>
+            <input id="new-rounds" name="rounds" type="number" min="1" max="30" required>
+          </label>
+          <label>
+            <span>Your slot</span>
+            <input id="new-user-team" name="user_team" type="number" min="1" required>
+          </label>
+        </div>
+        <p id="new-session-capacity" class="player-meta"></p>
+        <button id="create-session" class="dialog-button primary full-width" type="submit">Create draft</button>
+      </form>
+    </dialog>
+
     <dialog id="confirmation-dialog" class="confirmation-dialog">
       <form method="dialog">
         <p class="eyebrow">CONFIRM SELECTION</p>
@@ -139,6 +180,19 @@
         <div class="dialog-actions">
           <button class="dialog-button secondary" value="cancel">Cancel</button>
           <button id="confirm-pick" class="dialog-button primary" value="confirm">Record pick</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="delete-session-dialog" class="confirmation-dialog">
+      <form method="dialog">
+        <p class="eyebrow">DELETE DRAFT SESSION</p>
+        <h2 id="delete-session-name">Session</h2>
+        <p id="delete-session-text" class="player-meta"></p>
+        <p class="recovery-note">The session will be moved to <code>sessions/.trash</code> and can be recovered manually.</p>
+        <div class="dialog-actions">
+          <button class="dialog-button secondary" value="cancel">Keep session</button>
+          <button class="dialog-button danger" value="confirm">Delete session</button>
         </div>
       </form>
     </dialog>

@@ -120,6 +120,25 @@ def test_vorp_then_source_rank_break_blended_score_ties(tmp_path):
     assert names.index("Same VORP Worse Rank") < names.index("Lower VORP")
 
 
+def test_build_deduplicates_name_aliases_and_backfills_role_limit(tmp_path):
+    players = complete_players() + [
+        ranking("D.J. Moore", "WR", 3, 30, 210, score=80),
+        ranking("DJ Moore", "WR", 4, 29, 209, score=79),
+        ranking("Backfill Receiver", "WR", 5, 20, 200, score=70),
+    ]
+    board = DraftBoardBuilder(write_rankings(tmp_path, players)).build(
+        limits={"QB": 1, "RB": 1, "WR": 3, "TE": 1}
+    )
+
+    receivers = board["roles"]["WR"]
+    assert [player["player"] for player in receivers] == [
+        "D.J. Moore",
+        "Backfill Receiver",
+        "Receiver",
+    ]
+    assert [player["position_rank"] for player in receivers] == [1, 2, 3]
+
+
 def test_historical_fallback_marks_board_not_ready(tmp_path):
     path = write_rankings(tmp_path, complete_players())
     payload = json.loads(path.read_text())
@@ -166,6 +185,28 @@ def test_validation_detects_duplicate_and_rank_gap():
 
     assert report["status"] == "not_ready"
     assert {"duplicate_player", "position_rank_gap", "empty_role"} <= codes
+
+
+def test_validation_detects_punctuation_alias_duplicate():
+    board = {
+        "schema_version": "1.0",
+        "metadata": {
+            "season": 2026,
+            "projection_source": "historical_fantasy_points_fallback",
+        },
+        "roles": {
+            "QB": [
+                {"player": "D.J. Moore", "position": "QB", "position_rank": 1, "projected_points": 100},
+                {"player": "DJ Moore", "position": "QB", "position_rank": 2, "projected_points": 90},
+            ],
+            "RB": [],
+            "WR": [],
+            "TE": [],
+        },
+    }
+
+    report = validate_board(board)
+    assert "duplicate_player" in {issue["code"] for issue in report["issues"]}
 
 
 def test_league_config_and_text_format(tmp_path):

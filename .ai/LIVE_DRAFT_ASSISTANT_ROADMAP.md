@@ -507,8 +507,8 @@ Exit criteria:
 
 ### Milestone 2 — Safe web mutations
 
-**Status: In progress. The safe mutation core and mobile controls are implemented;
-browser session creation/resume remains.**
+**Status: Complete. Browser session creation/resume and the safe mutation core are
+implemented with readiness, capacity, idempotency, and rollback validation.**
 
 Deliverables:
 
@@ -532,6 +532,9 @@ Delivered so far:
 - Exact-event undo confirmation with stale-state rejection
 - Atomic 2–20 player catch-up preview and commit
 - Persisted idempotency across service restarts
+- Recent-first browser session selection with remembered resume
+- Idempotent browser creation against the configured ready board
+- Exact-confirmation, idempotent session deletion into recoverable local trash
 - Retry, concurrent double-tap, rollback, interpretation, API, and domain tests
 
 Exit criteria:
@@ -726,11 +729,10 @@ turning into an operations project.
 
 The next implementation session should proceed in this order:
 
-1. Add browser session creation, selection, and resume controls.
-2. Add the full position board, roster detail, and draft-log views.
-3. Add the Tailscale Serve startup command and private deployment runbook.
-4. Test delayed responses and real phone double taps over Tailscale.
-5. Add process-level file locking only if multiple server workers become supported.
+1. Add the full position board, roster detail, and draft-log views.
+2. Add the Tailscale Serve startup command and private deployment runbook.
+3. Test delayed responses and real phone double taps over Tailscale.
+4. Add process-level file locking only if multiple server workers become supported.
 
 The next visible demo should support safe undo from the phone and conversational
 questions in the same composer without allowing the model to mutate state.

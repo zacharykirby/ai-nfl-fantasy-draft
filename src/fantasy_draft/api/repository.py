@@ -37,13 +37,20 @@ class SessionRepository:
     def load(self, name: str) -> DraftSession:
         return DraftSession.load(self.path(name))
 
-    def path(self, name: str) -> Path:
+    def candidate_path(self, name: str) -> Path:
         if not SESSION_NAME_PATTERN.fullmatch(name):
             raise InvalidSessionNameError("Session name contains unsupported characters")
-        path = self.sessions_dir / "{}.json".format(name)
+        return self.sessions_dir / "{}.json".format(name)
+
+    def path(self, name: str) -> Path:
+        path = self.candidate_path(name)
         if not path.is_file():
             raise SessionNotFoundError("Session not found: {}".format(name))
         return path
 
     def list(self) -> List[DraftSession]:
-        return [DraftSession.load(path) for path in self.paths()]
+        return sorted(
+            [DraftSession.load(path) for path in self.paths()],
+            key=lambda session: session.payload["session"]["updated_at"],
+            reverse=True,
+        )

@@ -2,12 +2,13 @@
 
 from copy import deepcopy
 from contextlib import contextmanager
+from hashlib import sha256
 from pathlib import Path
 from threading import Lock, RLock
 from typing import Any, Dict, Iterator
 
 from fantasy_draft.draft.cockpit import DraftCockpitService
-from fantasy_draft.draft.session import DraftSession, DraftSessionError
+from fantasy_draft.draft.session import DraftSession, DraftSessionError, utc_now
 
 
 class IdempotencyConflictError(DraftSessionError):
@@ -15,6 +16,14 @@ class IdempotencyConflictError(DraftSessionError):
 
 
 class StaleMutationError(DraftSessionError):
+    pass
+
+
+class SessionAlreadyExistsError(DraftSessionError):
+    pass
+
+
+class SessionDeletionNotFoundError(DraftSessionError):
     pass
 
 
@@ -35,6 +44,92 @@ class SessionMutationCoordinator:
 
 
 COORDINATOR = SessionMutationCoordinator()
+
+
+class DraftSessionCreationService:
+    def __init__(self, session_path: Path, board_path: Path):
+        self.session_path = Path(session_path)
+        self.board_path = Path(board_path)
+
+    def create(
+        self,
+        name: str,
+        league_size: int,
+        rounds: int,
+        user_team: int,
+        request_id: str,
+    ) -> Dict[str, Any]:
+        with COORDINATOR.lock(self.session_path):
+            if self.session_path.exists():
+                session = DraftSession.load(self.session_path)
+                if session.payload["session"].get("creation_request_id") == request_id:
+                    return self._result(session, replayed=True)
+                raise SessionAlreadyExistsError(
+                    "A draft session named '{}' already exists".format(name)
+                )
+            session = DraftSession.create(
+                self.session_path,
+                self.board_path,
+                name,
+                league_size,
+                rounds,
+                user_team,
+                request_id=request_id,
+            )
+            return self._result(session, replayed=False)
+
+    @staticmethod
+    def _result(session: DraftSession, replayed: bool) -> Dict[str, Any]:
+        return {
+            "session": session.summary(),
+            "cockpit": DraftCockpitService(session).snapshot(),
+            "replayed": replayed,
+        }
+
+
+class DraftSessionDeletionService:
+    """Move an active session into a recoverable local trash directory."""
+
+    def __init__(self, session_path: Path):
+        self.session_path = Path(session_path)
+        self.trash_dir = self.session_path.parent / ".trash"
+
+    def delete(self, request_id: str) -> Dict[str, Any]:
+        with COORDINATOR.lock(self.session_path):
+            archive = self._archive_path(request_id)
+            if not self.session_path.is_file():
+                if archive.is_file():
+                    return self._result(DraftSession.load(archive), replayed=True)
+                raise SessionDeletionNotFoundError(
+                    "Session not found: {}".format(self.session_path.stem)
+                )
+
+            if archive.exists():
+                raise IdempotencyConflictError(
+                    "The deletion request ID collides with an existing archive"
+                )
+            self.trash_dir.mkdir(parents=True, exist_ok=True)
+            self.session_path.replace(archive)
+            session = DraftSession.load(archive)
+            session.payload["session"]["deletion_request_id"] = request_id
+            session.payload["session"]["deleted_at"] = session.payload["session"].get(
+                "deleted_at"
+            ) or utc_now()
+            session.save()
+            return self._result(session, replayed=False)
+
+    def _archive_path(self, request_id: str) -> Path:
+        digest = sha256(request_id.encode("utf-8")).hexdigest()[:20]
+        return self.trash_dir / "{}.{}.json".format(self.session_path.stem, digest)
+
+    @staticmethod
+    def _result(session: DraftSession, replayed: bool) -> Dict[str, Any]:
+        return {
+            "name": session.payload["session"]["name"],
+            "deleted": True,
+            "recoverable": True,
+            "replayed": replayed,
+        }
 
 
 class DraftMutationService:

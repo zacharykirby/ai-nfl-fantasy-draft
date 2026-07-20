@@ -23,7 +23,9 @@ deferred until the state-changing routes and confirmation UI are complete.
 GET /api/v1/health
 GET /api/v1/board/summary
 GET /api/v1/sessions
+POST /api/v1/sessions
 GET /api/v1/sessions/{name}
+DELETE /api/v1/sessions/{name}
 GET /api/v1/sessions/{name}/cockpit
 GET /api/v1/sessions/{name}/players/search?q=...
 GET /api/v1/sessions/{name}/available?position=RB&limit=20
@@ -43,6 +45,8 @@ The OpenAPI document is available at `/openapi.json` and interactive documentati
 
 - Route handlers compose existing domain services; they do not rank players.
 - Session names are restricted to safe filename slugs inside the configured directory.
+- Browser-created sessions snapshot only the configured server-side board and require
+  that board to be ready and deep enough for every planned pick.
 - Session detail responses omit the embedded full board snapshot.
 - API responses disable caching and include basic private-app security headers.
 - Filesystem paths and secrets are not returned to the browser.
@@ -61,6 +65,21 @@ The OpenAPI document is available at `/openapi.json` and interactive documentati
 recommendation, best available players, per-position availability, tier alerts,
 position-run state, and local health into one presentation read model. The CLI domain
 objects remain authoritative.
+
+## Session management
+
+The **Drafts** control lists sessions by most recent update, resumes the selected
+session, and remembers it in browser-local storage. If no sessions exist, the creation
+dialog stays open and draft controls remain disabled. New-session requests include a
+request ID, league size, rounds, and user slot; they never include a board path.
+Concurrent or restarted retries return the originally created session, while a reused
+name from another request returns a structured conflict without changing the file.
+
+Session deletion is also idempotent and requires a separate request ID after the user
+confirms the exact name, current pick, and selection count. The server atomically moves
+the complete session JSON into `sessions/.trash/`; it does not unlink the only copy.
+To recover manually, stop the server, verify that no active session has the same name,
+and move the desired archived JSON back into `sessions/` under its original name.
 
 ## Text composer
 

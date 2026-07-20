@@ -6,6 +6,10 @@ const state = {
   pendingUndo: null,
   pendingBulk: null,
   askController: null,
+  sessions: [],
+  board: null,
+  createRequestId: null,
+  pendingDelete: null,
 };
 
 const byId = (id) => document.getElementById(id);
@@ -92,14 +96,116 @@ function renderAvailable() {
   setList(byId("best-available"), players.map(playerRow).join(""), "No players available");
 }
 
-async function load() {
+function savedSession() {
+  try { return localStorage.getItem("draft-cockpit-session"); } catch (_error) { return null; }
+}
+
+function rememberSession(name) {
+  try { localStorage.setItem("draft-cockpit-session", name); } catch (_error) { /* private mode */ }
+}
+
+function forgetSession(name) {
+  try {
+    if (localStorage.getItem("draft-cockpit-session") === name) {
+      localStorage.removeItem("draft-cockpit-session");
+    }
+  } catch (_error) { /* private mode */ }
+}
+
+async function load(preferredSession = null) {
   showNotice("");
-  const sessions = await api("/api/v1/sessions");
+  const [sessions, board] = await Promise.all([
+    api("/api/v1/sessions"),
+    api("/api/v1/board/summary"),
+  ]);
+  state.sessions = sessions.sessions;
+  state.board = board;
+  renderSessionManager();
   const requested = new URLSearchParams(window.location.search).get("session");
-  state.session = requested || sessions.sessions[0]?.name;
-  if (!state.session) throw new Error("No saved draft sessions were found.");
-  const cockpit = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/cockpit`);
+  const availableNames = new Set(state.sessions.map((session) => session.name));
+  const selected = [preferredSession, requested, savedSession(), state.sessions[0]?.name]
+    .find((name) => name && availableNames.has(name));
+  if (!selected) {
+    state.session = null;
+    byId("command-input").disabled = true;
+    byId("command-send").disabled = true;
+    openSessionManager(true);
+    showNotice("Create a draft session to get started.");
+    return;
+  }
+  await loadSession(selected);
+}
+
+async function loadSession(name) {
+  const cockpit = await api(`/api/v1/sessions/${encodeURIComponent(name)}/cockpit`);
+  state.session = name;
+  byId("command-input").disabled = false;
+  byId("command-send").disabled = false;
+  rememberSession(name);
+  const url = new URL(window.location.href);
+  url.searchParams.set("session", name);
+  history.replaceState(null, "", url);
+  byId("assistant-card").hidden = true;
   render(cockpit);
+  renderSessionManager();
+  if (byId("session-dialog").open) byId("session-dialog").close();
+}
+
+function sessionSlug(value) {
+  return String(value || "").trim().toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+function boardPlayerCount() {
+  return Object.values(state.board?.role_counts || {}).reduce((total, count) => total + Number(count || 0), 0);
+}
+
+function updateSessionCapacity() {
+  const teams = Number(byId("new-league-size").value || 0);
+  const total = boardPlayerCount();
+  const maxRounds = teams ? Math.min(30, Math.floor(total / teams)) : 0;
+  byId("new-rounds").max = Math.max(1, maxRounds);
+  if (Number(byId("new-rounds").value) > maxRounds) byId("new-rounds").value = maxRounds;
+  byId("new-user-team").max = Math.max(1, teams);
+  if (Number(byId("new-user-team").value) > teams) byId("new-user-team").value = teams;
+  byId("new-session-capacity").textContent = `${total} ranked players · up to ${maxRounds} rounds for ${teams || "—"} teams`;
+  byId("create-session").disabled = state.board?.health?.status !== "ready" || maxRounds < 1;
+}
+
+function renderSessionManager() {
+  setList(
+    byId("session-list"),
+    state.sessions.map((session) => `<div class="session-row">
+      <button class="session-option" type="button" data-session="${escapeHtml(session.name)}">
+        <span><strong>${escapeHtml(session.name)}</strong><span class="session-meta">${escapeHtml(session.status)} · Pick ${session.current_pick} · Slot ${session.user_team}</span></span>
+        <span class="resume-label">${session.name === state.session ? "Current" : "Resume"}</span>
+      </button>
+      <button class="session-delete" type="button" data-delete-session="${escapeHtml(session.name)}" aria-label="Delete ${escapeHtml(session.name)}">⌫</button>
+    </div>`).join(""),
+    "No saved drafts yet",
+  );
+  const leagueSize = Number(state.board?.league?.league_size || 10);
+  const total = boardPlayerCount();
+  if (!byId("new-league-size").value) byId("new-league-size").value = leagueSize;
+  if (!byId("new-rounds").value) byId("new-rounds").value = Math.min(15, Math.floor(total / leagueSize));
+  if (!byId("new-user-team").value) byId("new-user-team").value = 1;
+  const ready = state.board?.health?.status === "ready";
+  byId("session-board-status").textContent = ready ? "Board ready" : "Board not ready";
+  updateSessionCapacity();
+}
+
+function openSessionManager(required = false) {
+  byId("session-dialog-close").hidden = required;
+  if (!byId("session-dialog").open) byId("session-dialog").showModal();
+}
+
+function showSessionNotice(message, success = false) {
+  const notice = byId("session-form-notice");
+  notice.hidden = !message;
+  notice.textContent = message;
+  notice.classList.toggle("success", Boolean(message) && success);
 }
 
 function showNotice(message, success = false) {
@@ -234,7 +340,106 @@ function escapeHtml(value) {
   })[char]);
 }
 
-byId("refresh").addEventListener("click", () => load().catch((error) => showNotice(error.message)));
+byId("refresh").addEventListener("click", () => load(state.session).catch((error) => showNotice(error.message)));
+byId("session-switcher").addEventListener("click", () => {
+  showSessionNotice("");
+  openSessionManager(false);
+});
+byId("session-dialog-close").addEventListener("click", () => byId("session-dialog").close());
+byId("session-dialog").addEventListener("cancel", (event) => {
+  if (state.sessions.length === 0) event.preventDefault();
+});
+byId("session-list").addEventListener("click", (event) => {
+  const deleteButton = event.target.closest("[data-delete-session]");
+  if (deleteButton) {
+    const session = state.sessions.find((item) => item.name === deleteButton.dataset.deleteSession);
+    if (!session) return;
+    state.pendingDelete = { session, requestId: requestId() };
+    byId("delete-session-name").textContent = session.name;
+    byId("delete-session-text").textContent = `Delete ${session.name} at pick ${session.current_pick} with ${session.selections} recorded selections?`;
+    byId("session-dialog").close();
+    byId("delete-session-dialog").returnValue = "";
+    byId("delete-session-dialog").showModal();
+    return;
+  }
+  const option = event.target.closest("[data-session]");
+  if (!option) return;
+  loadSession(option.dataset.session).catch((error) => showSessionNotice(error.message));
+});
+byId("delete-session-dialog").addEventListener("close", async () => {
+  const pending = state.pendingDelete;
+  if (!pending) return;
+  if (byId("delete-session-dialog").returnValue !== "confirm") {
+    state.pendingDelete = null;
+    openSessionManager(false);
+    return;
+  }
+  try {
+    const result = await api(`/api/v1/sessions/${encodeURIComponent(pending.session.name)}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ request_id: pending.requestId }),
+    });
+    const deletedCurrent = state.session === pending.session.name;
+    if (deletedCurrent) {
+      state.session = null;
+      forgetSession(pending.session.name);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("session");
+      history.replaceState(null, "", url);
+    }
+    state.pendingDelete = null;
+    await load(deletedCurrent ? null : state.session);
+    const message = `Deleted ${result.name}. Recovery copy saved in sessions/.trash.`;
+    if (state.sessions.length === 0) showSessionNotice(message, true);
+    else showNotice(message, true);
+  } catch (error) {
+    state.pendingDelete = null;
+    openSessionManager(false);
+    showSessionNotice(error.message);
+  }
+});
+byId("new-league-size").addEventListener("input", () => {
+  state.createRequestId = null;
+  updateSessionCapacity();
+});
+["new-session-name", "new-rounds", "new-user-team"].forEach((id) => {
+  byId(id).addEventListener("input", () => { state.createRequestId = null; });
+});
+byId("new-session-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const create = byId("create-session");
+  const name = sessionSlug(byId("new-session-name").value);
+  if (!name) {
+    showSessionNotice("Enter a session name using letters or numbers.");
+    return;
+  }
+  byId("new-session-name").value = name;
+  state.createRequestId = state.createRequestId || requestId();
+  create.disabled = true;
+  showSessionNotice("Creating draft…");
+  try {
+    await api("/api/v1/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        league_size: Number(byId("new-league-size").value),
+        rounds: Number(byId("new-rounds").value),
+        user_team: Number(byId("new-user-team").value),
+        request_id: state.createRequestId,
+      }),
+    });
+    state.createRequestId = null;
+    byId("new-session-form").reset();
+    await load(name);
+    showNotice(`Created and opened ${name}.`, true);
+  } catch (error) {
+    showSessionNotice(error.message);
+  } finally {
+    create.disabled = state.board?.health?.status !== "ready";
+  }
+});
 byId("assistant-cancel").addEventListener("click", () => state.askController?.abort());
 document.querySelectorAll(".prompt-chip").forEach((button) => {
   button.addEventListener("click", () => {

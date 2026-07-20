@@ -12,7 +12,12 @@ from fantasy_draft.api.repository import (
     InvalidSessionNameError,
     SessionNotFoundError,
 )
-from fantasy_draft.draft.mutations import IdempotencyConflictError, StaleMutationError
+from fantasy_draft.draft.mutations import (
+    IdempotencyConflictError,
+    SessionAlreadyExistsError,
+    SessionDeletionNotFoundError,
+    StaleMutationError,
+)
 from fantasy_draft.draft.session import (
     AmbiguousPlayerError,
     DraftSessionError,
@@ -89,6 +94,22 @@ def install_error_handlers(app: FastAPI) -> None:
     async def stale_mutation(_request: Request, exc: StaleMutationError) -> JSONResponse:
         return JSONResponse(
             error_payload("stale_mutation", str(exc), True), status_code=409
+        )
+
+    @app.exception_handler(SessionAlreadyExistsError)
+    async def session_exists(
+        _request: Request, exc: SessionAlreadyExistsError
+    ) -> JSONResponse:
+        return JSONResponse(
+            error_payload("session_exists", str(exc), True), status_code=409
+        )
+
+    @app.exception_handler(SessionDeletionNotFoundError)
+    async def deleted_session_not_found(
+        _request: Request, exc: SessionDeletionNotFoundError
+    ) -> JSONResponse:
+        return JSONResponse(
+            error_payload("session_not_found", str(exc)), status_code=404
         )
 
     @app.exception_handler(DraftSessionError)

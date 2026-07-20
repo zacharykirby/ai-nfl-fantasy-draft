@@ -81,10 +81,10 @@ The analytical pipeline, draft board, live state engine, deterministic recommend
 OpenRouter reasoning layer, and terminal draft dashboard are implemented.
 
 The packaged runtime, cockpit read model, versioned FastAPI API, interactive mobile
-page, safe mutation controls, and controlled conversational assistant are implemented.
-The active delivery sequence is now:
+page, browser session management, safe mutation controls, and controlled conversational
+assistant are implemented. The active delivery sequence is now:
 
-1. Add browser session creation/resume and full board, roster, and draft-log views.
+1. Add full board, roster, and draft-log views.
 2. Deploy privately through Tailscale Serve.
 3. Complete full phone-based draft simulations.
 
@@ -243,6 +243,17 @@ they took Ja'Marr Chase
 draft Puka Nacua
 ```
 
+Use **Drafts** in the header to resume any saved session or create a new one. The last
+opened session is remembered on that browser. New sessions use only the server's
+configured ready board; the form derives sensible team and round limits from board
+capacity. Creation retries are idempotent, while a duplicate name from a different
+request is rejected without overwriting the existing draft.
+
+Each saved draft also has a delete control. Deletion requires an exact-session
+confirmation showing its current pick and recorded-selection count. The JSON is moved
+to `sessions/.trash/` rather than permanently erased. Deleting the active session
+automatically resumes the next saved draft or opens the new-draft form.
+
 The server resolves the available player and shows the exact player, overall pick,
 and team in a confirmation dialog. Draft state changes only after confirmation.
 Unique last names are accepted; ambiguous names return candidate choices without
@@ -267,7 +278,9 @@ The implemented API includes:
 GET /api/v1/health
 GET /api/v1/board/summary
 GET /api/v1/sessions
+POST /api/v1/sessions
 GET /api/v1/sessions/{name}
+DELETE /api/v1/sessions/{name}
 GET /api/v1/sessions/{name}/cockpit
 GET /api/v1/sessions/{name}/players/search
 GET /api/v1/sessions/{name}/available

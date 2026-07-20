@@ -53,6 +53,11 @@ class BoardSummaryResponse(BaseModel):
 class SessionSummaryResponse(BaseModel):
     name: str
     status: str
+    created_at: str
+    updated_at: str
+    league_size: int
+    rounds: int
+    user_team: int
     current_pick: int
     current_team: Optional[int] = None
     next_user_pick: Optional[int] = None
@@ -63,6 +68,14 @@ class SessionSummaryResponse(BaseModel):
 
 class SessionListResponse(BaseModel):
     sessions: List[SessionSummaryResponse]
+
+
+class SessionCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=80)
+    league_size: int = Field(ge=2, le=32)
+    rounds: int = Field(ge=1, le=30)
+    user_team: int = Field(ge=1, le=32)
+    request_id: str = Field(min_length=8, max_length=100)
 
 
 class SessionDetailResponse(BaseModel):
@@ -94,6 +107,23 @@ class CockpitResponse(BaseModel):
     tier_alerts: List[Dict[str, Any]]
     position_run: Dict[str, Any]
     health: Dict[str, Any]
+
+
+class SessionCreateResponse(BaseModel):
+    session: SessionSummaryResponse
+    cockpit: CockpitResponse
+    replayed: bool
+
+
+class SessionDeleteRequest(BaseModel):
+    request_id: str = Field(min_length=8, max_length=100)
+
+
+class SessionDeleteResponse(BaseModel):
+    name: str
+    deleted: bool
+    recoverable: bool
+    replayed: bool
 
 
 class InterpretCommandRequest(BaseModel):

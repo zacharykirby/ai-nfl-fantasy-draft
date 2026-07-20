@@ -119,6 +119,7 @@ class DraftSession:
         league_size: int,
         rounds: int,
         user_team: int,
+        request_id: Optional[str] = None,
     ) -> "DraftSession":
         if not 2 <= league_size <= 32:
             raise DraftSessionError("league_size must be between 2 and 32")
@@ -168,6 +169,8 @@ class DraftSession:
             },
             "events": [],
         }
+        if request_id:
+            payload["session"]["creation_request_id"] = request_id
         session = cls(payload, path)
         session.save()
         return session
@@ -391,6 +394,11 @@ class DraftSession:
         return {
             "name": self.payload["session"]["name"],
             "status": self.payload["session"]["status"],
+            "created_at": self.payload["session"]["created_at"],
+            "updated_at": self.payload["session"]["updated_at"],
+            "league_size": self.league_size,
+            "rounds": self.rounds,
+            "user_team": self.user_team,
             "current_pick": self.current_pick,
             "current_team": self.current_team,
             "next_user_pick": next_user_pick,

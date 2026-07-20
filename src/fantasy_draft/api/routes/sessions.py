@@ -2,10 +2,12 @@
 
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, Query
+from pathlib import Path
 
-from fantasy_draft.api.dependencies import assistant_client, session_repository
-from fantasy_draft.api.repository import SessionRepository
+from fastapi import APIRouter, Depends, Query, Response
+
+from fantasy_draft.api.dependencies import assistant_client, board_path, session_repository
+from fantasy_draft.api.repository import BoardNotFoundError, SessionRepository
 from fantasy_draft.api.schemas import (
     AssistantAnswerResponse,
     AssistantQuestionRequest,
@@ -21,13 +23,21 @@ from fantasy_draft.api.schemas import (
     PlayerListResponse,
     RecommendationResponse,
     SessionDetailResponse,
+    SessionCreateRequest,
+    SessionCreateResponse,
+    SessionDeleteRequest,
+    SessionDeleteResponse,
     SessionListResponse,
     UndoRequest,
 )
 from fantasy_draft.assistant import DraftAssistantQueryService
 from fantasy_draft.draft.cockpit import DraftCockpitService, player_view
 from fantasy_draft.draft.commands import bulk_pick_queries, pick_query
-from fantasy_draft.draft.mutations import DraftMutationService
+from fantasy_draft.draft.mutations import (
+    DraftMutationService,
+    DraftSessionCreationService,
+    DraftSessionDeletionService,
+)
 from fantasy_draft.draft.recommendations import DraftRecommendationEngine, MODES
 
 
@@ -39,6 +49,41 @@ def list_sessions(
     repository: SessionRepository = Depends(session_repository),
 ) -> Dict[str, Any]:
     return {"sessions": [session.summary() for session in repository.list()]}
+
+
+@router.post("", response_model=SessionCreateResponse, status_code=201)
+def create_session(
+    request: SessionCreateRequest,
+    response: Response,
+    repository: SessionRepository = Depends(session_repository),
+    configured_board: Path = Depends(board_path),
+) -> Dict[str, Any]:
+    if not configured_board.is_file():
+        raise BoardNotFoundError("Draft board is not available")
+    result = DraftSessionCreationService(
+        repository.candidate_path(request.name),
+        configured_board,
+    ).create(
+        request.name,
+        request.league_size,
+        request.rounds,
+        request.user_team,
+        request.request_id,
+    )
+    if result["replayed"]:
+        response.status_code = 200
+    return result
+
+
+@router.delete("/{session_name}", response_model=SessionDeleteResponse)
+def delete_session(
+    session_name: str,
+    request: SessionDeleteRequest,
+    repository: SessionRepository = Depends(session_repository),
+) -> Dict[str, Any]:
+    return DraftSessionDeletionService(
+        repository.candidate_path(session_name)
+    ).delete(request.request_id)
 
 
 @router.get("/{session_name}", response_model=SessionDetailResponse)

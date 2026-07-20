@@ -2,7 +2,13 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
-from fantasy_draft.draft.mutations import DraftMutationService, StaleMutationError
+from fantasy_draft.draft.mutations import (
+    DraftMutationService,
+    DraftSessionCreationService,
+    DraftSessionDeletionService,
+    SessionAlreadyExistsError,
+    StaleMutationError,
+)
 from fantasy_draft.draft.session import DraftSession, PlayerNotFoundError
 
 
@@ -121,3 +127,45 @@ def test_concurrent_bulk_double_tap_records_one_batch(web_draft):
 
     assert sorted(result["replayed"] for result in results) == [False, True]
     assert DraftSession.load(path).current_pick == 4
+
+
+def test_concurrent_session_creation_is_idempotent(web_draft):
+    path = web_draft["sessions_dir"] / "new-session.json"
+
+    def create():
+        return DraftSessionCreationService(path, web_draft["board_path"]).create(
+            "new-session", 4, 2, 3, "request-create-double-tap"
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(executor.map(lambda _item: create(), range(2)))
+
+    assert sorted(result["replayed"] for result in results) == [False, True]
+    assert DraftSession.load(path).user_team == 3
+
+    with pytest.raises(SessionAlreadyExistsError):
+        DraftSessionCreationService(path, web_draft["board_path"]).create(
+            "new-session", 4, 2, 1, "different-create-request"
+        )
+
+
+def test_session_delete_moves_file_to_recoverable_trash_and_replays(web_draft):
+    path = web_draft["session"].path
+    service = DraftSessionDeletionService(path)
+
+    deleted = service.delete("request-delete-session-0001")
+    replay = DraftSessionDeletionService(path).delete("request-delete-session-0001")
+
+    assert deleted == {
+        "name": "phone-test",
+        "deleted": True,
+        "recoverable": True,
+        "replayed": False,
+    }
+    assert replay["replayed"] is True
+    assert not path.exists()
+    archives = list((path.parent / ".trash").glob("phone-test.*.json"))
+    assert len(archives) == 1
+    archived = DraftSession.load(archives[0])
+    assert archived.payload["session"]["deletion_request_id"] == "request-delete-session-0001"
+    assert archived.current_pick == 2
