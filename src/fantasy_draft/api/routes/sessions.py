@@ -256,6 +256,7 @@ def record_pick(
     return DraftMutationService(repository.path(session_name)).record_pick(
         request.player,
         request.request_id,
+        expected_pick=request.expected_pick,
         mode=request.mode,
     )
 

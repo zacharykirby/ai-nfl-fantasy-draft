@@ -268,11 +268,16 @@ These views refresh on entry, after state changes, through the refresh button, a
 the browser returns to the foreground. The private single-user deployment intentionally
 does not add websocket infrastructure without evidence that polling is needed.
 
-The server resolves the available player and shows the exact player, overall pick,
-and team in a confirmation dialog. Draft state changes only after confirmation.
-Unique last names are accepted; ambiguous names return candidate choices without
-changing state. Retries and double taps use an idempotency key so the same request
-cannot advance the draft twice.
+The recommendation, alternatives, best-available rows, and debounced player search
+all open the same exact player, overall pick, and team confirmation. Draft state
+changes only after confirmation. Unique last names are accepted; ambiguous names
+return candidate choices without changing state. Retries and double taps use an
+idempotency key so the same request cannot advance the draft twice, and a confirmation
+is rejected if the overall pick has advanced since it opened.
+
+The cockpit shows the current team on the clock, the user's countdown, tier cliffs,
+recent position runs, and separate board, model, autosave, and server-connectivity
+health indicators.
 
 Use **Undo last** to review the exact player, pick, position, and team before restoring
 that player to the pool. The confirmation is rejected if another pick arrives first.

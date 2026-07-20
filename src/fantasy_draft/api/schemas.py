@@ -183,6 +183,7 @@ class AssistantAnswerResponse(BaseModel):
 class PickRequest(BaseModel):
     player: str = Field(min_length=1, max_length=100)
     request_id: str = Field(min_length=8, max_length=100)
+    expected_pick: Optional[int] = Field(default=None, ge=1)
     mode: str = "balanced"
 
 

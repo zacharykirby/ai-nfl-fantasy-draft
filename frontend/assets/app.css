@@ -120,7 +120,7 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 
 .pick-strip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   margin-bottom: 12px;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -163,6 +163,40 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 .pill.muted { background: rgba(145, 163, 183, 0.12); color: var(--muted); }
 .reason-list { margin: 0; padding-left: 19px; color: #c9d5e2; font-size: 0.86rem; }
 .reason-list li + li { margin-top: 5px; }
+
+.quick-draft {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 14px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 850;
+  text-align: left;
+}
+.quick-draft:disabled { opacity: 0.42; }
+.primary-quick-draft { border: 0; background: var(--accent); color: #052018; text-align: center; }
+.player-action { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; border-top: 1px solid rgba(32, 54, 78, 0.8); }
+.player-action:first-child { border-top: 0; }
+.player-action .player-row { min-width: 0; border-top: 0; }
+.player-action .quick-draft { width: auto; min-height: 44px; margin: 0; color: var(--accent); }
+
+.search-card input {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 14px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  outline: none;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.search-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.search-results { margin-top: 8px; }
 
 .filters {
   display: grid;
@@ -401,6 +435,12 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 .full-width { width: 100%; }
 
 .status-dot { color: var(--accent); font-size: 0.75rem; }
+.health-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 12px; }
+.health-item { min-width: 0; padding: 10px 7px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); text-align: center; }
+.health-item span, .health-item strong { display: block; overflow: hidden; text-overflow: ellipsis; }
+.health-item span { color: var(--muted); font-size: 0.64rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+.health-item strong { margin-top: 4px; color: var(--accent); font-size: 0.72rem; }
+.health-item strong.unhealthy { color: var(--danger); }
 .read-only-note { margin: 18px 0 0; color: var(--muted); text-align: center; font-size: 0.75rem; }
 
 @media (max-width: 390px) {
@@ -408,6 +448,9 @@ h2 { margin-bottom: 0; font-size: 1rem; }
   .card { padding: 13px; }
   .grid-two { grid-template-columns: 1fr; gap: 0; }
   .pick-strip > div { padding: 11px; }
+  .pick-strip .label { font-size: 0.58rem; }
+  .pick-strip strong { font-size: 1.05rem; }
+  .health-grid { grid-template-columns: 1fr 1fr; }
   .composer { padding-left: 10px; padding-right: 10px; }
 }
 

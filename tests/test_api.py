@@ -49,6 +49,12 @@ def test_health_board_and_frontend(web_draft):
     assert "Roster detail" in frontend.text
     assert "Complete pick log" in frontend.text
     assert "player-detail-dialog" in frontend.text
+    assert 'id="current-team"' in frontend.text
+    assert 'id="draft-primary"' in frontend.text
+    assert 'id="player-search"' in frontend.text
+    assert 'id="position-run"' in frontend.text
+    assert 'id="health-autosave"' in frontend.text
+    assert 'id="health-connectivity"' in frontend.text
     assert frontend.headers["x-frame-options"] == "DENY"
 
 
@@ -281,6 +287,27 @@ def test_text_command_requires_confirmation_then_records_pick(web_draft):
     assert replay.status_code == 200
     assert replay.json()["replayed"] is True
     assert replay.json()["cockpit"]["session"]["current_pick"] == 3
+
+
+def test_pick_route_rejects_confirmation_after_draft_advances(web_draft):
+    client = make_client(web_draft)
+    client.post(
+        "/api/v1/sessions/phone-test/picks",
+        json={"player": "Bijan Robinson", "request_id": "api-pick-fresh-0001"},
+    )
+
+    stale = client.post(
+        "/api/v1/sessions/phone-test/picks",
+        json={
+            "player": "Puka Nacua",
+            "request_id": "api-pick-stale-0001",
+            "expected_pick": 2,
+        },
+    )
+
+    assert stale.status_code == 409
+    assert stale.json()["error"]["code"] == "stale_mutation"
+    assert client.get("/api/v1/sessions/phone-test/cockpit").json()["session"]["current_pick"] == 3
 
 
 def test_non_mutating_text_is_classified_as_question(web_draft):

@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from hashlib import sha256
 from pathlib import Path
 from threading import Lock, RLock
-from typing import Any, Dict, Iterator
+from typing import Any, Dict, Iterator, Optional
 
 from fantasy_draft.draft.cockpit import DraftCockpitService
 from fantasy_draft.draft.session import DraftSession, DraftSessionError, utc_now
@@ -140,6 +140,7 @@ class DraftMutationService:
         self,
         player: str,
         request_id: str,
+        expected_pick: Optional[int] = None,
         mode: str = "balanced",
     ) -> Dict[str, Any]:
         with COORDINATOR.lock(self.session_path):
@@ -147,6 +148,10 @@ class DraftMutationService:
             existing = self._event_for_request(session, request_id, "selection")
             if existing:
                 return self._result(session, existing, mode, replayed=True)
+            if expected_pick is not None and session.current_pick != expected_pick:
+                raise StaleMutationError(
+                    "The draft advanced after this pick was confirmed. Refresh and try again."
+                )
             event = session.draft(player, request_id=request_id)
             return self._result(session, event, mode, replayed=False)
 

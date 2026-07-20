@@ -114,6 +114,18 @@ players produce structured errors and do not advance the draft.
 The confirmation dialog displays the resolved full player name, overall pick, and
 team. Only confirmation calls the pick mutation endpoint.
 
+The cockpit also provides two-step draft actions on the primary recommendation,
+alternatives, best-available rows, and debounced available-player search results. All
+of these controls resolve through the same server-side interpretation route before
+opening confirmation. Pick mutations include the confirmed overall pick; if another
+selection advances the draft before submission, the server rejects the stale action
+without changing state.
+
+The top strip identifies the team currently on the clock and the user's countdown.
+Tier and position-run alerts share the compact cockpit evidence area, while separate
+board, model, autosave, and server-connectivity indicators keep degraded conditions
+visible without opening diagnostics.
+
 Question-classified text calls the assistant endpoint. The response reports model or
 fallback source, latency, and freshness. A session revision change while the call is
 in flight marks the result stale and triggers a cockpit refresh. The browser can

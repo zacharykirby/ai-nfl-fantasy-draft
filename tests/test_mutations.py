@@ -26,6 +26,26 @@ def test_record_pick_is_idempotent_and_returns_fresh_cockpit(web_draft):
     assert len(DraftSession.load(path).active_selections()) == 2
 
 
+def test_record_pick_rejects_stale_confirmation(web_draft):
+    path = web_draft["session"].path
+    service = DraftMutationService(path)
+    service.record_pick("Bijan", "request-pick-before-stale")
+
+    with pytest.raises(StaleMutationError, match="draft advanced"):
+        service.record_pick(
+            "Puka",
+            "request-stale-confirmation",
+            expected_pick=2,
+        )
+
+    resumed = DraftSession.load(path)
+    assert resumed.current_pick == 3
+    assert all(
+        event.get("request_id") != "request-stale-confirmation"
+        for event in resumed.payload["events"]
+    )
+
+
 def test_concurrent_retries_record_one_selection(web_draft):
     path = web_draft["session"].path
 

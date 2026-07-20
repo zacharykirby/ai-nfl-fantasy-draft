@@ -545,6 +545,9 @@ Exit criteria:
 
 ### Milestone 3 — Mobile cockpit MVP
 
+**Status: Implementation complete; real-phone layout and full-draft verification remain
+part of Milestones 6 and 7.**
+
 Deliverables:
 
 - Build the responsive cockpit screen.
@@ -555,6 +558,23 @@ Deliverables:
 - Add undo confirmation and clear success/error feedback.
 - Add visible board, model, autosave, and connectivity status.
 - Test common phone widths and landscape recovery.
+
+Delivered:
+
+- Four-part pick context showing round, overall pick, current team, and user countdown
+- Direct two-step draft flow for the recommendation, alternatives, best available, and search results
+- Debounced available-player search with server-side player resolution
+- Shared player/pick/team confirmation for typed and tapped draft actions
+- Expected-pick validation that rejects confirmations after the draft advances
+- Tier-cliff and recent position-run alerts
+- Visible board, model, autosave, and server-connectivity health
+- Refresh-on-focus and reconnect behavior with deterministic controls available offline from the model
+
+Still to verify manually:
+
+- Representative small-phone widths and landscape recovery
+- A complete physical-phone draft without a keyboard
+- Tailnet disconnect/reconnect and delayed double taps under realistic network conditions
 
 Exit criteria:
 

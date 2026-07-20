@@ -3,6 +3,7 @@ const state = {
   position: "ALL",
   session: null,
   pendingPick: null,
+  preparingPick: false,
   pendingUndo: null,
   pendingBulk: null,
   askController: null,
@@ -13,15 +14,29 @@ const state = {
   view: "cockpit",
   boardPosition: "ALL",
   detailPlayer: null,
+  searchTimer: null,
+  searchSequence: 0,
+  serverOnline: false,
 };
 
 const byId = (id) => document.getElementById(id);
 
 async function api(path, options = {}) {
-  const response = await fetch(path, {
-    ...options,
-    headers: { Accept: "application/json", ...(options.headers || {}) },
-  });
+  let response;
+  try {
+    response = await fetch(path, {
+      ...options,
+      headers: { Accept: "application/json", ...(options.headers || {}) },
+    });
+  } catch (error) {
+    if (error.name !== "AbortError") {
+      state.serverOnline = false;
+      updateConnectivityIndicator();
+    }
+    throw error;
+  }
+  state.serverOnline = true;
+  updateConnectivityIndicator();
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message || `Request failed (${response.status})`);
   return payload;
@@ -41,6 +56,13 @@ function compactRow(left, right = "") {
   return `<div class="compact-row"><span>${escapeHtml(left)}</span><span class="player-detail">${escapeHtml(right)}</span></div>`;
 }
 
+function actionablePlayerRow(player, label = "Draft") {
+  return `<div class="player-action">
+    ${playerRow(player)}
+    <button class="quick-draft" type="button" data-draft-player="${escapeHtml(player.player)}" aria-label="Draft ${escapeHtml(player.player)}">${label}</button>
+  </div>`;
+}
+
 function setList(element, html, emptyText) {
   element.innerHTML = html || emptyText;
   element.classList.toggle("empty-state", !html);
@@ -52,6 +74,9 @@ function render(cockpit) {
   byId("session-name").textContent = session.name;
   byId("round").textContent = session.round;
   byId("current-pick").textContent = session.current_pick;
+  byId("current-team").textContent = session.current_team == null
+    ? "Done"
+    : session.current_team === session.user_team ? "You" : `T${session.current_team}`;
   byId("your-turn").textContent = session.picks_until_user === 0 ? "Now" : session.picks_until_user ?? "Done";
   byId("available-count").textContent = `${session.available} available`;
 
@@ -65,10 +90,12 @@ function render(cockpit) {
   byId("mode").textContent = recommendation?.mode || "complete";
   byId("primary-reasons").innerHTML = (primary?.reasons || []).slice(0, 3)
     .map((reason) => `<li>${escapeHtml(reason)}</li>`).join("");
+  byId("draft-primary").disabled = !primary;
+  byId("draft-primary").dataset.draftPlayer = primary?.player || "";
 
   setList(
     byId("alternatives"),
-    (recommendation?.alternatives || []).slice(0, 3).map(playerRow).join(""),
+    (recommendation?.alternatives || []).slice(0, 3).map((player) => actionablePlayerRow(player)).join(""),
     "No alternatives available",
   );
   renderAvailable();
@@ -82,12 +109,20 @@ function render(cockpit) {
     cockpit.tier_alerts.map((alert) => compactRow(`${alert.position} Tier ${alert.tier}`, `${alert.remaining} left`)).join(""),
     "No urgent drops",
   );
+  const run = cockpit.position_run || {};
+  setList(
+    byId("position-run"),
+    run.active
+      ? (run.positions || []).map((position) => compactRow(`${position} run`, `${run.counts?.[position] || 0} of last ${run.window}`)).join("")
+      : "",
+    "No active position run",
+  );
   setList(
     byId("recent-picks"),
     cockpit.recent_picks.slice().reverse().map((pick) => compactRow(`${pick.overall_pick}. ${pick.player}`, `${pick.position} · Team ${pick.team}`)).join(""),
     "No selections yet",
   );
-  byId("health").textContent = `${cockpit.health.board} · ${cockpit.health.model}`;
+  renderHealth(cockpit.health);
   byId("undo-last").disabled = cockpit.recent_picks.length === 0;
   const teamSelect = byId("log-team");
   const selectedTeam = teamSelect.value;
@@ -106,7 +141,69 @@ function renderAvailable() {
   const players = state.position === "ALL"
     ? state.cockpit.best_available
     : state.cockpit.top_available_by_position[state.position] || [];
-  setList(byId("best-available"), players.map(playerRow).join(""), "No players available");
+  setList(
+    byId("best-available"),
+    players.map((player) => actionablePlayerRow(player)).join(""),
+    "No players available",
+  );
+}
+
+function setHealth(id, text, healthy = true) {
+  const element = byId(id);
+  element.textContent = text;
+  element.classList.toggle("unhealthy", !healthy);
+}
+
+function renderHealth(health) {
+  setHealth("health-board", health.board === "ready_snapshot" ? "Ready" : health.board, health.board === "ready_snapshot");
+  setHealth("health-model", health.model === "configured" ? "Configured" : "Offline", true);
+  setHealth("health-autosave", health.autosave === "ok" ? "Saved" : "Missing", health.autosave === "ok");
+  updateConnectivityIndicator();
+}
+
+function updateConnectivityIndicator() {
+  const element = byId("health-connectivity");
+  if (!element) return;
+  const browserOnline = navigator.onLine !== false;
+  const connected = browserOnline && state.serverOnline;
+  setHealth("health-connectivity", connected ? "Connected" : browserOnline ? "Server lost" : "Offline", connected);
+}
+
+async function beginPickConfirmation(playerName) {
+  if (!playerName || !state.session || state.preparingPick || state.pendingPick) return;
+  state.preparingPick = true;
+  try {
+    showNotice("Checking current draft state…");
+    const interpretation = await interpretCommand(`draft ${playerName}`);
+    if (interpretation.intent !== "record_pick") {
+      throw new Error("That player could not be prepared for drafting.");
+    }
+    state.pendingPick = { ...interpretation, requestId: requestId() };
+    byId("confirmation-player").textContent = interpretation.player.player;
+    byId("confirmation-text").textContent = interpretation.confirmation.text;
+    byId("confirmation-dialog").returnValue = "";
+    byId("confirmation-dialog").showModal();
+    showNotice("");
+  } finally {
+    state.preparingPick = false;
+  }
+}
+
+async function searchPlayers(query, sequence = ++state.searchSequence) {
+  const results = byId("player-search-results");
+  if (query.length < 2) {
+    setList(results, "", "Type at least 2 characters");
+    return;
+  }
+  results.textContent = "Searching…";
+  results.classList.add("empty-state");
+  const payload = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/players/search?q=${encodeURIComponent(query)}&limit=8`);
+  if (sequence !== state.searchSequence) return;
+  setList(
+    results,
+    payload.players.map((player) => actionablePlayerRow(player)).join(""),
+    "No available players match",
+  );
 }
 
 async function showView(view) {
@@ -262,6 +359,9 @@ async function load(preferredSession = null) {
 }
 
 async function loadSession(name) {
+  state.searchSequence += 1;
+  byId("player-search").value = "";
+  setList(byId("player-search-results"), "", "Type at least 2 characters");
   const cockpit = await api(`/api/v1/sessions/${encodeURIComponent(name)}/cockpit`);
   state.session = name;
   byId("command-input").disabled = false;
@@ -407,11 +507,15 @@ async function recordPendingPick() {
     body: JSON.stringify({
       player: state.pendingPick.player.player,
       request_id: state.pendingPick.requestId,
+      expected_pick: state.pendingPick.confirmation.overall_pick,
       mode: "balanced",
     }),
   });
   render(result.cockpit);
   byId("command-input").value = "";
+  byId("player-search").value = "";
+  state.searchSequence += 1;
+  setList(byId("player-search-results"), "", "Type at least 2 characters");
   state.pendingPick = null;
   showNotice(`Recorded ${result.event.player} at pick ${result.event.overall_pick}.`, true);
 }
@@ -481,6 +585,12 @@ byId("board-available-only").addEventListener("change", () => loadBoardView().ca
 byId("log-team").addEventListener("change", () => loadDraftLogView().catch((error) => showNotice(error.message)));
 byId("log-position").addEventListener("change", () => loadDraftLogView().catch((error) => showNotice(error.message)));
 document.addEventListener("click", (event) => {
+  const draftButton = event.target.closest("[data-draft-player]");
+  if (draftButton) {
+    beginPickConfirmation(draftButton.dataset.draftPlayer)
+      .catch((error) => showNotice(error.message));
+    return;
+  }
   const player = event.target.closest("[data-player-id]");
   if (player) openPlayerDetail(player.dataset.playerId).catch((error) => showNotice(error.message));
 });
@@ -489,8 +599,7 @@ byId("player-detail-draft").addEventListener("click", () => {
   const player = state.detailPlayer;
   if (!player?.available) return;
   byId("player-detail-dialog").close();
-  byId("command-input").value = `draft ${player.player}`;
-  byId("command-form").requestSubmit();
+  beginPickConfirmation(player.player).catch((error) => showNotice(error.message));
 });
 byId("session-switcher").addEventListener("click", () => {
   showSessionNotice("");
@@ -621,6 +730,19 @@ document.querySelectorAll(".filter").forEach((button) => {
     renderAvailable();
   });
 });
+byId("player-search").addEventListener("input", (event) => {
+  clearTimeout(state.searchTimer);
+  const query = event.target.value.trim();
+  const sequence = ++state.searchSequence;
+  state.searchTimer = setTimeout(() => {
+    searchPlayers(query, sequence).catch((error) => showNotice(error.message));
+  }, 150);
+});
+window.addEventListener("online", () => {
+  updateConnectivityIndicator();
+  load(state.session).catch((error) => showNotice(error.message));
+});
+window.addEventListener("offline", updateConnectivityIndicator);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") load().catch((error) => showNotice(error.message));
 });
