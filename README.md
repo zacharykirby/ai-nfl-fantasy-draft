@@ -3,11 +3,10 @@
 A data-driven fantasy football draft engine with live session tracking,
 VORP-based recommendations, and an optional OpenRouter reasoning layer.
 
-The project currently works as a command-line application. Its next product milestone
-is a private, mobile-first web cockpit hosted on the user's PC and accessed from a
-phone through Tailscale. The repository remains the source of truth for projections,
-rankings, availability, draft state, and recommendations; the browser will be a fast
-interface over the same tested domain code.
+The project includes a command-line application and the first read-only version of a
+private, mobile-first web cockpit hosted on the user's PC. The repository remains the
+source of truth for projections, rankings, availability, draft state, and
+recommendations; the browser is a fast interface over the same tested domain code.
 
 ## Product Direction
 
@@ -81,16 +80,14 @@ draft-night readiness.
 The analytical pipeline, draft board, live state engine, deterministic recommender,
 OpenRouter reasoning layer, and terminal draft dashboard are implemented.
 
-The private web application is planned but not yet implemented. The active delivery
-sequence is:
+The packaged runtime, cockpit read model, versioned read-only FastAPI API, and first
+mobile page are implemented. The active delivery sequence is now:
 
-1. Verify the existing foundation and current board.
-2. Add a FastAPI application and versioned read-only API.
-3. Add safe pick, bulk-pick, and undo mutations.
-4. Build the mobile cockpit.
-5. Add board, roster, draft-log, and assistant views.
-6. Deploy privately through Tailscale Serve.
-7. Complete full phone-based draft simulations.
+1. Add safe pick, bulk-pick, and undo mutations.
+2. Turn the read-only preview into the interactive mobile cockpit.
+3. Add board, roster, draft-log, and assistant views.
+4. Deploy privately through Tailscale Serve.
+5. Complete full phone-based draft simulations.
 
 ## Installation
 
@@ -223,6 +220,40 @@ Use `--json` for the validated response contract, `--model` to override the conf
 OpenRouter model, or `--timeout` to change the request timeout. If the model cannot
 produce a valid answer, the command returns deterministic fallback advice.
 
+## Read-Only Web Preview
+
+Start the local server:
+
+```bash
+draft-server
+```
+
+Then open [http://127.0.0.1:8000](http://127.0.0.1:8000) on the PC. The preview uses
+the first saved session by default. Select a specific session with:
+
+```text
+http://127.0.0.1:8000/?session=home-league
+```
+
+The page currently displays live state but intentionally has no pick or undo buttons.
+The implemented read-only API includes:
+
+```text
+GET /api/v1/health
+GET /api/v1/board/summary
+GET /api/v1/sessions
+GET /api/v1/sessions/{name}
+GET /api/v1/sessions/{name}/cockpit
+GET /api/v1/sessions/{name}/players/search
+GET /api/v1/sessions/{name}/available
+GET /api/v1/sessions/{name}/recommendation
+```
+
+Interactive API documentation is available at
+[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). The server binds to
+localhost by default. Private Tailscale setup is deferred until safe state-changing
+routes and the mobile interaction flow are implemented.
+
 ## Build or Refresh the Draft Board
 
 ### Full pipeline
@@ -330,12 +361,13 @@ The corresponding files under `scripts/` are compatibility wrappers so existing
 commands continue to work. Install the repository in editable mode with
 `pip install -e .` before using those wrappers.
 
-The planned FastAPI layer will wrap these modules. HTTP routes and browser code will
-not duplicate ranking, availability, or recommendation logic.
+The FastAPI layer wraps these modules through a cockpit composition service. HTTP
+routes and browser code do not duplicate ranking, availability, or recommendation
+logic.
 
 ## Private Mobile Cockpit
 
-The planned deployment model is:
+The target private deployment model is:
 
 ```text
 Phone browser
@@ -357,9 +389,9 @@ The mobile UI will prioritize:
 - Prominent undo with exact confirmation
 - Clear board, model, connectivity, and autosave health
 
-The initial frontend will use HTML, CSS, and small JavaScript modules served by the
-Python application. An installable PWA is deferred until the mobile flow succeeds in
-realistic full-draft simulations.
+The initial frontend uses HTML, CSS, and small JavaScript modules served by the Python
+application. It is currently read-only. An installable PWA is deferred until the
+interactive mobile flow succeeds in realistic full-draft simulations.
 
 ## Verification
 
@@ -394,6 +426,7 @@ state must not require model access.
 - [Recommendation engine](docs/components/draft-recommendation-engine.md)
 - [Model reasoning layer](docs/components/model-reasoning-layer.md)
 - [Draft-night CLI](docs/components/draft-night-cli.md)
+- [Private web API](docs/components/web-api.md)
 
 ## Contributing
 

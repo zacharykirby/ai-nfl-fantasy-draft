@@ -1,0 +1,164 @@
+:root {
+  color-scheme: dark;
+  --bg: #07111f;
+  --surface: #0e1c2d;
+  --surface-strong: #13263a;
+  --border: #20364e;
+  --text: #f5f8fc;
+  --muted: #91a3b7;
+  --accent: #5ee0b0;
+  --accent-soft: rgba(94, 224, 176, 0.13);
+  --warning: #ffc857;
+  --danger: #ff7b7b;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(32, 88, 111, 0.35), transparent 36%),
+    var(--bg);
+  color: var(--text);
+}
+
+button { font: inherit; }
+
+.shell {
+  width: min(100%, 700px);
+  margin: 0 auto;
+  padding: max(18px, env(safe-area-inset-top)) 14px max(32px, env(safe-area-inset-bottom));
+}
+
+.topbar,
+.card-heading,
+.player-row,
+.compact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.topbar { margin-bottom: 14px; }
+
+h1, h2, p { margin-top: 0; }
+h1 { margin-bottom: 0; font-size: 1.35rem; line-height: 1.15; }
+h2 { margin-bottom: 0; font-size: 1rem; }
+
+.eyebrow,
+.label {
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.icon-button,
+.filter {
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.icon-button { width: 44px; font-size: 1.4rem; }
+
+.pick-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.pick-strip > div { padding: 13px; border-right: 1px solid var(--border); }
+.pick-strip > div:last-child { border-right: 0; }
+.pick-strip strong { display: block; font-size: 1.25rem; }
+.pick-strip .accent-stat { background: var(--accent-soft); }
+.accent-stat strong { color: var(--accent); }
+
+.card {
+  margin-bottom: 12px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(19, 38, 58, 0.96), rgba(11, 25, 41, 0.96));
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+.recommendation-card { border-color: rgba(94, 224, 176, 0.42); }
+.recommendation-card h2 { font-size: 1.45rem; }
+.player-meta, .small-meta, .empty-state { color: var(--muted); }
+.player-meta { margin: 7px 0 10px; }
+.small-meta { font-size: 0.78rem; }
+
+.pill {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pill.muted { background: rgba(145, 163, 183, 0.12); color: var(--muted); }
+.reason-list { margin: 0; padding-left: 19px; color: #c9d5e2; font-size: 0.86rem; }
+.reason-list li + li { margin-top: 5px; }
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  margin: 13px 0 10px;
+}
+
+.filter { padding: 0 7px; font-weight: 750; }
+.filter.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+
+.player-list,
+.compact-list { margin-top: 10px; }
+
+.player-row,
+.compact-row { min-height: 42px; padding: 8px 0; border-top: 1px solid rgba(32, 54, 78, 0.8); }
+.player-row:first-child, .compact-row:first-child { border-top: 0; }
+.player-name { font-weight: 760; }
+.player-detail { color: var(--muted); font-size: 0.77rem; }
+.rank-badge { color: var(--accent); font-size: 0.78rem; font-weight: 800; white-space: nowrap; }
+
+.grid-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.compact-card { min-width: 0; }
+.compact-row { font-size: 0.82rem; }
+
+.notice {
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid rgba(255, 123, 123, 0.45);
+  border-radius: 12px;
+  background: rgba(255, 123, 123, 0.09);
+  color: #ffd0d0;
+}
+
+.status-dot { color: var(--accent); font-size: 0.75rem; }
+.read-only-note { margin: 18px 0 0; color: var(--muted); text-align: center; font-size: 0.75rem; }
+
+@media (max-width: 390px) {
+  .shell { padding-left: 10px; padding-right: 10px; }
+  .card { padding: 13px; }
+  .grid-two { grid-template-columns: 1fr; gap: 0; }
+  .pick-strip > div { padding: 11px; }
+}
+
+@media (min-width: 701px) {
+  .shell { padding-top: 28px; }
+}

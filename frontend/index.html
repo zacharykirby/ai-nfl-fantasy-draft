@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#07111f">
+    <title>Draft Cockpit</title>
+    <link rel="stylesheet" href="/assets/app.css">
+    <script type="module" src="/assets/app.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">LIVE DRAFT COCKPIT</p>
+          <h1 id="session-name">Loading session…</h1>
+        </div>
+        <button id="refresh" class="icon-button" type="button" aria-label="Refresh draft state">↻</button>
+      </header>
+
+      <section id="notice" class="notice" hidden></section>
+
+      <section class="pick-strip" aria-label="Current draft position">
+        <div>
+          <span class="label">Round</span>
+          <strong id="round">—</strong>
+        </div>
+        <div>
+          <span class="label">Pick</span>
+          <strong id="current-pick">—</strong>
+        </div>
+        <div class="accent-stat">
+          <span class="label">Your turn</span>
+          <strong id="your-turn">—</strong>
+        </div>
+      </section>
+
+      <section class="card recommendation-card">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">RECOMMENDATION</p>
+            <h2 id="primary-player">No recommendation</h2>
+          </div>
+          <span id="confidence" class="pill">—</span>
+        </div>
+        <p id="primary-meta" class="player-meta">Waiting for draft state</p>
+        <ul id="primary-reasons" class="reason-list"></ul>
+      </section>
+
+      <section class="card">
+        <div class="card-heading">
+          <h2>Alternatives</h2>
+          <span id="mode" class="pill muted">balanced</span>
+        </div>
+        <div id="alternatives" class="player-list empty-state">No alternatives available</div>
+      </section>
+
+      <section class="card">
+        <div class="card-heading">
+          <h2>Best available</h2>
+          <span id="available-count" class="small-meta">—</span>
+        </div>
+        <nav class="filters" aria-label="Position filter">
+          <button class="filter active" data-position="ALL" type="button">All</button>
+          <button class="filter" data-position="RB" type="button">RB</button>
+          <button class="filter" data-position="WR" type="button">WR</button>
+          <button class="filter" data-position="QB" type="button">QB</button>
+          <button class="filter" data-position="TE" type="button">TE</button>
+        </nav>
+        <div id="best-available" class="player-list empty-state">No players available</div>
+      </section>
+
+      <section class="grid-two">
+        <section class="card compact-card">
+          <h2>My roster</h2>
+          <div id="roster" class="compact-list empty-state">No picks yet</div>
+        </section>
+        <section class="card compact-card">
+          <h2>Tier alerts</h2>
+          <div id="tier-alerts" class="compact-list empty-state">No urgent drops</div>
+        </section>
+      </section>
+
+      <section class="card">
+        <div class="card-heading">
+          <h2>Recent picks</h2>
+          <span id="health" class="status-dot">Checking…</span>
+        </div>
+        <div id="recent-picks" class="compact-list empty-state">No selections yet</div>
+      </section>
+
+      <p class="read-only-note">Read-only preview · pick controls arrive in the next milestone</p>
+    </main>
+  </body>
+</html>

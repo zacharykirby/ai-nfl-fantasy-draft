@@ -41,6 +41,10 @@ This directory contains detailed documentation for each component of the NFL Fan
   - Integrated interactive dashboard and keyboard workflow
   - Explicit mutations with natural-language read-only questions
 
+- **[Private Web API](web-api.md)** - `fantasy_draft.api`
+  - Versioned read-only HTTP contract and mobile cockpit preview
+  - Typed responses over the same draft domain services
+
 ### Supporting Components
 
 - **[News Fetcher](news-fetcher.md)** - `news_fetcher.py`

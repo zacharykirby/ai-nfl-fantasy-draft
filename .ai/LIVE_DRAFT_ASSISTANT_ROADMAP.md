@@ -476,7 +476,7 @@ Exit criteria:
 
 ### Milestone 1 — Application service and read-only API
 
-**Status: Next.**
+**Status: Implemented.**
 
 Deliverables:
 
@@ -489,6 +489,16 @@ Deliverables:
 - Add API tests using temporary boards and sessions.
 - Keep route handlers free of draft logic.
 
+Delivered:
+
+- Packaged `src/fantasy_draft` runtime with compatibility CLI wrappers
+- `DraftCockpitService` presentation read model
+- Versioned health, board, session, cockpit, search, availability, and recommendation reads
+- Typed response contracts and structured public errors
+- Same-process static mobile frontend
+- Read-only API and domain parity tests
+- Local `draft-server` entry point bound to localhost by default
+
 Exit criteria:
 
 - Read-only API responses match CLI/domain results for the same fixtures.
@@ -496,6 +506,8 @@ Exit criteria:
 - The generated API schema accurately describes the supported routes.
 
 ### Milestone 2 — Safe web mutations
+
+**Status: Next.**
 
 Deliverables:
 
@@ -694,20 +706,18 @@ turning into an operations project.
 
 ## 12. Immediate Next Work
 
-The next implementation session should execute Milestones 0 and 1 in this order:
+The next implementation session should execute Milestone 2 in this order:
 
-1. Run the existing test suite and validate the checked-in board.
-2. Identify the smallest supported service interface around `DraftSession`,
-   `DraftRecommendationEngine`, and `DraftAssistantContextBuilder`.
-3. Add FastAPI and versioned typed schemas.
-4. Implement health, session, cockpit, search, availability, and recommendation reads.
-5. Add API/domain parity tests.
-6. Serve a minimal phone-sized read-only cockpit page.
-7. Review the API shape before adding pick and undo mutations.
+1. Review the versioned read-only API and cockpit response using realistic sessions.
+2. Add a per-session mutation coordinator.
+3. Implement explicit pick, atomic bulk-pick, and undo application services.
+4. Add idempotency protection for retries and double taps.
+5. Map ambiguity, unavailable players, invalid ownership, and conflicts to structured errors.
+6. Return a refreshed cockpit snapshot after every successful mutation.
+7. Add concurrency, retry, autosave, restart, and API/domain parity tests.
 
-The first visible demo should be intentionally narrow: open a private/local page on a
-phone and see the exact current pick, roster, recommendation, best available players,
-tier alerts, recent selections, and health from an existing session.
+The next visible demo should allow a selection to be found, explicitly confirmed, and
+recorded from the phone preview without duplicating or skipping a pick.
 
 ## 13. Known Risks and Constraints
 
