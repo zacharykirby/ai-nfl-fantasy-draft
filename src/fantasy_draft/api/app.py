@@ -2,7 +2,7 @@
 
 import argparse
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
@@ -20,16 +20,18 @@ def create_app(
     sessions_dir: Path = Path("sessions"),
     board_path: Path = Path("outputs/draft_board.json"),
     frontend_dir: Optional[Path] = None,
+    assistant_client_factory: Optional[Callable] = None,
 ) -> FastAPI:
     load_environment()
     app = FastAPI(
         title="NFL Fantasy Draft Assistant",
         version="0.1.0",
-        description="Private, read-only API for the live fantasy draft cockpit.",
+        description="Private API for the live fantasy draft cockpit.",
     )
     app.state.sessions_dir = Path(sessions_dir)
     app.state.board_path = Path(board_path)
     app.state.frontend_dir = Path(frontend_dir or PROJECT_ROOT / "frontend")
+    app.state.assistant_client_factory = assistant_client_factory
 
     @app.middleware("http")
     async def private_app_headers(request: Request, call_next):

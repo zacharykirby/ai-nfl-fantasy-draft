@@ -5,6 +5,7 @@ const state = {
   pendingPick: null,
   pendingUndo: null,
   pendingBulk: null,
+  askController: null,
 };
 
 const byId = (id) => document.getElementById(id);
@@ -116,6 +117,52 @@ async function interpretCommand(text) {
   });
 }
 
+async function askAssistant(question) {
+  const controller = new AbortController();
+  state.askController = controller;
+  byId("assistant-cancel").hidden = false;
+  showNotice("Asking the draft assistant…");
+  try {
+    const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/assistant/ask`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, mode: "balanced" }),
+      signal: controller.signal,
+    });
+    renderAssistant(question, result);
+    byId("command-input").value = "";
+    if (result.freshness.stale) {
+      showNotice("The draft changed while that answer was in flight. State refreshed; ask again for current advice.");
+      const cockpit = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/cockpit`);
+      render(cockpit);
+    } else {
+      showNotice("Answer ready.", true);
+    }
+  } finally {
+    if (state.askController === controller) state.askController = null;
+    byId("assistant-cancel").hidden = true;
+  }
+}
+
+function renderAssistant(question, result) {
+  const answer = result.answer;
+  const stale = Boolean(result.freshness.stale);
+  const source = answer.source === "model" ? "MODEL" : "LOCAL FALLBACK";
+  const card = byId("assistant-card");
+  card.hidden = false;
+  card.classList.toggle("stale", stale);
+  byId("assistant-question").textContent = question;
+  byId("assistant-source").textContent = `${stale ? "STALE · " : ""}${source} · ${result.latency_ms}ms`;
+  byId("assistant-answer").textContent = answer.answer;
+  byId("assistant-recommendation").textContent = stale
+    ? `Previous recommendation: ${answer.recommendation || "none"} — ask again`
+    : answer.recommendation ? `Recommendation: ${answer.recommendation}` : "No single-player recommendation";
+  byId("assistant-rationale").innerHTML = (answer.rationale || []).slice(0, 4)
+    .map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  byId("assistant-cautions").innerHTML = (answer.cautions || []).slice(0, 3)
+    .map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+}
+
 function requestId() {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
   return `web-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -188,6 +235,13 @@ function escapeHtml(value) {
 }
 
 byId("refresh").addEventListener("click", () => load().catch((error) => showNotice(error.message)));
+byId("assistant-cancel").addEventListener("click", () => state.askController?.abort());
+document.querySelectorAll(".prompt-chip").forEach((button) => {
+  button.addEventListener("click", () => {
+    byId("command-input").value = button.textContent.trim();
+    byId("command-form").requestSubmit();
+  });
+});
 byId("undo-last").addEventListener("click", () => {
   const picks = state.cockpit?.recent_picks || [];
   const pick = picks[picks.length - 1];
@@ -226,7 +280,7 @@ byId("command-form").addEventListener("submit", async (event) => {
   try {
     const interpretation = await interpretCommand(text);
     if (interpretation.intent !== "record_pick") {
-      showNotice(interpretation.message);
+      await askAssistant(text);
       return;
     }
     state.pendingPick = { ...interpretation, requestId: requestId() };
@@ -235,7 +289,7 @@ byId("command-form").addEventListener("submit", async (event) => {
     byId("confirmation-dialog").returnValue = "";
     byId("confirmation-dialog").showModal();
   } catch (error) {
-    showNotice(error.message);
+    showNotice(error.name === "AbortError" ? "Question cancelled." : error.message);
   } finally {
     send.disabled = false;
   }

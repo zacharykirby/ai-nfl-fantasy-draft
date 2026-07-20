@@ -4,9 +4,11 @@ from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, Depends, Query
 
-from fantasy_draft.api.dependencies import session_repository
+from fantasy_draft.api.dependencies import assistant_client, session_repository
 from fantasy_draft.api.repository import SessionRepository
 from fantasy_draft.api.schemas import (
+    AssistantAnswerResponse,
+    AssistantQuestionRequest,
     BulkMutationResponse,
     BulkPickPreviewRequest,
     BulkPickPreviewResponse,
@@ -22,6 +24,7 @@ from fantasy_draft.api.schemas import (
     SessionListResponse,
     UndoRequest,
 )
+from fantasy_draft.assistant import DraftAssistantQueryService
 from fantasy_draft.draft.cockpit import DraftCockpitService, player_view
 from fantasy_draft.draft.commands import bulk_pick_queries, pick_query
 from fantasy_draft.draft.mutations import DraftMutationService
@@ -119,7 +122,7 @@ def interpret_command(
     if not query:
         return {
             "intent": "question",
-            "message": "This looks like a question. Conversational answers are not connected yet.",
+            "message": "This looks like a read-only draft question.",
         }
     player = session.match_player(query)
     return {
@@ -135,6 +138,20 @@ def interpret_command(
             ),
         },
     }
+
+
+@router.post("/{session_name}/assistant/ask", response_model=AssistantAnswerResponse)
+def ask_assistant(
+    session_name: str,
+    request: AssistantQuestionRequest,
+    repository: SessionRepository = Depends(session_repository),
+    client: Any = Depends(assistant_client),
+) -> Dict[str, Any]:
+    return DraftAssistantQueryService(
+        repository.path(session_name),
+        client=client,
+        timeout=12,
+    ).ask(request.question, mode=request.mode)
 
 
 @router.post("/{session_name}/picks", response_model=MutationResponse)

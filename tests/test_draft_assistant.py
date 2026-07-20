@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from fantasy_draft.assistant.service import (
     AssistantResponseError,
     DraftAssistantContextBuilder,
+    DraftAssistantQueryService,
     LiveDraftAssistant,
     build_messages,
     validate_model_response,
@@ -26,6 +27,12 @@ class FakeClient:
     def chat(self, **kwargs):
         self.calls.append(kwargs)
         return self.response
+
+
+class RaisingClient(FakeClient):
+    def chat(self, **kwargs):
+        self.calls.append(kwargs)
+        raise RuntimeError("upstream exploded")
 
 
 def player(name, position, rank):
@@ -123,6 +130,15 @@ def test_api_error_falls_back_to_deterministic_recommendation(tmp_path):
     assert "network unavailable" in result["cautions"][0]
 
 
+def test_thrown_upstream_error_falls_back_without_escaping(tmp_path):
+    result = LiveDraftAssistant(
+        make_session(tmp_path), client=RaisingClient("unused")
+    ).ask("Who should I take?")
+
+    assert result["source"] == "deterministic_fallback"
+    assert "upstream exploded" in result["cautions"][0]
+
+
 def test_unavailable_player_or_bad_json_falls_back_without_state_change(tmp_path):
     session = make_session(tmp_path)
     before = list(session.payload["events"])
@@ -156,3 +172,28 @@ def test_empty_question_and_invalid_mode_are_rejected(tmp_path):
         assistant.ask("  ")
     with pytest.raises(ValueError, match="mode"):
         assistant.ask("Who?", mode="chaos")
+
+
+def test_query_service_marks_answer_stale_when_state_changes_in_flight(tmp_path):
+    session = make_session(tmp_path)
+
+    class MutatingClient(FakeClient):
+        def chat(self, **kwargs):
+            self.calls.append(kwargs)
+            DraftSession.load(session.path).draft("Receiver One")
+            return self.response
+
+    client = MutatingClient(json.dumps(model_payload()))
+    response = DraftAssistantQueryService(
+        session.path, client=client, timeout=12
+    ).ask("Who should I take?")
+
+    assert response["answer"]["source"] == "model"
+    assert response["freshness"] == {
+        "stale": True,
+        "generated_for_pick": 1,
+        "current_pick": 2,
+        "recommendation_available": False,
+    }
+    assert response["latency_ms"] >= 0
+    assert client.calls[0]["timeout"] == 12

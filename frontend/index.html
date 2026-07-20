@@ -52,6 +52,26 @@
         <ul id="primary-reasons" class="reason-list"></ul>
       </section>
 
+      <section id="assistant-card" class="card assistant-card" hidden aria-live="polite">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">DRAFT ASSISTANT</p>
+            <h2 id="assistant-question">Your question</h2>
+          </div>
+          <span id="assistant-source" class="pill muted">—</span>
+        </div>
+        <p id="assistant-answer" class="assistant-answer"></p>
+        <p id="assistant-recommendation" class="assistant-recommendation"></p>
+        <ul id="assistant-rationale" class="reason-list"></ul>
+        <ul id="assistant-cautions" class="caution-list"></ul>
+      </section>
+
+      <nav class="suggested-prompts" aria-label="Suggested draft questions">
+        <button class="prompt-chip" type="button">Who should I take here?</button>
+        <button class="prompt-chip" type="button">Can I wait on QB?</button>
+        <button class="prompt-chip" type="button">What position is drying up?</button>
+      </nav>
+
       <section class="card">
         <div class="card-heading">
           <h2>Alternatives</h2>
@@ -107,6 +127,7 @@
         placeholder="e.g. Someone got Gibbs"
         enterkeyhint="send"
       >
+      <button id="assistant-cancel" class="cancel-send" type="button" hidden>Cancel</button>
       <button id="command-send" type="submit">Send</button>
     </form>
 

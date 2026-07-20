@@ -29,6 +29,7 @@ GET /api/v1/sessions/{name}/players/search?q=...
 GET /api/v1/sessions/{name}/available?position=RB&limit=20
 GET /api/v1/sessions/{name}/recommendation?mode=balanced
 POST /api/v1/sessions/{name}/commands/interpret
+POST /api/v1/sessions/{name}/assistant/ask
 POST /api/v1/sessions/{name}/picks
 POST /api/v1/sessions/{name}/picks/bulk/preview
 POST /api/v1/sessions/{name}/picks/bulk
@@ -51,8 +52,8 @@ The OpenAPI document is available at `/openapi.json` and interactive documentati
 - Undo can require the exact latest event ID shown in its confirmation sheet.
 - Bulk catch-up validates the starting pick and saves the complete batch atomically.
 - Successful mutations return the refreshed cockpit snapshot.
-- Model-backed assistant questions remain read-only and are not connected to the web
-  composer yet.
+- Model-backed assistant questions are read-only, bounded, validated, and fall back to
+  deterministic advice without blocking draft controls.
 
 ## Cockpit response
 
@@ -70,6 +71,11 @@ players produce structured errors and do not advance the draft.
 
 The confirmation dialog displays the resolved full player name, overall pick, and
 team. Only confirmation calls the pick mutation endpoint.
+
+Question-classified text calls the assistant endpoint. The response reports model or
+fallback source, latency, and freshness. A session revision change while the call is
+in flight marks the result stale and triggers a cockpit refresh. The browser can
+cancel waiting for a result without granting the model any mutation capability.
 
 ## Undo and catch-up
 

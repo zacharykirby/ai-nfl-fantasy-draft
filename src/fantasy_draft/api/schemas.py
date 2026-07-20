@@ -107,6 +107,18 @@ class InterpretCommandResponse(BaseModel):
     confirmation: Optional[Dict[str, Any]] = None
 
 
+class AssistantQuestionRequest(BaseModel):
+    question: str = Field(min_length=2, max_length=500)
+    mode: str = "balanced"
+
+
+class AssistantAnswerResponse(BaseModel):
+    answer: Dict[str, Any]
+    freshness: Dict[str, Any]
+    latency_ms: int
+    timeout_seconds: int
+
+
 class PickRequest(BaseModel):
     player: str = Field(min_length=1, max_length=100)
     request_id: str = Field(min_length=8, max_length=100)

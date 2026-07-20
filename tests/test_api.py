@@ -8,11 +8,12 @@ from fantasy_draft.api.app import create_app
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def make_client(web_draft):
+def make_client(web_draft, assistant_client_factory=None):
     app = create_app(
         sessions_dir=web_draft["sessions_dir"],
         board_path=web_draft["board_path"],
         frontend_dir=ROOT / "frontend",
+        assistant_client_factory=assistant_client_factory,
     )
     return TestClient(app)
 
@@ -37,6 +38,8 @@ def test_health_board_and_frontend(web_draft):
     assert "Someone got Gibbs" in frontend.text
     assert "Undo last" in frontend.text
     assert "Catch up" in frontend.text
+    assert "Who should I take here?" in frontend.text
+    assert "assistant-cancel" in frontend.text
     assert frontend.headers["x-frame-options"] == "DENY"
 
 
@@ -121,6 +124,36 @@ def test_non_mutating_text_is_classified_as_question(web_draft):
     assert response.status_code == 200
     assert response.json()["intent"] == "question"
     assert web_draft["session"].current_pick == 2
+
+
+def test_read_only_assistant_route_uses_deterministic_fallback(web_draft):
+    class OfflineClient:
+        model = "offline/test"
+
+        def __init__(self):
+            self.calls = []
+
+        def chat(self, **kwargs):
+            self.calls.append(kwargs)
+            return "Error: simulated offline model"
+
+    client = OfflineClient()
+    api = make_client(web_draft, assistant_client_factory=lambda: client)
+    before = web_draft["session"].path.read_bytes()
+
+    response = api.post(
+        "/api/v1/sessions/phone-test/assistant/ask",
+        json={"question": "Who should I take here?"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["answer"]["source"] == "deterministic_fallback"
+    assert payload["answer"]["recommendation"] == "Bijan Robinson"
+    assert payload["freshness"]["stale"] is False
+    assert payload["timeout_seconds"] == 12
+    assert client.calls[0]["timeout"] == 12
+    assert web_draft["session"].path.read_bytes() == before
 
 
 def test_undo_route_returns_refreshed_cockpit(web_draft):
@@ -221,6 +254,7 @@ def test_api_errors_are_structured_and_mutations_are_explicit(web_draft, tmp_pat
     paths = client.get("/openapi.json").json()["paths"]
     post_paths = {path for path, methods in paths.items() if "post" in methods}
     assert post_paths == {
+        "/api/v1/sessions/{session_name}/assistant/ask",
         "/api/v1/sessions/{session_name}/commands/interpret",
         "/api/v1/sessions/{session_name}/picks",
         "/api/v1/sessions/{session_name}/picks/bulk",

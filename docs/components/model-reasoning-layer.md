@@ -20,6 +20,11 @@ python scripts/live_draft.py ask home-league \
 
 Options include `--model`, `--timeout`, `--mode`, and `--json`.
 
+The mobile textbox exposes the same layer through
+`POST /api/v1/sessions/{name}/assistant/ask`. The web route uses a fixed 12-second
+server timeout, reports latency and response source, and compares the session revision
+again after the model returns. Advice generated across a state change is marked stale.
+
 ## Context boundary
 
 The model receives:
@@ -65,7 +70,7 @@ The assistant fails fast to deterministic advice when:
 
 Fallback responses use the same outward schema and include the failure reason in
 `cautions`. Session events are never changed by `ask`; selections remain explicit
-`live_draft.py draft` commands.
+pick, bulk-pick, undo, or `live_draft.py draft` commands.
 
 ## Prompt policy
 

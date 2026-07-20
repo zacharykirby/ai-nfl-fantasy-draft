@@ -2,6 +2,8 @@
 """Controlled model reasoning over deterministic live-draft facts."""
 
 import json
+from pathlib import Path
+from time import perf_counter
 from typing import Any, Dict, List, Optional, Set
 
 from fantasy_draft.draft.recommendations import DraftRecommendationEngine, MODES
@@ -207,13 +209,18 @@ class LiveDraftAssistant:
         if mode not in MODES:
             raise ValueError("mode must be safe, balanced, or upside")
         context = DraftAssistantContextBuilder(self.session).build(mode=mode)
-        response = self.client.chat(
-            messages=build_messages(question, context),
-            temperature=0.1,
-            max_tokens=700,
-            response_format={"type": "json_object"},
-            timeout=timeout,
-        )
+        try:
+            response = self.client.chat(
+                messages=build_messages(question, context),
+                temperature=0.1,
+                max_tokens=700,
+                response_format={"type": "json_object"},
+                timeout=timeout,
+            )
+        except Exception as exc:
+            return self.deterministic_fallback(
+                question, context, "model request failed: {}".format(exc)
+            )
         if response.startswith("Error:"):
             return self.deterministic_fallback(question, context, response)
         try:
@@ -233,3 +240,47 @@ class LiveDraftAssistant:
             "context_summary": self._context_summary(context),
         })
         return validated
+
+
+class DraftAssistantQueryService:
+    """Run one read-only question and report whether draft state changed in flight."""
+
+    def __init__(
+        self,
+        session_path: Path,
+        client: Optional[OpenRouterClient] = None,
+        timeout: int = 12,
+    ):
+        self.session_path = Path(session_path)
+        self.client = client
+        self.timeout = max(3, min(int(timeout), 25))
+
+    def ask(self, question: str, mode: str = "balanced") -> Dict[str, Any]:
+        session = DraftSession.load(self.session_path)
+        generated_revision = session.payload["session"]["updated_at"]
+        generated_for_pick = session.current_pick
+        started = perf_counter()
+        answer = LiveDraftAssistant(session, client=self.client).ask(
+            question,
+            mode=mode,
+            timeout=self.timeout,
+        )
+        latency_ms = round((perf_counter() - started) * 1000)
+
+        latest = DraftSession.load(self.session_path)
+        current_revision = latest.payload["session"]["updated_at"]
+        recommendation = answer.get("recommendation")
+        available_names = {player["player"] for player in latest.available_players()}
+        recommendation_available = recommendation is None or recommendation in available_names
+        stale = generated_revision != current_revision or not recommendation_available
+        return {
+            "answer": answer,
+            "freshness": {
+                "stale": stale,
+                "generated_for_pick": generated_for_pick,
+                "current_pick": latest.current_pick,
+                "recommendation_available": recommendation_available,
+            },
+            "latency_ms": latency_ms,
+            "timeout_seconds": self.timeout,
+        }

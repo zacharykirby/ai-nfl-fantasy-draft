@@ -187,13 +187,39 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 .action-button:disabled { opacity: 0.4; }
 .action-button.danger { border-color: rgba(255, 123, 123, 0.45); color: #ffd0d0; }
 
+.assistant-card { border-color: rgba(116, 166, 255, 0.38); }
+.assistant-card.stale { border-color: rgba(255, 190, 92, 0.55); }
+.assistant-question { max-width: 32ch; font-size: 1rem !important; color: var(--muted); }
+.assistant-answer { margin-top: 14px; line-height: 1.55; }
+.assistant-recommendation { margin-top: 12px; color: var(--accent); font-weight: 850; }
+.assistant-card.stale .assistant-recommendation { color: #ffd18b; }
+.caution-list { margin: 10px 0 0; padding-left: 18px; color: #ffd18b; font-size: 0.82rem; }
+.suggested-prompts {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.suggested-prompts::-webkit-scrollbar { display: none; }
+.prompt-chip {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .composer {
   position: fixed;
   z-index: 20;
   left: 50%;
   bottom: 0;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   gap: 9px;
   width: min(100%, 700px);
   padding: 10px 14px max(10px, env(safe-area-inset-bottom));
@@ -227,6 +253,7 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 }
 
 .composer button:disabled { opacity: 0.55; }
+.composer .cancel-send { min-width: 70px; background: #d95763; color: white; }
 
 .confirmation-dialog {
   width: min(calc(100% - 28px), 440px);
