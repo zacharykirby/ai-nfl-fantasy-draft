@@ -35,6 +35,8 @@ def test_health_board_and_frontend(web_draft):
     assert frontend.status_code == 200
     assert "Draft Cockpit" in frontend.text
     assert "Someone got Gibbs" in frontend.text
+    assert "Undo last" in frontend.text
+    assert "Catch up" in frontend.text
     assert frontend.headers["x-frame-options"] == "DENY"
 
 
@@ -124,13 +126,58 @@ def test_non_mutating_text_is_classified_as_question(web_draft):
 def test_undo_route_returns_refreshed_cockpit(web_draft):
     client = make_client(web_draft)
 
+    target = client.get("/api/v1/sessions/phone-test/cockpit").json()["recent_picks"][-1]
     response = client.post(
         "/api/v1/sessions/phone-test/undo",
-        json={"request_id": "api-undo-0001"},
+        json={
+            "request_id": "api-undo-0001",
+            "target_event_id": target["event_id"],
+        },
     )
     assert response.status_code == 200
     assert response.json()["event"]["player"] == "Jahmyr Gibbs"
     assert response.json()["cockpit"]["session"]["current_pick"] == 1
+
+
+def test_bulk_preview_and_atomic_commit(web_draft):
+    client = make_client(web_draft)
+
+    preview = client.post(
+        "/api/v1/sessions/phone-test/picks/bulk/preview",
+        json={"text": "Bijan, Chase picked; Bowers"},
+    )
+    assert preview.status_code == 200
+    payload = preview.json()
+    assert payload["start_pick"] == 2
+    assert [pick["player"] for pick in payload["picks"]] == [
+        "Bijan Robinson",
+        "Ja'Marr Chase",
+        "Brock Bowers",
+    ]
+
+    committed = client.post(
+        "/api/v1/sessions/phone-test/picks/bulk",
+        json={
+            "players": [pick["player"] for pick in payload["picks"]],
+            "expected_start_pick": payload["start_pick"],
+            "request_id": "api-bulk-0001",
+        },
+    )
+    assert committed.status_code == 200
+    assert len(committed.json()["events"]) == 3
+    assert committed.json()["cockpit"]["session"]["current_pick"] == 5
+
+    replay = client.post(
+        "/api/v1/sessions/phone-test/picks/bulk",
+        json={
+            "players": [pick["player"] for pick in payload["picks"]],
+            "expected_start_pick": payload["start_pick"],
+            "request_id": "api-bulk-0001",
+        },
+    )
+    assert replay.status_code == 200
+    assert replay.json()["replayed"] is True
+    assert replay.json()["cockpit"]["session"]["current_pick"] == 5
 
 
 def test_invalid_mutation_payload_uses_public_error_contract(web_draft):
@@ -176,5 +223,7 @@ def test_api_errors_are_structured_and_mutations_are_explicit(web_draft, tmp_pat
     assert post_paths == {
         "/api/v1/sessions/{session_name}/commands/interpret",
         "/api/v1/sessions/{session_name}/picks",
+        "/api/v1/sessions/{session_name}/picks/bulk",
+        "/api/v1/sessions/{session_name}/picks/bulk/preview",
         "/api/v1/sessions/{session_name}/undo",
     }

@@ -80,14 +80,13 @@ draft-night readiness.
 The analytical pipeline, draft board, live state engine, deterministic recommender,
 OpenRouter reasoning layer, and terminal draft dashboard are implemented.
 
-The packaged runtime, cockpit read model, versioned FastAPI API, and first interactive
-mobile page are implemented. The active delivery sequence is now:
+The packaged runtime, cockpit read model, versioned FastAPI API, interactive mobile
+page, and safe mutation controls are implemented. The active delivery sequence is now:
 
-1. Add atomic bulk-pick catch-up and an undo confirmation control.
-2. Connect ordinary textbox questions to the controlled assistant.
-3. Add full board, roster, and draft-log views.
-4. Deploy privately through Tailscale Serve.
-5. Complete full phone-based draft simulations.
+1. Connect ordinary textbox questions to the controlled assistant.
+2. Add browser session creation/resume and full board, roster, and draft-log views.
+3. Deploy privately through Tailscale Serve.
+4. Complete full phone-based draft simulations.
 
 ## Installation
 
@@ -250,6 +249,12 @@ Unique last names are accepted; ambiguous names return candidate choices without
 changing state. Retries and double taps use an idempotency key so the same request
 cannot advance the draft twice.
 
+Use **Undo last** to review the exact player, pick, position, and team before restoring
+that player to the pool. The confirmation is rejected if another pick arrives first.
+Use **Catch up** to enter 2–20 missed selections separated by commas, semicolons, or
+new lines. The app resolves and previews the full ordered batch, then saves every pick
+atomically. If any player is ambiguous, unavailable, or invalid, no picks are saved.
+
 Ordinary questions are recognized but are not connected to the model in the web UI
 yet. Continue using `live-draft ask` for conversational answers until that route is
 added.
@@ -267,13 +272,15 @@ GET /api/v1/sessions/{name}/available
 GET /api/v1/sessions/{name}/recommendation
 POST /api/v1/sessions/{name}/commands/interpret
 POST /api/v1/sessions/{name}/picks
+POST /api/v1/sessions/{name}/picks/bulk/preview
+POST /api/v1/sessions/{name}/picks/bulk
 POST /api/v1/sessions/{name}/undo
 ```
 
 Interactive API documentation is available at
 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). The server binds to
-localhost by default. Private Tailscale setup is deferred until safe state-changing
-routes and the mobile interaction flow are implemented.
+localhost by default. Private Tailscale setup remains the next deployment phase after
+the conversational web path is connected and the mobile flow is simulated locally.
 
 ## Build or Refresh the Draft Board
 

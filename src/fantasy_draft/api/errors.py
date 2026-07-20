@@ -12,7 +12,7 @@ from fantasy_draft.api.repository import (
     InvalidSessionNameError,
     SessionNotFoundError,
 )
-from fantasy_draft.draft.mutations import IdempotencyConflictError
+from fantasy_draft.draft.mutations import IdempotencyConflictError, StaleMutationError
 from fantasy_draft.draft.session import (
     AmbiguousPlayerError,
     DraftSessionError,
@@ -84,6 +84,12 @@ def install_error_handlers(app: FastAPI) -> None:
         _request: Request, exc: IdempotencyConflictError
     ) -> JSONResponse:
         return JSONResponse(error_payload("idempotency_conflict", str(exc)), status_code=409)
+
+    @app.exception_handler(StaleMutationError)
+    async def stale_mutation(_request: Request, exc: StaleMutationError) -> JSONResponse:
+        return JSONResponse(
+            error_payload("stale_mutation", str(exc), True), status_code=409
+        )
 
     @app.exception_handler(DraftSessionError)
     async def invalid_session_file(_request: Request, exc: DraftSessionError) -> JSONResponse:

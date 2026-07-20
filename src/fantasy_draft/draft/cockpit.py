@@ -125,6 +125,7 @@ class DraftCockpitService:
             "user_roster": [player_view(player) for player in self.session.roster()],
             "recent_picks": [
                 {
+                    "event_id": event["id"],
                     "overall_pick": event["overall_pick"],
                     "round": event["round"],
                     "team": event["team"],

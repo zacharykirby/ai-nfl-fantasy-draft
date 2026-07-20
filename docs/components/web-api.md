@@ -30,6 +30,8 @@ GET /api/v1/sessions/{name}/available?position=RB&limit=20
 GET /api/v1/sessions/{name}/recommendation?mode=balanced
 POST /api/v1/sessions/{name}/commands/interpret
 POST /api/v1/sessions/{name}/picks
+POST /api/v1/sessions/{name}/picks/bulk/preview
+POST /api/v1/sessions/{name}/picks/bulk
 POST /api/v1/sessions/{name}/undo
 ```
 
@@ -46,6 +48,8 @@ The OpenAPI document is available at `/openapi.json` and interactive documentati
 - Natural-language pick phrases are interpreted without changing state.
 - Pick recording requires a second explicit request after user confirmation.
 - State mutations are serialized per session and accept idempotency request IDs.
+- Undo can require the exact latest event ID shown in its confirmation sheet.
+- Bulk catch-up validates the starting pick and saves the complete batch atomically.
 - Successful mutations return the refreshed cockpit snapshot.
 - Model-backed assistant questions remain read-only and are not connected to the web
   composer yet.
@@ -66,3 +70,11 @@ players produce structured errors and do not advance the draft.
 
 The confirmation dialog displays the resolved full player name, overall pick, and
 team. Only confirmation calls the pick mutation endpoint.
+
+## Undo and catch-up
+
+**Undo last** confirms the exact active selection before restoring it to the pool. A
+stale confirmation cannot reverse a newer selection. **Catch up** accepts 2–20 names
+separated by commas, semicolons, or new lines. Preview resolves each name against the
+evolving available pool and assigns its pick and snake-draft team. Commit verifies
+that the draft still starts at the previewed pick and writes the full batch once.

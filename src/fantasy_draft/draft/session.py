@@ -318,6 +318,8 @@ class DraftSession:
         team: Optional[int] = None,
         position: Optional[str] = None,
         request_id: Optional[str] = None,
+        batch_request_id: Optional[str] = None,
+        persist: bool = True,
     ) -> Dict[str, Any]:
         if self.current_team is None:
             raise DraftSessionError("Draft is already complete")
@@ -341,11 +343,14 @@ class DraftSession:
         }
         if request_id:
             event["request_id"] = request_id
+        if batch_request_id:
+            event["batch_request_id"] = batch_request_id
         self.payload["events"].append(event)
         self.payload["session"]["updated_at"] = event["created_at"]
         if self.current_pick > self.league_size * self.rounds:
             self.payload["session"]["status"] = "complete"
-        self.save()
+        if persist:
+            self.save()
         return event
 
     def undo(self, request_id: Optional[str] = None) -> Dict[str, Any]:

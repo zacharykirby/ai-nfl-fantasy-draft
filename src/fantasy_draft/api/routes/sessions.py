@@ -7,6 +7,10 @@ from fastapi import APIRouter, Depends, Query
 from fantasy_draft.api.dependencies import session_repository
 from fantasy_draft.api.repository import SessionRepository
 from fantasy_draft.api.schemas import (
+    BulkMutationResponse,
+    BulkPickPreviewRequest,
+    BulkPickPreviewResponse,
+    BulkPickRequest,
     CockpitResponse,
     InterpretCommandRequest,
     InterpretCommandResponse,
@@ -19,7 +23,7 @@ from fantasy_draft.api.schemas import (
     UndoRequest,
 )
 from fantasy_draft.draft.cockpit import DraftCockpitService, player_view
-from fantasy_draft.draft.commands import pick_query
+from fantasy_draft.draft.commands import bulk_pick_queries, pick_query
 from fantasy_draft.draft.mutations import DraftMutationService
 from fantasy_draft.draft.recommendations import DraftRecommendationEngine, MODES
 
@@ -146,6 +150,33 @@ def record_pick(
     )
 
 
+@router.post(
+    "/{session_name}/picks/bulk/preview",
+    response_model=BulkPickPreviewResponse,
+)
+def preview_bulk_picks(
+    session_name: str,
+    request: BulkPickPreviewRequest,
+    repository: SessionRepository = Depends(session_repository),
+) -> Dict[str, Any]:
+    players = bulk_pick_queries(request.text)
+    return DraftMutationService(repository.path(session_name)).preview_bulk(players)
+
+
+@router.post("/{session_name}/picks/bulk", response_model=BulkMutationResponse)
+def record_bulk_picks(
+    session_name: str,
+    request: BulkPickRequest,
+    repository: SessionRepository = Depends(session_repository),
+) -> Dict[str, Any]:
+    return DraftMutationService(repository.path(session_name)).record_bulk(
+        request.players,
+        request.request_id,
+        request.expected_start_pick,
+        mode=request.mode,
+    )
+
+
 @router.post("/{session_name}/undo", response_model=MutationResponse)
 def undo_pick(
     session_name: str,
@@ -155,4 +186,5 @@ def undo_pick(
     return DraftMutationService(repository.path(session_name)).undo(
         request.request_id,
         mode=request.mode,
+        expected_target_event_id=request.target_event_id,
     )

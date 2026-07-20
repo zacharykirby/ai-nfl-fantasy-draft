@@ -113,12 +113,36 @@ class PickRequest(BaseModel):
     mode: str = "balanced"
 
 
+class BulkPickPreviewRequest(BaseModel):
+    text: str = Field(min_length=3, max_length=1000)
+
+
+class BulkPickPreviewResponse(BaseModel):
+    start_pick: int
+    end_pick: int
+    picks: List[Dict[str, Any]]
+
+
+class BulkPickRequest(BaseModel):
+    players: List[str] = Field(min_length=2, max_length=20)
+    request_id: str = Field(min_length=8, max_length=100)
+    expected_start_pick: int = Field(ge=1)
+    mode: str = "balanced"
+
+
 class UndoRequest(BaseModel):
     request_id: str = Field(min_length=8, max_length=100)
+    target_event_id: str = Field(default="", max_length=100)
     mode: str = "balanced"
 
 
 class MutationResponse(BaseModel):
     event: Dict[str, Any]
+    cockpit: CockpitResponse
+    replayed: bool
+
+
+class BulkMutationResponse(BaseModel):
+    events: List[Dict[str, Any]]
     cockpit: CockpitResponse
     replayed: bool

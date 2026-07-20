@@ -35,6 +35,11 @@
         </div>
       </section>
 
+      <nav class="draft-actions" aria-label="Draft corrections and catch-up">
+        <button id="undo-last" class="action-button danger" type="button" disabled>Undo last</button>
+        <button id="catch-up" class="action-button" type="button">Catch up</button>
+      </nav>
+
       <section class="card recommendation-card">
         <div class="card-heading">
           <div>
@@ -113,6 +118,45 @@
         <div class="dialog-actions">
           <button class="dialog-button secondary" value="cancel">Cancel</button>
           <button id="confirm-pick" class="dialog-button primary" value="confirm">Record pick</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="undo-dialog" class="confirmation-dialog">
+      <form method="dialog">
+        <p class="eyebrow">CONFIRM UNDO</p>
+        <h2 id="undo-player">Player</h2>
+        <p id="undo-text" class="player-meta"></p>
+        <div class="dialog-actions">
+          <button class="dialog-button secondary" value="cancel">Keep pick</button>
+          <button class="dialog-button danger" value="confirm">Undo pick</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="catch-up-dialog" class="confirmation-dialog">
+      <form method="dialog">
+        <p class="eyebrow">CATCH UP MISSED PICKS</p>
+        <h2>Enter picks in order</h2>
+        <p class="player-meta">Separate names with commas or new lines.</p>
+        <label class="sr-only" for="catch-up-input">Missed players in draft order</label>
+        <textarea id="catch-up-input" rows="6" maxlength="1000" placeholder="Bijan, Chase, Bowers"></textarea>
+        <div class="dialog-actions">
+          <button class="dialog-button secondary" value="cancel">Cancel</button>
+          <button class="dialog-button primary" value="preview">Preview</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="bulk-confirmation-dialog" class="confirmation-dialog">
+      <form method="dialog">
+        <p class="eyebrow">CONFIRM CATCH-UP</p>
+        <h2 id="bulk-title">Review picks</h2>
+        <div id="bulk-preview" class="compact-list preview-list"></div>
+        <p class="player-meta">All picks are saved together. If one fails, none are recorded.</p>
+        <div class="dialog-actions">
+          <button class="dialog-button secondary" value="cancel">Cancel</button>
+          <button class="dialog-button primary" value="confirm">Record all</button>
         </div>
       </form>
     </dialog>

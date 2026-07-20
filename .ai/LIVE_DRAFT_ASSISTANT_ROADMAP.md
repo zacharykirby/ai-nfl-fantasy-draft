@@ -507,8 +507,8 @@ Exit criteria:
 
 ### Milestone 2 — Safe web mutations
 
-**Status: In progress. Single-pick and undo services are implemented; atomic bulk
-entry and the undo UI remain.**
+**Status: In progress. The safe mutation core and mobile controls are implemented;
+browser session creation/resume remains.**
 
 Deliverables:
 
@@ -529,7 +529,10 @@ Delivered so far:
 - Idempotent pick and undo application services
 - Pick and undo HTTP endpoints returning fresh cockpit snapshots
 - Fixed mobile text composer and selection confirmation dialog
-- Retry, concurrent duplicate, interpretation, API, and domain tests
+- Exact-event undo confirmation with stale-state rejection
+- Atomic 2–20 player catch-up preview and commit
+- Persisted idempotency across service restarts
+- Retry, concurrent double-tap, rollback, interpretation, API, and domain tests
 
 Exit criteria:
 
@@ -718,14 +721,13 @@ turning into an operations project.
 
 ## 12. Immediate Next Work
 
-The next implementation session should finish Milestone 2 in this order:
+The next implementation session should proceed in this order:
 
-1. Add an undo control that confirms the exact selection being reversed.
-2. Implement atomic bulk-pick catch-up for missed selections.
-3. Add an explicit regression test for persisted idempotency across server restarts.
-4. Add process-level file locking if multiple server workers become supported.
-5. Test delayed responses and real phone double taps against the running server.
-6. Connect question-classified composer text to the existing read-only assistant.
+1. Connect question-classified composer text to the existing read-only assistant.
+2. Add browser session creation, selection, and resume controls.
+3. Test delayed responses and real phone double taps against the running server.
+4. Add process-level file locking only if multiple server workers become supported.
+5. Add the full position board, roster detail, and draft-log views.
 
 The next visible demo should support safe undo from the phone and conversational
 questions in the same composer without allowing the model to mutate state.

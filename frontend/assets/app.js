@@ -1,4 +1,11 @@
-const state = { cockpit: null, position: "ALL", session: null, pendingPick: null };
+const state = {
+  cockpit: null,
+  position: "ALL",
+  session: null,
+  pendingPick: null,
+  pendingUndo: null,
+  pendingBulk: null,
+};
 
 const byId = (id) => document.getElementById(id);
 
@@ -73,6 +80,7 @@ function render(cockpit) {
     "No selections yet",
   );
   byId("health").textContent = `${cockpit.health.board} · ${cockpit.health.model}`;
+  byId("undo-last").disabled = cockpit.recent_picks.length === 0;
 }
 
 function renderAvailable() {
@@ -130,6 +138,49 @@ async function recordPendingPick() {
   showNotice(`Recorded ${result.event.player} at pick ${result.event.overall_pick}.`, true);
 }
 
+async function previewBulk(text) {
+  return api(`/api/v1/sessions/${encodeURIComponent(state.session)}/picks/bulk/preview`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+}
+
+async function recordPendingBulk() {
+  if (!state.pendingBulk) return;
+  const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/picks/bulk`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      players: state.pendingBulk.picks.map((pick) => pick.player),
+      expected_start_pick: state.pendingBulk.start_pick,
+      request_id: state.pendingBulk.requestId,
+      mode: "balanced",
+    }),
+  });
+  render(result.cockpit);
+  byId("catch-up-input").value = "";
+  const count = result.events.length;
+  state.pendingBulk = null;
+  showNotice(`Recorded ${count} catch-up picks.`, true);
+}
+
+async function undoPendingPick() {
+  if (!state.pendingUndo) return;
+  const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/undo`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      request_id: state.pendingUndo.requestId,
+      target_event_id: state.pendingUndo.pick.event_id,
+      mode: "balanced",
+    }),
+  });
+  render(result.cockpit);
+  state.pendingUndo = null;
+  showNotice(`Restored ${result.event.player} to the available pool.`, true);
+}
+
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
@@ -137,6 +188,21 @@ function escapeHtml(value) {
 }
 
 byId("refresh").addEventListener("click", () => load().catch((error) => showNotice(error.message)));
+byId("undo-last").addEventListener("click", () => {
+  const picks = state.cockpit?.recent_picks || [];
+  const pick = picks[picks.length - 1];
+  if (!pick) return;
+  state.pendingUndo = { pick, requestId: requestId() };
+  byId("undo-player").textContent = pick.player;
+  byId("undo-text").textContent = `Undo pick ${pick.overall_pick} (${pick.position}) for Team ${pick.team}?`;
+  byId("undo-dialog").returnValue = "";
+  byId("undo-dialog").showModal();
+});
+byId("catch-up").addEventListener("click", () => {
+  byId("catch-up-dialog").returnValue = "";
+  byId("catch-up-dialog").showModal();
+  byId("catch-up-input").focus();
+});
 document.querySelectorAll(".filter").forEach((button) => {
   button.addEventListener("click", () => {
     document.querySelectorAll(".filter").forEach((item) => item.classList.remove("active"));
@@ -183,6 +249,51 @@ byId("confirmation-dialog").addEventListener("close", async () => {
   try {
     await recordPendingPick();
   } catch (error) {
+    showNotice(error.message);
+  }
+});
+
+byId("undo-dialog").addEventListener("close", async () => {
+  if (byId("undo-dialog").returnValue !== "confirm") {
+    state.pendingUndo = null;
+    return;
+  }
+  try {
+    await undoPendingPick();
+  } catch (error) {
+    state.pendingUndo = null;
+    showNotice(error.message);
+  }
+});
+
+byId("catch-up-dialog").addEventListener("close", async () => {
+  if (byId("catch-up-dialog").returnValue !== "preview") return;
+  const text = byId("catch-up-input").value.trim();
+  if (!text) return;
+  try {
+    const preview = await previewBulk(text);
+    state.pendingBulk = { ...preview, requestId: requestId() };
+    byId("bulk-title").textContent = `${preview.picks.length} picks · ${preview.start_pick}–${preview.end_pick}`;
+    byId("bulk-preview").innerHTML = preview.picks.map((pick) => compactRow(
+      `${pick.overall_pick}. ${pick.player}`,
+      `${pick.position} · Team ${pick.team}`,
+    )).join("");
+    byId("bulk-confirmation-dialog").returnValue = "";
+    byId("bulk-confirmation-dialog").showModal();
+  } catch (error) {
+    showNotice(error.message);
+  }
+});
+
+byId("bulk-confirmation-dialog").addEventListener("close", async () => {
+  if (byId("bulk-confirmation-dialog").returnValue !== "confirm") {
+    state.pendingBulk = null;
+    return;
+  }
+  try {
+    await recordPendingBulk();
+  } catch (error) {
+    state.pendingBulk = null;
     showNotice(error.message);
   }
 });
