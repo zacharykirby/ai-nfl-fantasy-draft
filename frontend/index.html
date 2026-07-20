@@ -89,7 +89,32 @@
         <div id="recent-picks" class="compact-list empty-state">No selections yet</div>
       </section>
 
-      <p class="read-only-note">Read-only preview · pick controls arrive in the next milestone</p>
+      <p class="read-only-note">Draft facts stay local · every pick requires confirmation</p>
     </main>
+
+    <form id="command-form" class="composer" autocomplete="off">
+      <label class="sr-only" for="command-input">Record a pick or ask a draft question</label>
+      <input
+        id="command-input"
+        name="command"
+        type="text"
+        maxlength="160"
+        placeholder="e.g. Someone got Gibbs"
+        enterkeyhint="send"
+      >
+      <button id="command-send" type="submit">Send</button>
+    </form>
+
+    <dialog id="confirmation-dialog" class="confirmation-dialog">
+      <form method="dialog">
+        <p class="eyebrow">CONFIRM SELECTION</p>
+        <h2 id="confirmation-player">Player</h2>
+        <p id="confirmation-text" class="player-meta"></p>
+        <div class="dialog-actions">
+          <button class="dialog-button secondary" value="cancel">Cancel</button>
+          <button id="confirm-pick" class="dialog-button primary" value="confirm">Record pick</button>
+        </div>
+      </form>
+    </dialog>
   </body>
 </html>

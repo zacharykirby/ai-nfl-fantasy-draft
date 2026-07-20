@@ -3,10 +3,10 @@
 A data-driven fantasy football draft engine with live session tracking,
 VORP-based recommendations, and an optional OpenRouter reasoning layer.
 
-The project includes a command-line application and the first read-only version of a
-private, mobile-first web cockpit hosted on the user's PC. The repository remains the
-source of truth for projections, rankings, availability, draft state, and
-recommendations; the browser is a fast interface over the same tested domain code.
+The project includes a command-line application and a private, mobile-first web
+cockpit hosted on the user's PC. The repository remains the source of truth for
+projections, rankings, availability, draft state, and recommendations; the browser is
+a fast interface over the same tested domain code.
 
 ## Product Direction
 
@@ -80,12 +80,12 @@ draft-night readiness.
 The analytical pipeline, draft board, live state engine, deterministic recommender,
 OpenRouter reasoning layer, and terminal draft dashboard are implemented.
 
-The packaged runtime, cockpit read model, versioned read-only FastAPI API, and first
+The packaged runtime, cockpit read model, versioned FastAPI API, and first interactive
 mobile page are implemented. The active delivery sequence is now:
 
-1. Add safe pick, bulk-pick, and undo mutations.
-2. Turn the read-only preview into the interactive mobile cockpit.
-3. Add board, roster, draft-log, and assistant views.
+1. Add atomic bulk-pick catch-up and an undo confirmation control.
+2. Connect ordinary textbox questions to the controlled assistant.
+3. Add full board, roster, and draft-log views.
 4. Deploy privately through Tailscale Serve.
 5. Complete full phone-based draft simulations.
 
@@ -220,7 +220,7 @@ Use `--json` for the validated response contract, `--model` to override the conf
 OpenRouter model, or `--timeout` to change the request timeout. If the model cannot
 produce a valid answer, the command returns deterministic fallback advice.
 
-## Read-Only Web Preview
+## Mobile Web Cockpit
 
 Start the local server:
 
@@ -235,8 +235,26 @@ the first saved session by default. Select a specific session with:
 http://127.0.0.1:8000/?session=home-league
 ```
 
-The page currently displays live state but intentionally has no pick or undo buttons.
-The implemented read-only API includes:
+The fixed textbox accepts conservative pick phrases such as:
+
+```text
+someone got Gibbs
+Gibbs picked
+they took Ja'Marr Chase
+draft Puka Nacua
+```
+
+The server resolves the available player and shows the exact player, overall pick,
+and team in a confirmation dialog. Draft state changes only after confirmation.
+Unique last names are accepted; ambiguous names return candidate choices without
+changing state. Retries and double taps use an idempotency key so the same request
+cannot advance the draft twice.
+
+Ordinary questions are recognized but are not connected to the model in the web UI
+yet. Continue using `live-draft ask` for conversational answers until that route is
+added.
+
+The implemented API includes:
 
 ```text
 GET /api/v1/health
@@ -247,6 +265,9 @@ GET /api/v1/sessions/{name}/cockpit
 GET /api/v1/sessions/{name}/players/search
 GET /api/v1/sessions/{name}/available
 GET /api/v1/sessions/{name}/recommendation
+POST /api/v1/sessions/{name}/commands/interpret
+POST /api/v1/sessions/{name}/picks
+POST /api/v1/sessions/{name}/undo
 ```
 
 Interactive API documentation is available at
@@ -390,8 +411,8 @@ The mobile UI will prioritize:
 - Clear board, model, connectivity, and autosave health
 
 The initial frontend uses HTML, CSS, and small JavaScript modules served by the Python
-application. It is currently read-only. An installable PWA is deferred until the
-interactive mobile flow succeeds in realistic full-draft simulations.
+application. An installable PWA is deferred until the interactive mobile flow
+succeeds in realistic full-draft simulations.
 
 ## Verification
 

@@ -42,8 +42,8 @@ This directory contains detailed documentation for each component of the NFL Fan
   - Explicit mutations with natural-language read-only questions
 
 - **[Private Web API](web-api.md)** - `fantasy_draft.api`
-  - Versioned read-only HTTP contract and mobile cockpit preview
-  - Typed responses over the same draft domain services
+  - Versioned HTTP contract and interactive mobile cockpit
+  - Confirmed, serialized, idempotent pick recording
 
 ### Supporting Components
 

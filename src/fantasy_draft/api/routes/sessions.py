@@ -1,4 +1,4 @@
-"""Read-only live session routes."""
+"""Live session read and explicit mutation routes."""
 
 from typing import Any, Dict, Optional
 
@@ -8,12 +8,19 @@ from fantasy_draft.api.dependencies import session_repository
 from fantasy_draft.api.repository import SessionRepository
 from fantasy_draft.api.schemas import (
     CockpitResponse,
+    InterpretCommandRequest,
+    InterpretCommandResponse,
+    MutationResponse,
+    PickRequest,
     PlayerListResponse,
     RecommendationResponse,
     SessionDetailResponse,
     SessionListResponse,
+    UndoRequest,
 )
-from fantasy_draft.draft.cockpit import DraftCockpitService
+from fantasy_draft.draft.cockpit import DraftCockpitService, player_view
+from fantasy_draft.draft.commands import pick_query
+from fantasy_draft.draft.mutations import DraftMutationService
 from fantasy_draft.draft.recommendations import DraftRecommendationEngine, MODES
 
 
@@ -96,3 +103,56 @@ def recommendation(
     )
     return {"recommendation": result}
 
+
+@router.post("/{session_name}/commands/interpret", response_model=InterpretCommandResponse)
+def interpret_command(
+    session_name: str,
+    command: InterpretCommandRequest,
+    repository: SessionRepository = Depends(session_repository),
+) -> Dict[str, Any]:
+    session = repository.load(session_name)
+    query = pick_query(command.text)
+    if not query:
+        return {
+            "intent": "question",
+            "message": "This looks like a question. Conversational answers are not connected yet.",
+        }
+    player = session.match_player(query)
+    return {
+        "intent": "record_pick",
+        "message": "Confirm this selection before changing draft state.",
+        "player": player_view(player),
+        "confirmation": {
+            "overall_pick": session.current_pick,
+            "round": ((session.current_pick - 1) // session.league_size) + 1,
+            "team": session.current_team,
+            "text": "Record {} at pick {} for team {}?".format(
+                player["player"], session.current_pick, session.current_team
+            ),
+        },
+    }
+
+
+@router.post("/{session_name}/picks", response_model=MutationResponse)
+def record_pick(
+    session_name: str,
+    request: PickRequest,
+    repository: SessionRepository = Depends(session_repository),
+) -> Dict[str, Any]:
+    return DraftMutationService(repository.path(session_name)).record_pick(
+        request.player,
+        request.request_id,
+        mode=request.mode,
+    )
+
+
+@router.post("/{session_name}/undo", response_model=MutationResponse)
+def undo_pick(
+    session_name: str,
+    request: UndoRequest,
+    repository: SessionRepository = Depends(session_repository),
+) -> Dict[str, Any]:
+    return DraftMutationService(repository.path(session_name)).undo(
+        request.request_id,
+        mode=request.mode,
+    )

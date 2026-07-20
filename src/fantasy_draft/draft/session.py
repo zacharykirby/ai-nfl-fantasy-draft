@@ -278,6 +278,15 @@ class DraftSession:
         if len(exact) == 1:
             return exact[0]
 
+        suffix = [
+            player for player in candidates
+            if normalize_name(player["player"]).endswith(" " + normalized_query)
+        ]
+        if len(suffix) == 1:
+            return suffix[0]
+        if len(suffix) > 1:
+            raise AmbiguousPlayerError(query, [player["player"] for player in suffix[:8]])
+
         prefix = [player for player in candidates if normalize_name(player["player"]).startswith(normalized_query)]
         if len(prefix) == 1:
             return prefix[0]
@@ -303,7 +312,13 @@ class DraftSession:
             raise AmbiguousPlayerError(query, [match.player["player"] for match in scored[:5]])
         return scored[0].player
 
-    def draft(self, query: str, team: Optional[int] = None, position: Optional[str] = None) -> Dict[str, Any]:
+    def draft(
+        self,
+        query: str,
+        team: Optional[int] = None,
+        position: Optional[str] = None,
+        request_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
         if self.current_team is None:
             raise DraftSessionError("Draft is already complete")
         expected_team = self.current_team
@@ -324,6 +339,8 @@ class DraftSession:
             "player": player["player"],
             "position": player["position"],
         }
+        if request_id:
+            event["request_id"] = request_id
         self.payload["events"].append(event)
         self.payload["session"]["updated_at"] = event["created_at"]
         if self.current_pick > self.league_size * self.rounds:
@@ -331,7 +348,7 @@ class DraftSession:
         self.save()
         return event
 
-    def undo(self) -> Dict[str, Any]:
+    def undo(self, request_id: Optional[str] = None) -> Dict[str, Any]:
         selections = self.active_selections()
         if not selections:
             raise DraftSessionError("There is no selection to undo")
@@ -345,6 +362,8 @@ class DraftSession:
             "player_id": target["player_id"],
             "player": target["player"],
         }
+        if request_id:
+            event["request_id"] = request_id
         self.payload["events"].append(event)
         self.payload["session"]["updated_at"] = event["created_at"]
         self.payload["session"]["status"] = "active"

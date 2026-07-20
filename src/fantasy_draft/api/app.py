@@ -64,17 +64,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run the private fantasy draft web server")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
-    parser.add_argument("--reload", action="store_true")
+    parser.add_argument("--sessions-dir", type=Path, default=Path("sessions"))
+    parser.add_argument("--board", type=Path, default=Path("outputs/draft_board.json"))
     args = parser.parse_args()
 
     import uvicorn
 
-    uvicorn.run(
-        "fantasy_draft.api.app:app",
-        host=args.host,
-        port=args.port,
-        reload=args.reload,
-    )
+    server_app = create_app(sessions_dir=args.sessions_dir, board_path=args.board)
+    uvicorn.run(server_app, host=args.host, port=args.port)
 
 
 if __name__ == "__main__":

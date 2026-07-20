@@ -68,6 +68,12 @@ def create_session(tmp_path, **overrides):
 def test_snake_team_and_next_pick_calculation():
     assert [snake_team_for_pick(pick, 4) for pick in range(1, 9)] == [1, 2, 3, 4, 4, 3, 2, 1]
     assert next_pick_for_team(3, team=2, league_size=4, max_rounds=3) == 7
+
+
+def test_unique_last_name_matches_player(tmp_path):
+    session = create_session(tmp_path)
+
+    assert session.match_player("Gibbs")["player"] == "Jahmyr Gibbs"
     assert next_pick_for_team(12, team=1, league_size=4, max_rounds=3) is None
 
 

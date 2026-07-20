@@ -95,3 +95,30 @@ class CockpitResponse(BaseModel):
     position_run: Dict[str, Any]
     health: Dict[str, Any]
 
+
+class InterpretCommandRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=160)
+
+
+class InterpretCommandResponse(BaseModel):
+    intent: str
+    message: str
+    player: Optional[PlayerResponse] = None
+    confirmation: Optional[Dict[str, Any]] = None
+
+
+class PickRequest(BaseModel):
+    player: str = Field(min_length=1, max_length=100)
+    request_id: str = Field(min_length=8, max_length=100)
+    mode: str = "balanced"
+
+
+class UndoRequest(BaseModel):
+    request_id: str = Field(min_length=8, max_length=100)
+    mode: str = "balanced"
+
+
+class MutationResponse(BaseModel):
+    event: Dict[str, Any]
+    cockpit: CockpitResponse
+    replayed: bool

@@ -1,9 +1,12 @@
-const state = { cockpit: null, position: "ALL", session: null };
+const state = { cockpit: null, position: "ALL", session: null, pendingPick: null };
 
 const byId = (id) => document.getElementById(id);
 
-async function api(path) {
-  const response = await fetch(path, { headers: { Accept: "application/json" } });
+async function api(path, options = {}) {
+  const response = await fetch(path, {
+    ...options,
+    headers: { Accept: "application/json", ...(options.headers || {}) },
+  });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message || `Request failed (${response.status})`);
   return payload;
@@ -81,7 +84,7 @@ function renderAvailable() {
 }
 
 async function load() {
-  showError("");
+  showNotice("");
   const sessions = await api("/api/v1/sessions");
   const requested = new URLSearchParams(window.location.search).get("session");
   state.session = requested || sessions.sessions[0]?.name;
@@ -90,10 +93,41 @@ async function load() {
   render(cockpit);
 }
 
-function showError(message) {
+function showNotice(message, success = false) {
   const notice = byId("notice");
   notice.hidden = !message;
   notice.textContent = message;
+  notice.classList.toggle("success", Boolean(message) && success);
+}
+
+async function interpretCommand(text) {
+  return api(`/api/v1/sessions/${encodeURIComponent(state.session)}/commands/interpret`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+}
+
+function requestId() {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  return `web-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+async function recordPendingPick() {
+  if (!state.pendingPick) return;
+  const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/picks`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      player: state.pendingPick.player.player,
+      request_id: state.pendingPick.requestId,
+      mode: "balanced",
+    }),
+  });
+  render(result.cockpit);
+  byId("command-input").value = "";
+  state.pendingPick = null;
+  showNotice(`Recorded ${result.event.player} at pick ${result.event.overall_pick}.`, true);
 }
 
 function escapeHtml(value) {
@@ -102,7 +136,7 @@ function escapeHtml(value) {
   })[char]);
 }
 
-byId("refresh").addEventListener("click", () => load().catch((error) => showError(error.message)));
+byId("refresh").addEventListener("click", () => load().catch((error) => showNotice(error.message)));
 document.querySelectorAll(".filter").forEach((button) => {
   button.addEventListener("click", () => {
     document.querySelectorAll(".filter").forEach((item) => item.classList.remove("active"));
@@ -112,7 +146,45 @@ document.querySelectorAll(".filter").forEach((button) => {
   });
 });
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") load().catch((error) => showError(error.message));
+  if (document.visibilityState === "visible") load().catch((error) => showNotice(error.message));
 });
 
-load().catch((error) => showError(error.message));
+byId("command-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const input = byId("command-input");
+  const send = byId("command-send");
+  const text = input.value.trim();
+  if (!text) return;
+  send.disabled = true;
+  showNotice("");
+  try {
+    const interpretation = await interpretCommand(text);
+    if (interpretation.intent !== "record_pick") {
+      showNotice(interpretation.message);
+      return;
+    }
+    state.pendingPick = { ...interpretation, requestId: requestId() };
+    byId("confirmation-player").textContent = interpretation.player.player;
+    byId("confirmation-text").textContent = interpretation.confirmation.text;
+    byId("confirmation-dialog").returnValue = "";
+    byId("confirmation-dialog").showModal();
+  } catch (error) {
+    showNotice(error.message);
+  } finally {
+    send.disabled = false;
+  }
+});
+
+byId("confirmation-dialog").addEventListener("close", async () => {
+  if (byId("confirmation-dialog").returnValue !== "confirm") {
+    state.pendingPick = null;
+    return;
+  }
+  try {
+    await recordPendingPick();
+  } catch (error) {
+    showNotice(error.message);
+  }
+});
+
+load().catch((error) => showNotice(error.message));

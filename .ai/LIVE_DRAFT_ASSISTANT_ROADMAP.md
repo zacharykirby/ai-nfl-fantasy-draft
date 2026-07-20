@@ -507,7 +507,8 @@ Exit criteria:
 
 ### Milestone 2 — Safe web mutations
 
-**Status: Next.**
+**Status: In progress. Single-pick and undo services are implemented; atomic bulk
+entry and the undo UI remain.**
 
 Deliverables:
 
@@ -518,6 +519,17 @@ Deliverables:
 - Return the refreshed cockpit snapshot after successful mutations.
 - Add tests for retries, rapid duplicate submissions, ambiguity, invalid order, undo,
   autosave, and restart recovery.
+
+Delivered so far:
+
+- Conservative natural-language pick interpretation without mutation
+- Unique-surname matching with explicit ambiguity handling
+- Full player, pick, and team confirmation before recording
+- Per-session in-process mutation serialization
+- Idempotent pick and undo application services
+- Pick and undo HTTP endpoints returning fresh cockpit snapshots
+- Fixed mobile text composer and selection confirmation dialog
+- Retry, concurrent duplicate, interpretation, API, and domain tests
 
 Exit criteria:
 
@@ -706,18 +718,17 @@ turning into an operations project.
 
 ## 12. Immediate Next Work
 
-The next implementation session should execute Milestone 2 in this order:
+The next implementation session should finish Milestone 2 in this order:
 
-1. Review the versioned read-only API and cockpit response using realistic sessions.
-2. Add a per-session mutation coordinator.
-3. Implement explicit pick, atomic bulk-pick, and undo application services.
-4. Add idempotency protection for retries and double taps.
-5. Map ambiguity, unavailable players, invalid ownership, and conflicts to structured errors.
-6. Return a refreshed cockpit snapshot after every successful mutation.
-7. Add concurrency, retry, autosave, restart, and API/domain parity tests.
+1. Add an undo control that confirms the exact selection being reversed.
+2. Implement atomic bulk-pick catch-up for missed selections.
+3. Add an explicit regression test for persisted idempotency across server restarts.
+4. Add process-level file locking if multiple server workers become supported.
+5. Test delayed responses and real phone double taps against the running server.
+6. Connect question-classified composer text to the existing read-only assistant.
 
-The next visible demo should allow a selection to be found, explicitly confirmed, and
-recorded from the phone preview without duplicating or skipping a pick.
+The next visible demo should support safe undo from the phone and conversational
+questions in the same composer without allowing the model to mutate state.
 
 ## 13. Known Risks and Constraints
 

@@ -34,6 +34,7 @@ def test_health_board_and_frontend(web_draft):
     frontend = client.get("/")
     assert frontend.status_code == 200
     assert "Draft Cockpit" in frontend.text
+    assert "Someone got Gibbs" in frontend.text
     assert frontend.headers["x-frame-options"] == "DENY"
 
 
@@ -77,7 +78,74 @@ def test_available_search_and_recommendation_routes(web_draft):
     assert len(recommendation.json()["recommendation"]["alternatives"]) == 2
 
 
-def test_api_errors_are_structured_and_api_is_read_only(web_draft, tmp_path):
+def test_text_command_requires_confirmation_then_records_pick(web_draft):
+    client = make_client(web_draft)
+
+    interpretation = client.post(
+        "/api/v1/sessions/phone-test/commands/interpret",
+        json={"text": "someone got Bijan"},
+    )
+    assert interpretation.status_code == 200
+    assert interpretation.json()["intent"] == "record_pick"
+    assert interpretation.json()["player"]["player"] == "Bijan Robinson"
+    assert interpretation.json()["confirmation"]["overall_pick"] == 2
+    assert web_draft["session"].current_pick == 2
+
+    recorded = client.post(
+        "/api/v1/sessions/phone-test/picks",
+        json={"player": "Bijan Robinson", "request_id": "api-pick-0001"},
+    )
+    assert recorded.status_code == 200
+    assert recorded.json()["event"]["player"] == "Bijan Robinson"
+    assert recorded.json()["cockpit"]["session"]["current_pick"] == 3
+    assert recorded.json()["replayed"] is False
+
+    replay = client.post(
+        "/api/v1/sessions/phone-test/picks",
+        json={"player": "Bijan Robinson", "request_id": "api-pick-0001"},
+    )
+    assert replay.status_code == 200
+    assert replay.json()["replayed"] is True
+    assert replay.json()["cockpit"]["session"]["current_pick"] == 3
+
+
+def test_non_mutating_text_is_classified_as_question(web_draft):
+    client = make_client(web_draft)
+
+    response = client.post(
+        "/api/v1/sessions/phone-test/commands/interpret",
+        json={"text": "Who should I take?"},
+    )
+    assert response.status_code == 200
+    assert response.json()["intent"] == "question"
+    assert web_draft["session"].current_pick == 2
+
+
+def test_undo_route_returns_refreshed_cockpit(web_draft):
+    client = make_client(web_draft)
+
+    response = client.post(
+        "/api/v1/sessions/phone-test/undo",
+        json={"request_id": "api-undo-0001"},
+    )
+    assert response.status_code == 200
+    assert response.json()["event"]["player"] == "Jahmyr Gibbs"
+    assert response.json()["cockpit"]["session"]["current_pick"] == 1
+
+
+def test_invalid_mutation_payload_uses_public_error_contract(web_draft):
+    client = make_client(web_draft)
+
+    response = client.post(
+        "/api/v1/sessions/phone-test/picks",
+        json={"player": "Bijan", "request_id": "short"},
+    )
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "invalid_payload"
+    assert response.json()["error"]["recoverable"] is True
+
+
+def test_api_errors_are_structured_and_mutations_are_explicit(web_draft, tmp_path):
     client = make_client(web_draft)
 
     missing = client.get("/api/v1/sessions/missing")
@@ -103,9 +171,10 @@ def test_api_errors_are_structured_and_api_is_read_only(web_draft, tmp_path):
     assert missing_board.status_code == 404
     assert missing_board.json()["error"]["code"] == "board_not_found"
 
-    methods = {
-        method
-        for path in client.get("/openapi.json").json()["paths"].values()
-        for method in path
+    paths = client.get("/openapi.json").json()["paths"]
+    post_paths = {path for path, methods in paths.items() if "post" in methods}
+    assert post_paths == {
+        "/api/v1/sessions/{session_name}/commands/interpret",
+        "/api/v1/sessions/{session_name}/picks",
+        "/api/v1/sessions/{session_name}/undo",
     }
-    assert methods == {"get"}
