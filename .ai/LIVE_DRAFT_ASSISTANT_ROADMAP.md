@@ -1,576 +1,767 @@
-# Live Fantasy Draft Assistant Roadmap
+# Live Fantasy Draft Cockpit Roadmap
 
-**Status:** Active implementation plan  
-**Product direction:** Position-first draft intelligence with a live conversational assistant  
-**Last updated:** 2026-07-10
+**Status:** Active product and implementation plan
+
+**Product direction:** Private, mobile-first draft cockpit hosted on the user's PC
+
+**Last updated:** 2026-07-19
 
 ## 1. Product Vision
 
-Build a draft-night application that separates reliable facts from model reasoning:
+Turn this repository into the analytical engine and private server for a fast,
+phone-friendly fantasy football draft assistant.
 
-1. The data pipeline supplies current projections, ADP, historical performance,
-   player identity, news, risk, and bye weeks.
-2. A deterministic engine produces auditable player priorities and evaluates live
-   draft conditions.
-3. A stateful draft session records every selection and roster.
-4. A language model explains tradeoffs and answers questions using only the board,
-   league configuration, and live state supplied by the application.
+The repository remains responsible for the difficult and trustworthy work:
 
-Snake-order planning is secondary. The primary product is a trustworthy top-N board
-for each role and a live assistant that can answer questions such as:
+1. Build current player projections from attributable sources.
+2. Blend projections with historical performance, availability, news, risk, and ADP.
+3. Produce auditable position rankings, tiers, and VORP-based priorities.
+4. Track the complete live draft and every team's roster.
+5. Generate deterministic recommendations that remain useful without a model.
+6. Give an optional OpenRouter model a small, validated evidence packet so it can
+   explain tradeoffs and answer questions without inventing draft facts.
 
-- Who should I prioritize at RB, WR, QB, and TE?
-- Who is the best choice right now?
-- Can I wait at quarterback or tight end?
-- Is a position run happening?
-- Which tier is about to disappear?
-- What safe, balanced, and upside choices do I have?
+The primary user experience becomes a responsive web application running on the
+user's PC and accessed from a phone over Tailscale. It should feel like a draft
+cockpit, not a desktop dashboard squeezed onto a small screen and not a generic chat
+window that requires constant typing.
 
-## 2. Design Principles
+The core draft-night loop is:
 
-- **Facts stay deterministic.** The model must not invent projections, rankings,
-  availability, news, or draft state.
-- **Every recommendation is explainable.** Preserve the inputs and signals that led
-  to a result.
-- **The app works without the model.** Draft-state management and deterministic
-  recommendations must remain available during an API or internet outage.
-- **Unsafe data is visible.** Missing, stale, fallback, or conflicting data marks the
-  board as not ready for live advice.
-- **State changes are explicit and reversible.** Draft, undo, correction, save, and
-  resume operations cannot depend on natural-language interpretation alone.
-- **One engine, multiple interfaces.** CLI, future browser UI, and model tools consume
-  the same schemas and services.
-- **Manual draft entry comes first.** Platform integrations are optional later work,
-  after the local workflow is dependable.
+```text
+See the current pick and best available players
+                  |
+Record a selection with one or two taps
+                  |
+Watch availability, tiers, runs, and recommendations update immediately
+                  |
+Ask a short question only when judgment or explanation is useful
+```
+
+## 2. Product Decisions
+
+These decisions supersede the earlier plan to treat the CLI as the final primary
+interface or to expose a public API for a Custom GPT.
+
+### Private hosting
+
+- The application server runs on the user's PC.
+- The backend listens on localhost by default.
+- Tailscale Serve provides private HTTPS access to the phone through the user's
+  tailnet.
+- Tailscale Funnel and public inbound access are out of scope.
+- The phone never receives the OpenRouter API key.
+- OpenRouter calls originate from the PC and are outbound-only.
+
+### Mobile-first interaction
+
+- The primary interface is optimized first for a narrow portrait phone viewport.
+- Recording a normal pick should require no more than two deliberate taps.
+- Drafting the recommended player must still require explicit confirmation.
+- Search, recommendation, undo, and position filters remain reachable with one hand.
+- Important information appears above the fold; secondary evidence opens on demand.
+- The terminal CLI remains a supported fallback and debugging interface.
+
+### Deterministic core, optional model
+
+- Draft facts and state are always owned by local deterministic code.
+- The model explains and compares; it does not calculate availability or mutate state.
+- Every model-named player must be in the supplied available candidate allowlist.
+- If OpenRouter is slow, unavailable, or returns malformed output, the UI immediately
+  shows deterministic advice.
+- A user must be able to finish the entire draft with no model connection.
+
+### One backend, multiple clients
+
+- The web UI and CLI use the same session and recommendation services.
+- HTTP route handlers stay thin and contain no ranking or draft strategy logic.
+- Existing modules are wrapped before they are reorganized.
+- Stable versioned JSON contracts separate the domain layer from the interface.
 
 ## 3. Target Architecture
 
 ```text
-Historical stats   Projections   ADP   News/risk   Player identity
-        \               |         |       |              /
+                         PRE-DRAFT / OCCASIONAL
+
+ Historical stats   Projections   ADP   News/risk   Player identity
+        \               |          |       |              /
                          Data pipeline
                               |
-                   Position-first draft board
+                 outputs/player_rankings.json
                               |
-                Deterministic recommendation engine
+                   outputs/draft_board.json
                               |
-       League config + live draft state + recent selections
-                              |
-                  Controlled model context/tools
-                              |
-                    CLI first, local web UI later
+                      Board validation
+
+
+                              DRAFT NIGHT
+
+ Phone browser
+      |
+      | Private HTTPS inside tailnet
+      v
+ Tailscale Serve on PC
+      |
+      | Reverse proxy to localhost only
+      v
+ FastAPI application
+      |
+      +-- Static mobile frontend
+      +-- Versioned JSON API
+      +-- Draft session service ------> sessions/*.json
+      +-- Recommendation engine
+      +-- Assistant context builder
+      |
+      +-- Optional outbound request --> OpenRouter
+
+ CLI ----------------------------------------------------+
+      uses the same board, session, and recommendation domain code
 ```
 
-Long-term module shape:
+### Initial technology choices
 
-```text
-draft_assistant/
-  config.py
-  schemas.py
-  board/
-    builder.py
-    rankings.py
-    validation.py
-  data/
-    projections.py
-    adp.py
-    history.py
-    news.py
-    identity.py
-  draft/
-    session.py
-    state.py
-    availability.py
-    recommendations.py
-  assistant/
-    context.py
-    client.py
-    prompts.py
-    response_validation.py
-```
+Backend:
 
-Migration can be incremental. Useful existing scripts do not need to be rewritten
-until their behavior moves behind a stable boundary.
+- Python 3.12
+- FastAPI for HTTP routing, validation, and generated API documentation
+- Existing JSON session persistence for the first release
+- Existing OpenRouter client and deterministic fallback
 
-## 4. Stable Data Contracts
+Frontend:
 
-### League configuration
+- Semantic HTML, modern CSS, and small JavaScript modules
+- Served by the same FastAPI process
+- No required Node build toolchain for the first release
+- Progressive enhancement toward an installable PWA after the core flow is proven
 
-The league contract must eventually cover:
+This is a deliberate reliability choice. The first mobile interface does not need a
+large frontend framework. If later UI complexity demonstrates a real need, the API
+boundary allows a React, Vue, or other client without rewriting the domain engine.
 
-- League name and team count
-- Standard, half-PPR, or PPR scoring
-- Scoring bonuses and custom rules
-- Starting QB, RB, WR, TE, FLEX, and Superflex slots
-- Bench and reserve slots
-- Draft type and optional keeper settings
+## 4. Existing Foundation
 
-### Draft board
+The following capabilities are implemented and should be reused rather than rebuilt.
 
-The board contains:
+### Data and board
 
-- Schema version and generation metadata
-- Target season and source timestamps
-- Projection, ADP, news, and identity sources
-- Health status and validation issues
-- Independent top-N QB, RB, WR, and TE lists
-- Optional FLEX and Superflex views
-- Player rank, tier, projections, VORP, ADP, bye, risk, news flags,
-  confidence, and auditable scoring evidence
+- Season-aware historical data ingestion
+- Current-season projection acquisition and import
+- Projection provenance and validation
+- Player identity normalization and conflict reporting
+- VORP-based ranking with auditable score components
+- Versioned `outputs/player_rankings.json`
+- Position-first `outputs/draft_board.json`
+- Independent QB, RB, WR, and TE priorities
+- Board health checks and readiness status
 
 ### Draft state
 
-The live state will contain:
+- Versioned draft-session JSON contract
+- Immutable board snapshot per session
+- Snake-order pick ownership
+- Every-team roster tracking
+- Exact, prefix, and conservative fuzzy player matching
+- Duplicate and unavailable-player prevention
+- Atomic autosave after mutations
+- Event-backed selection and undo history
+- Crash-safe session resume
 
-- Session identifier and timestamps
-- League configuration reference
-- Current pick and round
-- Ordered selection history
-- Available and drafted player identifiers
-- Every team's roster
-- User-controlled team identifier
-- Undo/correction history
-- Autosave version
+### Recommendations and assistant
 
-### Recommendation response
+- Safe, balanced, and upside recommendation modes
+- Board value, position value, VORP, roster need, tier scarcity, and risk signals
+- Recent position-run detection
+- ADP-based survival estimate to the user's next pick
+- Bounded model context and candidate allowlist
+- Structured model response validation
+- Deterministic fallback on timeout, connection failure, or invalid model output
 
-Deterministic and model-assisted recommendations should share a structured shape:
+### Existing interface
+
+- Noninteractive draft session commands
+- Interactive terminal dashboard
+- Human-readable and JSON recommendation output
+- Read-only conversational questions
+
+The CLI remains the recovery path throughout web development. A web feature is not
+complete if it can corrupt or diverge from the session behavior already tested by the
+CLI.
+
+## 5. Domain and API Contracts
+
+The browser should never read or write session files directly. It communicates with
+the application through a small versioned API.
+
+### Draft cockpit snapshot
+
+The primary read model should let the phone render the whole above-the-fold screen
+with one request:
 
 ```json
 {
-  "primary": "Player A",
-  "alternatives": ["Player B", "Player C"],
-  "strategy": "balanced",
-  "confidence": 0.84,
-  "signals": {
-    "roster_need": "RB",
-    "tier_drop_imminent": true,
-    "position_run": false,
-    "survival_to_next_pick": 0.21
+  "schema_version": "1.0",
+  "session": {
+    "id": "home-league",
+    "round": 4,
+    "current_pick": 34,
+    "current_team": 4,
+    "user_team": 5,
+    "next_user_pick": 36,
+    "picks_until_user": 2
   },
-  "reasons": [
-    "Last remaining RB in the current tier",
-    "Comparable wide receivers remain available"
-  ]
+  "user_roster": [],
+  "recent_picks": [],
+  "recommendation": {},
+  "best_available": [],
+  "top_available_by_position": {},
+  "tier_alerts": [],
+  "position_run": {},
+  "health": {
+    "board": "ready",
+    "model": "online",
+    "autosave": "ok"
+  }
 }
 ```
 
-## 5. Implementation Phases
+This response is composed from existing domain services. It is a presentation read
+model, not a second recommendation engine.
 
-## Phase 1 — Position-First Board MVP
-
-**Status: Implemented; blocked from live-ready status by missing projection source.**
-
-Delivered:
-
-- `scripts/draft_board.py`
-- Versioned `outputs/draft_board.json` contract
-- League metadata
-- Independent QB, RB, WR, and TE rankings
-- Default role limits: QB 20, RB 50, WR 60, TE 20
-- Player evidence, news, risk, VORP, ADP, tier, and projection fields
-- Board health validation
-- CLI build, show, and validate commands
-- Unit and end-to-end tests
-
-Commands:
-
-```bash
-python scripts/cli.py --build-board --league-size 10 --scoring half_ppr
-python scripts/cli.py --show-board --position RB --top 10
-python scripts/cli.py --validate-board
-```
-
-Remaining exit criterion:
-
-- Restore or replace the missing `data/players_2026_positions_bye.csv` source and
-  produce a board whose `health.status` is `ready`.
-
-## Phase 2 — Projection and Data Reliability
-
-**Status: Core work complete.** The primary provider now parses the full official
-ESPN Mike Clay projection guide and merges it with FantasyPros ADP/bye context.
-Scoring conversion is explicit, source metadata is attributable, a provider-neutral
-CSV importer is available, and the generated board passes readiness validation.
-
-**Goal:** Make the position board reproducible and trustworthy.
-
-Work:
-
-- Choose dependable current-season projection and ADP sources.
-- Separate historical performance from future projections.
-- Normalize player names, suffixes, team abbreviations, rookies, and free agents.
-- Assign stable internal player identifiers where possible.
-- Record retrieval timestamps and source versions.
-- Validate player/team combinations and duplicate identities.
-- Check projection coverage, bye-week coverage, and positional coverage.
-- Detect stale sources individually rather than only checking final output.
-- Keep historical fallback diagnostic-only.
-- Add a concise data-health command and report.
-- Make scoring-format transformations explicit and testable.
-
-Delivered so far:
-
-- Season-aware projection fetch CLI
-- Source and retrieval-time manifest
-- Published-versus-estimated provenance on every row
-- Coverage, duplicate, missing field, staleness, and team-conflict checks
-- Projection health propagated into draft-board health
-- Projection provenance exported through rankings into player board records
-- Tests for good, stale, estimated, and malformed inputs
-- Full ESPN PDF adapter for QB, RB, WR, and TE projections
-- Deterministic PPR, half-PPR, and standard conversion from projected receptions
-- Conservative cross-provider player identity normalization and aliases
-- Licensed/user-supplied CSV import fallback
-
-Acceptance criteria:
-
-- A clean checkout can reproduce the board using documented commands.
-- Essential sources are current, attributable, and locally verifiable.
-- Conflicts are reported with actionable player-level detail.
-- A board cannot be marked ready when it uses historical results as projections.
-- Representative player projections and team assignments pass fixture checks.
-
-## Phase 3 — Live Draft State Engine
-
-**Status: Core engine implemented.** Ready-board snapshots, event-backed selections,
-undo, snake ownership, all-team rosters, safe player matching, atomic autosave,
-resume, and noninteractive CLI queries are operational. Bulk entry and arbitrary
-historical correction remain later usability enhancements.
-
-**Goal:** Reliably record and recover an entire draft without a model.
-
-Work:
-
-- Create new, save, resume, list, and close session operations.
-- Track current pick, round, selections, availability, and every team roster.
-- Add `draft`, `undo`, and correction operations.
-- Add fuzzy player search with explicit ambiguity handling.
-- Autosave atomically after every state change.
-- Store append-only events or sufficient history for safe undo and auditing.
-- Allow bulk entry when several picks were missed.
-- Reject duplicate selections and invalid team/pick transitions.
-- Support manual override without silently corrupting state.
-
-Initial CLI experience:
+### Initial endpoints
 
 ```text
-new-draft
-draft "Jahmyr Gibbs" --team 1
-draft "Ja'Marr Chase" --team 2
-available RB
-roster mine
-undo
-save
-resume
+GET    /api/v1/health
+GET    /api/v1/board/summary
+GET    /api/v1/sessions
+POST   /api/v1/sessions
+GET    /api/v1/sessions/{session_id}
+GET    /api/v1/sessions/{session_id}/cockpit
+GET    /api/v1/sessions/{session_id}/players/search?q=...
+GET    /api/v1/sessions/{session_id}/available?position=RB&limit=20
+GET    /api/v1/sessions/{session_id}/recommendation?mode=balanced
+POST   /api/v1/sessions/{session_id}/picks
+POST   /api/v1/sessions/{session_id}/picks/bulk
+POST   /api/v1/sessions/{session_id}/undo
+POST   /api/v1/sessions/{session_id}/assistant
 ```
 
-Acceptance criteria:
+### Mutation rules
 
-- A draft survives process termination and resumes exactly.
-- Undo restores availability, roster, and pick position.
-- Ambiguous or unknown player names never silently select the wrong player.
-- Duplicate drafting is prevented.
-- State operations have focused unit tests and full-draft simulations.
+- Every state-changing request requires an explicit endpoint and valid payload.
+- Assistant messages are always read-only.
+- A successful mutation returns the new cockpit snapshot so the UI updates without a
+  second round trip.
+- Ambiguous names return a structured conflict with candidate choices.
+- Duplicate submissions are safe to retry or rejected without advancing the draft.
+- The backend serializes session mutations to prevent two rapid taps from corrupting
+  the event log.
+- Undo returns exactly which selection was reversed.
+- Bulk entry is atomic by default: either the entire ordered batch is valid or none of
+  it is applied.
 
-Delivered:
+### Error contract
 
-- Versioned draft-session JSON contract
-- Immutable board snapshot per session
-- Atomic persistence and load-time event validation
-- Draft, undo, status, roster, availability, and session-list commands
-- Exact, prefix, and conservative fuzzy player matching
-- Explicit ambiguity and unavailable-player errors
-- Snake-order pick ownership and next-user-pick calculation
-- Board depth validation against planned draft size
+Errors should be actionable on a phone:
 
-## Phase 4 — Deterministic Recommendation Engine
+```json
+{
+  "error": {
+    "code": "ambiguous_player",
+    "message": "Multiple players match Williams.",
+    "recoverable": true,
+    "candidates": []
+  }
+}
+```
 
-**Status: Core engine implemented.** Safe, balanced, and upside recommendations are
-available as human-readable CLI output or versioned JSON. Board value, VORP, roster
-need, tiers, position runs, source confidence, risk, and next-pick survival remain
-separate auditable signals.
+Do not expose stack traces, environment values, API keys, or raw provider responses to
+the browser.
 
-**Goal:** Produce useful draft-night choices even when no model is available.
+## 6. Mobile Experience
 
-Capabilities:
+### Primary cockpit screen
 
-- Best available overall and by position
-- Remaining players and counts by tier
-- Position scarcity and tier-drop alerts
-- Roster need and starter-slot coverage
-- FLEX and Superflex eligibility
-- Safe, balanced, and upside recommendation modes
-- Position-run detection from recent selections
-- Picks until the user's next selection
-- Estimated probability that a player survives to the next pick
-- Bye-week concentration warnings as a secondary signal
+The default screen answers five questions without scrolling:
 
-Rules:
+1. Whose pick is it?
+2. How long until my pick?
+3. Who is recommended right now?
+4. Which alternatives or tier cliffs matter?
+5. How do I record the player who was just selected?
 
-- Never choose solely because a player's ADP is closest to the current pick.
-- Keep board priority, VORP, tier scarcity, roster need, and availability as
-  separate inspectable signals.
-- Avoid forcing positional balance when elite value is available.
-- Do not overreact to runs; measure the next tier and replacement cost.
-
-Acceptance criteria:
-
-- Every recommendation includes structured signals and concise reasons.
-- Results remain deterministic for the same board, config, and draft state.
-- Tests cover early, middle, and late picks across league formats.
-- The fallback experience is useful enough to finish a draft offline.
-
-Delivered:
-
-- Versioned deterministic recommendation response
-- Best available candidate scoring with alternatives
-- Safe, balanced, and upside modes
-- Base starter and FLEX-aware roster need reporting
-- Remaining-tier counts and imminent tier-drop detection
-- Recent position-run detection
-- ADP-based next-pick survival heuristic
-- Projection-source confidence penalties
-- Human-readable and JSON CLI output
-- Scenario tests for risk, scarcity, runs, roster state, and survival
-
-## Phase 5 — Model Reasoning Layer
-
-**Status: Core layer implemented.** OpenRouter receives a bounded evidence packet and
-candidate allowlist, returns versioned JSON, and cannot mutate draft state. Invalid,
-unavailable-player, timeout, and API responses fail immediately to deterministic
-advice. A real configured-model request passed the contract.
-
-**Goal:** Add conversational judgment without giving the model ownership of facts.
-
-Work:
-
-- Create a compact context builder from board, league, state, and deterministic
-  recommendation output.
-- Send only relevant available candidates rather than all player records.
-- Define model tools for read-only queries and explicit state mutations.
-- Require structured model responses and validate them before display.
-- Prevent recommendations of unavailable or unknown players.
-- Preserve OpenRouter as the initial provider abstraction.
-- Add timeouts, retries, cost/token limits, and deterministic fallback.
-- Log recommendation inputs and structured outputs without logging secrets.
-- Make uncertainty and data-health limitations visible in responses.
-
-Model responsibilities:
-
-- Explain recommendations and tradeoffs.
-- Compare players requested by the user.
-- Respond to strategy and risk preferences.
-- Answer counterfactual questions.
-- Disagree with the deterministic primary only when supplied evidence supports it.
-
-The model must not:
-
-- Invent player facts, news, projections, or selections.
-- Change draft state through unvalidated prose.
-- Recommend a drafted player.
-- conceal that the board is not ready.
-
-Delivered:
-
-- Compact context builder with deterministic signals and recent live state
-- Candidate allowlist instead of full-board context
-- Strict structured prompt and versioned response contract
-- Recommendation and alternative availability validation
-- Confidence, type, schema, and deterministic-agreement validation
-- Low-temperature, bounded-token, explicit-timeout OpenRouter requests
-- Deterministic fallback for connectivity and validation failures
-- Read-only `ask` command with human-readable and JSON output
-- Mocked failure, hallucination, mutation-safety, and schema tests
-- Successful real-model contract smoke test
-
-Acceptance criteria:
-
-- Responses parse against the recommendation schema.
-- Every named candidate exists and is available.
-- API failure immediately falls back to deterministic advice.
-- Context size and response latency are suitable for live picks.
-
-## Phase 6 — Draft-Night CLI
-
-**Status: Implemented.** A compact interactive dashboard combines session state,
-best available players, tier alerts, offline recommendations, and controlled model
-questions. Mutations remain explicit, errors are recoverable, and EOF/Ctrl-C saves.
-
-**Goal:** Combine board, state, recommendations, and chat into a fast terminal UI.
-
-Desired display:
+Suggested portrait layout:
 
 ```text
-Pick 28 | Next pick 37 | Roster RB, WR, WR
-
-Best available
-1. Player A — RB — Tier 2
-2. Player B — TE — Tier 2
-3. Player C — WR — Tier 3
-
-Tier alerts
-RB: 1 remaining in Tier 2
-TE: 2 remaining in Tier 2
-
-Assistant
-Take Player A. This is the final RB in the current tier, and comparable
-receivers are likely to remain at your next pick.
-
-> drafted Player A
++--------------------------------+
+| R4 · Pick 34       You in 2     |
+| Board ready · Model online      |
++--------------------------------+
+| RECOMMENDATION                  |
+| Puka Nacua · WR1 · Tier 1       |
+| 94.1 VORP · unlikely to survive |
+| [ Draft Puka ]  [ Why? ]        |
++--------------------------------+
+| Alternatives                    |
+| Saquon Barkley       [ Draft ]  |
+| CeeDee Lamb          [ Draft ]  |
++--------------------------------+
+| [All] [RB] [WR] [QB] [TE]       |
+| Search a selected player...     |
++--------------------------------+
+| Recent: Gibbs · Bijan · Chase   |
++--------------------------------+
+| Board   Roster   Ask   Undo      |
++--------------------------------+
 ```
 
-Work:
+### Interaction requirements
 
-- Interactive loop with command history and help.
-- Quick draft entry and keyboard-friendly corrections.
-- Compact roster, availability, tier, and recent-pick panels.
-- Explicit online/offline and board-health indicators.
-- Natural-language questions alongside structured commands.
-- Optional noninteractive commands for scripting and tests.
+- Minimum comfortable touch targets of roughly 44 CSS pixels.
+- No horizontal scrolling in the primary flow.
+- Sticky pick/search controls where they materially reduce thumb travel.
+- Search results show player, position, team, tier, and availability.
+- Selecting a player opens a compact confirmation sheet rather than immediately
+  mutating state.
+- Confirmation clearly names the player, overall pick, and drafting team.
+- The just-recorded player disappears immediately from every availability view.
+- Undo is prominent but requires confirmation showing the exact pick being reversed.
+- Filters and scroll position survive ordinary screen refreshes where practical.
+- Color is supportive, never the only way status or risk is communicated.
+- Core actions remain usable with the model offline.
 
-Acceptance criteria:
+### Views
 
-- Common actions require minimal typing.
-- The screen remains readable on a laptop at a live draft.
-- The user can continue when the model or network is unavailable.
-- Mistakes can be corrected in seconds.
+#### Cockpit
 
-Delivered:
+- Current round, overall pick, current team, and countdown to user pick
+- Primary recommendation and concise reason
+- Two or three alternatives
+- Tier-drop and position-run alerts
+- Quick selection search
+- Recent selections
+- Connectivity, board-health, and autosave status
 
-- Interactive `live_draft.py interactive SESSION` entry point
-- Pick/round/team, next-pick, roster, recent-pick, and autosave display
-- Best-available and imminent-tier-drop dashboard panels
-- Visible online/offline model status
-- Draft, undo, recommendation, availability, roster, status, help, and quit commands
-- Bare-question conversational input with deterministic fallback
-- Automatic dashboard redraw after state mutations
-- Graceful error handling and save-on-interrupt behavior
-- Scripted terminal workflow and mutation-safety tests
+#### Board
 
-## Phase 7 — Draft Simulation and Hardening
+- All, QB, RB, WR, and TE filters
+- Available players by default
+- Tier boundaries visually separated
+- Compact rows with rank, ADP, projection, VORP, team, and risk indicators
+- Expandable evidence rather than dense always-visible columns
+- Fast draft action on each available player
 
-**Goal:** Test behavior under realistic draft pressure and failure modes.
+#### My roster
+
+- Players grouped by projected roster slot
+- Starter needs and FLEX eligibility
+- Bye-week concentration shown as a secondary warning
+- Current construction summary such as `RB 2 · WR 1 · QB 0 · TE 0`
+
+#### Draft log
+
+- Ordered selections with pick, round, team, player, and position
+- Search and team filtering
+- Undo latest pick in the first release
+- Arbitrary historical correction only after event replay semantics are designed and
+  tested
+
+#### Ask
+
+- Short prompt field with phone dictation support
+- Suggested prompts such as `Can I wait at QB?` and `Compare these two players`
+- Compact answer with recommendation, alternatives, confidence, evidence, and cautions
+- No chat-driven state mutation
+
+### Voice strategy
+
+The first release relies on the phone keyboard's speech-to-text. Dedicated audio
+recording, transcription, wake words, and speech playback are deferred until normal
+dictation is tested during simulations. Voice convenience must not complicate the
+critical state path.
+
+## 7. Security and Privacy Model
+
+### Network boundary
+
+- FastAPI binds to `127.0.0.1` by default.
+- Tailscale Serve terminates private HTTPS and proxies to the local port.
+- The application is not configured with Tailscale Funnel.
+- No router port forwarding, public DNS record, public tunnel, or public cloud ingress
+  is required.
+- Tailnet access controls determine which devices or users can reach the service.
+
+### Secrets
+
+- `.env` remains server-side and untracked.
+- `OPENROUTER_API_KEY` is never included in HTML, JavaScript, API responses, logs, or
+  session files.
+- The frontend never calls OpenRouter directly.
+- Error messages redact upstream response details that might contain sensitive data.
+- `.env.example` documents names and safe placeholders only.
+
+### Browser/API defenses
+
+- Restrict allowed hosts and origins to the local and expected tailnet addresses.
+- State-changing routes use POST and reject cross-origin requests.
+- Do not trust client-supplied pick number, team ownership, or player availability;
+  recompute them from the loaded session.
+- Validate every request and response at the HTTP boundary.
+- Add security headers suitable for a same-origin private web application.
+- Treat Tailscale as the access boundary, while still keeping safe application-level
+  validation and optional identity-header checks.
+
+## 8. Reliability and Performance Budgets
+
+Draft-night speed matters more than visual novelty.
+
+### Target budgets
+
+- Cockpit load from local server: under 500 ms on a healthy tailnet connection
+- Search response: under 200 ms for local data
+- Pick or undo mutation including autosave: under 500 ms
+- Deterministic recommendation: under 500 ms
+- Model response target: under 5 seconds
+- Model timeout: short enough to fall back before advice becomes useless
+
+These are initial engineering targets, not guarantees. Measure them in realistic phone
+simulations and optimize the slowest critical path.
+
+### Failure behavior
+
+| Failure | Required behavior |
+| --- | --- |
+| OpenRouter unavailable | Show deterministic advice and keep every state action working |
+| Internet unavailable | Keep local/tailnet application working if the phone can still reach the PC |
+| Browser refresh | Reload the exact saved session state |
+| Double tap or retry | Never record the same pick twice |
+| Ambiguous player | Show candidates and make no state change |
+| Invalid board | Refuse to create a live session and show health issues |
+| PC process restart | Resume from the atomically saved session |
+| Phone disconnect | Preserve server state; reconnect and refresh safely |
+| Corrupt session file | Fail closed and preserve the file for diagnosis |
+
+### Emergency fallback
+
+Before draft night, generate a small static markdown or printable board containing:
+
+- Data freshness and health warnings
+- Overall priorities
+- Tier-aware QB, RB, WR, and TE lists
+- Key strategy notes
+- Startup and recovery commands
+
+This artifact is not live state. It is the emergency cheatsheet if the PC or phone
+workflow becomes unavailable.
+
+## 9. Implementation Plan
+
+### Milestone 0 — Freeze and verify the foundation
+
+**Status: Mostly complete; verify before web work.**
+
+Deliverables:
+
+- Run the existing board, session, recommendation, assistant, and terminal tests.
+- Regenerate and validate the current board.
+- Record current health warnings as known input limitations.
+- Confirm `.env` and session files are excluded from version control.
+- Add a full-draft CLI simulation fixture if one is not already present.
+- Document which existing functions are the supported domain-service entry points.
+
+Exit criteria:
+
+- Board health is `ready`.
+- Existing tests pass without web dependencies.
+- A complete draft can still be conducted and recovered through the CLI.
+
+### Milestone 1 — Application service and read-only API
+
+**Status: Next.**
+
+Deliverables:
+
+- Add FastAPI and an application entry point.
+- Add typed request/response schemas with an API version prefix.
+- Add health, board summary, session list, session detail, cockpit, player search,
+  availability, and deterministic recommendation endpoints.
+- Compose cockpit responses from existing domain services.
+- Serve a minimal static page from the same process.
+- Add API tests using temporary boards and sessions.
+- Keep route handlers free of draft logic.
+
+Exit criteria:
+
+- Read-only API responses match CLI/domain results for the same fixtures.
+- No endpoint leaks secrets or filesystem implementation details.
+- The generated API schema accurately describes the supported routes.
+
+### Milestone 2 — Safe web mutations
+
+Deliverables:
+
+- Create and resume sessions from the browser.
+- Add pick, bulk-pick, and undo endpoints.
+- Add structured ambiguous-name and unavailable-player responses.
+- Serialize mutations per session.
+- Return the refreshed cockpit snapshot after successful mutations.
+- Add tests for retries, rapid duplicate submissions, ambiguity, invalid order, undo,
+  autosave, and restart recovery.
+
+Exit criteria:
+
+- Browser and CLI produce equivalent session event histories.
+- Rapid repeated taps cannot duplicate or skip a pick.
+- All failed mutations leave the session unchanged.
+
+### Milestone 3 — Mobile cockpit MVP
+
+Deliverables:
+
+- Build the responsive cockpit screen.
+- Add player search and explicit draft confirmation sheet.
+- Add best-available position filters.
+- Add recommendation and alternative cards.
+- Add recent picks, compact roster summary, and tier/run alerts.
+- Add undo confirmation and clear success/error feedback.
+- Add visible board, model, autosave, and connectivity status.
+- Test common phone widths and landscape recovery.
+
+Exit criteria:
+
+- A simulated draft can be entered entirely from a phone without a physical keyboard.
+- Normal pick entry requires no more than two deliberate taps after locating a player.
+- The most important state fits within one portrait screen with no horizontal scroll.
+- Refresh, reconnect, and accidental double taps do not corrupt state.
+
+### Milestone 4 — Board, roster, and draft-log views
+
+Deliverables:
+
+- Add tier-aware position board with available-only default.
+- Add player evidence details on demand.
+- Add user roster with needs and bye-week summary.
+- Add complete draft log and team filters.
+- Add desktop-responsive enhancements without weakening the phone layout.
+- Decide whether limited polling, server-sent events, or manual refresh best fits the
+  single-user local deployment; avoid real-time infrastructure without a measured need.
+
+Exit criteria:
+
+- Every important CLI read operation has an equivalent mobile view.
+- Position and tier context is understandable without opening raw JSON.
+- The interface stays responsive with the full configured board and draft log.
+
+### Milestone 5 — Conversational assistant in the cockpit
+
+Deliverables:
+
+- Connect the existing assistant context builder and response validator to the API.
+- Add the Ask view and suggested prompts.
+- Display source mode: model or deterministic fallback.
+- Keep model calls cancellable or ignorable by the UI.
+- Add latency measurement and a strict server-side timeout.
+- Test unavailable-player hallucinations, malformed responses, upstream errors, and
+  concurrent state changes while an answer is in flight.
+
+Exit criteria:
+
+- The assistant never mutates state.
+- Every recommended player is still available when the response is displayed, or the
+  UI marks the answer stale and refreshes advice.
+- Model failure never blocks recording picks or viewing deterministic recommendations.
+
+### Milestone 6 — Private Tailscale deployment
+
+Deliverables:
+
+- Add documented localhost startup command.
+- Add Tailscale Serve setup and status checks.
+- Add a single draft-night startup script or command that validates the board, starts
+  the app, and prints the private URL.
+- Document how to stop Serve and the application.
+- Add PC sleep/power guidance and phone reconnection steps.
+- Verify the service is unreachable from a non-tailnet device.
+- Verify no Funnel configuration is active.
+
+Exit criteria:
+
+- The phone can complete a simulated draft over cellular while connected to Tailscale.
+- The backend remains bound to localhost.
+- The OpenRouter key is absent from browser traffic and built assets.
+- Startup and recovery can be performed from a short runbook.
+
+### Milestone 7 — Draft simulation and hardening
 
 Simulation matrix:
 
 - 8-, 10-, and 12-team leagues
 - Standard, half-PPR, and PPR
-- FLEX and Superflex
-- Early, middle, and late draft slots
+- Early, middle, and late draft positions
+- FLEX and Superflex configurations
 - Position runs and unexpected reaches
 - Major ADP fallers
-- Missing or conflicting projections
-- Ambiguous player names
-- Duplicate and out-of-order entry attempts
-- Undo and crash recovery
-- Model/API unavailable or malformed response
-- Stale or not-ready board
+- Ambiguous search terms and misspellings
+- Bulk catch-up after several missed picks
+- Double taps and delayed network responses
+- Undo, browser refresh, server restart, and phone reconnect
+- OpenRouter timeout, invalid response, and total internet loss
+- Stale, incomplete, and not-ready boards
 
 Evaluate:
 
-- Recommendation latency
-- Roster construction and starter coverage
-- Value captured relative to board and ADP
-- Position-run response quality
-- Nonsensical or unavailable-player recommendation rate
+- Time required to record each pick
+- Recommendation and search latency
 - Recovery time after an incorrect entry
-- Model token usage and cost
+- Missed or duplicated selection rate
+- Visibility of tier cliffs and roster needs
+- Model token usage, latency, and cost
+- Battery and readability during a complete phone session
 
-Acceptance criteria:
+Exit criteria:
 
-- Complete simulated drafts finish without state corruption.
-- Critical workflows have regression fixtures.
-- Recommendation latency fits typical live pick timers.
-- Known failure modes produce actionable messages and safe fallback behavior.
+- At least three complete phone-based simulated drafts finish without state corruption.
+- Critical paths have regression tests.
+- Known failures produce short, actionable messages.
+- The user can recover from a wrong pick in seconds.
 
-## Phase 8 — Local Browser UI
+### Milestone 8 — PWA and quality-of-life improvements
 
-**Goal:** Provide a more visual draft-night interface after the engine is proven.
+Only pursue after the mobile MVP survives realistic drafts.
 
-Potential interface:
+Candidates:
 
-- Position and tier board columns
-- Search and one-click drafting
-- All team rosters
-- Recent picks and position-run visualization
-- Chat and recommendation panel
-- Undo/correction controls
-- Data-health, autosave, and connectivity indicators
-- Local-only server by default
+- Installable home-screen PWA shell
+- Cached application shell and emergency read-only board
+- Wake-lock request during an active draft
+- Better bulk pick entry
+- Arbitrary historical correction with safe event replay
+- Larger desktop board mode
+- Haptics where browser support permits and the feedback is useful
+- Optional speech transcription or spoken answers
+- Draft result export and post-draft roster analysis
 
-Rules:
+Do not cache mutable draft state in a way that competes with the server's authoritative
+session. Offline mutation and later synchronization are explicitly out of scope until
+there is a proven need and a conflict-safe design.
 
-- Reuse the same board, state, and recommendation services as the CLI.
-- Do not move domain logic into browser components.
-- Preserve terminal support as the reliable fallback.
+## 10. Testing Strategy
 
-Acceptance criteria:
+### Domain tests
 
-- Browser and CLI produce identical state transitions and recommendations.
-- Refreshing the browser does not lose draft state.
-- The UI remains usable on a laptop without external hosting.
+Continue testing ranking, board, session, recommendation, and assistant modules without
+starting an HTTP server. Domain correctness should not depend on FastAPI or a browser.
 
-## Phase 9 — Optional Platform Integrations
+### API tests
 
-Only consider after the manual workflow is reliable:
+- Contract shape and versioning
+- HTTP status and structured error mapping
+- Read parity with domain services
+- Mutation atomicity and idempotency behavior
+- Per-session mutation serialization
+- Secret and internal-path leakage checks
 
-- Draft result import/export
-- Read-only league configuration import
-- Platform-specific draft synchronization where stable APIs permit it
-- Multiple board/provider adapters
-- Post-draft roster analysis
+### Browser tests
 
-Platform access must degrade gracefully and never become required for the core app.
+- Primary flow at representative small-phone widths
+- Touch confirmation and undo behavior
+- No horizontal overflow
+- Search, filters, and stale-result handling
+- Reload and reconnect behavior
+- Model-online and model-offline states
+- Basic accessibility: labels, focus, contrast, and keyboard operation
 
-## 6. Recommended Delivery Order
+Start with focused browser-level smoke tests for critical paths. Add broader end-to-end
+coverage after the UI structure stabilizes.
 
-1. Finish Board MVP readiness by repairing projections and identity validation.
-2. Build the live draft state engine.
-3. Add deterministic recommendations.
-4. Add model reasoning over controlled context.
-5. Harden the terminal workflow through simulations.
-6. Build a local browser UI.
-7. Evaluate optional platform integrations.
+### Manual draft-night rehearsal
 
-## 7. Immediate Next Work
+Use the actual phone, cellular data, Tailscale, target PC, and OpenRouter configuration.
+A desktop browser resized to mobile width is useful during development but is not an
+adequate final test.
 
-The next implementation session should begin with Phase 2:
+## 11. Observability and Operations
 
-1. Audit `fetch_2026_projections.py` and choose the supported projection source.
-2. Make projection acquisition produce a documented, reproducible artifact.
-3. Add source timestamp and coverage validation.
-4. Add player identity/team conflict reporting.
-5. Regenerate rankings and `draft_board.json`.
-6. Require `python scripts/cli.py --validate-board` to return success before
-   beginning live-state work.
+The application should expose enough local information to diagnose problems without
+turning into an operations project.
 
-Once the board is genuinely ready, start Phase 3 with event-backed draft sessions,
-autosave, draft/undo, availability, and roster views.
+- Structured local logs with timestamps, request IDs, route, latency, and outcome
+- No API keys, full prompts, or sensitive environment values in logs
+- Visible last autosave time and path in the server/CLI output
+- Visible board generation time and health in the cockpit
+- Model source, model slug, latency, fallback reason, and token usage when available
+- Lightweight `/health` response for local startup checks
+- Optional bounded log file rotation before draft night
 
-## 8. Current Known Risks
+## 12. Immediate Next Work
 
-- The checked-in ranking metadata references a missing Windows-style projection path.
-- Current projections and some player/team records have not been independently
-  validated.
-- `nfl_data_py` historical endpoints did not provide 2025 seasonal or weekly data in
-  the tested environment.
-- Apple Python 3.9 uses LibreSSL and emits an urllib3 compatibility warning; the
-  documented target remains Python 3.12.
-- Existing recommendation logic overweights nearby ADP and should not become the
-  foundation of the new deterministic engine.
-- News signals should remain capped advisory evidence, not dominate rankings.
+The next implementation session should execute Milestones 0 and 1 in this order:
 
-## 9. Definition of Draft-Night Ready
+1. Run the existing test suite and validate the checked-in board.
+2. Identify the smallest supported service interface around `DraftSession`,
+   `DraftRecommendationEngine`, and `DraftAssistantContextBuilder`.
+3. Add FastAPI and versioned typed schemas.
+4. Implement health, session, cockpit, search, availability, and recommendation reads.
+5. Add API/domain parity tests.
+6. Serve a minimal phone-sized read-only cockpit page.
+7. Review the API shape before adding pick and undo mutations.
 
-The product is ready to bring to a real draft when:
+The first visible demo should be intentionally narrow: open a private/local page on a
+phone and see the exact current pick, roster, recommendation, best available players,
+tier alerts, recent selections, and health from an existing session.
 
-- The board health status is `ready` with current, attributable projections.
-- Position priorities and representative player records have been reviewed.
-- Draft sessions autosave and recover without corruption.
-- Draft, undo, correction, availability, and roster workflows are fast and tested.
-- Deterministic recommendations work offline.
-- The model cannot recommend unavailable players or mutate state without validation.
-- Full draft simulations pass across the target league configuration.
-- The UI clearly displays stale data, connectivity loss, and fallback mode.
-- A short draft-night runbook documents startup, recovery, and emergency commands.
+## 13. Known Risks and Constraints
+
+- The PC is a single point of service; sleep, restart, or power loss interrupts phone
+  access until it recovers.
+- Tailscale access does not replace application validation or safe mutation design.
+- Mobile browsers may suspend background tabs; the UI must refresh state on focus.
+- Draft platform selections remain manual unless a later stable integration is added.
+- Missing bye weeks, teams, or ADP-derived projections must remain visible as data
+  warnings rather than being hidden by the UI.
+- Historical and projection sources can change format and break preseason refreshes.
+- OpenRouter model behavior, latency, and model availability can change; deterministic
+  fallback remains mandatory.
+- Arbitrary correction of an older pick is more complex than undoing the latest event
+  and must not be implemented as unsafe JSON editing.
+- A large frontend framework could slow delivery and add build/runtime failure modes
+  before the interaction design is proven.
+
+## 14. Definition of Draft-Night Ready
+
+The product is ready for a real draft when:
+
+- The current board is attributable, reviewed, and reports `health.status = ready`.
+- The PC starts the backend with one documented command and binds only to localhost.
+- Tailscale Serve exposes the site only inside the intended tailnet.
+- The phone can create or resume a session and record a complete simulated draft.
+- The cockpit clearly shows current pick, time-to-user-pick context, recommendation,
+  alternatives, tier alerts, recent picks, roster, and health.
+- Search and normal pick entry are fast enough for live use.
+- Duplicate, ambiguous, or unavailable selections never corrupt state.
+- Undo, autosave, refresh, reconnect, and server restart recovery are tested.
+- Deterministic recommendations remain fully usable without OpenRouter.
+- The model cannot mutate state or recommend unavailable players without rejection.
+- Secrets never reach browser code, responses, session files, or logs.
+- At least three full phone-based draft simulations pass.
+- A short runbook covers startup, Tailscale verification, recovery, shutdown, and the
+  emergency static cheatsheet.
+
+## 15. Deferred Ideas
+
+These may be valuable later but are not part of the first private mobile release:
+
+- Public hosting or public Custom GPT Actions
+- Tailscale Funnel
+- Native iOS or Android applications
+- Automatic scraping of a third-party live draft room through browser automation
+- Multi-user simultaneous draft-room collaboration
+- Cloud database or account system
+- Offline write synchronization
+- Dedicated realtime voice conversation
+- Push notifications
+- Platform-specific league and draft integrations
+- Public distribution or multi-tenant hosting
+
+The near-term goal is narrower and more useful: one user, one phone, one trusted PC,
+one private tailnet, and a draft assistant fast and reliable enough to use on the
+clock.
