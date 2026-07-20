@@ -110,6 +110,7 @@ cd ai-nfl-fantasy-draft
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+pip install -e .
 ```
 
 On Windows PowerShell, activate with:
@@ -318,11 +319,16 @@ Data pipeline
     -> bounded optional model context
 ```
 
-- `scripts/draft_board.py` owns the position-first board contract.
-- `scripts/draft_session.py` owns live state, selection validation, and persistence.
-- `scripts/draft_recommendation_engine.py` owns deterministic advice.
-- `scripts/draft_assistant.py` owns bounded model context and response validation.
-- `scripts/live_draft.py` and `scripts/draft_night_cli.py` are the current interfaces.
+- `src/fantasy_draft/board/` owns the position-first board contract.
+- `src/fantasy_draft/validation/` owns projection and board input validation.
+- `src/fantasy_draft/draft/` owns live state, persistence, and deterministic advice.
+- `src/fantasy_draft/assistant/` owns bounded model context and response validation.
+- `src/fantasy_draft/providers/` owns external service adapters such as OpenRouter.
+- `src/fantasy_draft/cli/` owns the packaged live-draft terminal interfaces.
+
+The corresponding files under `scripts/` are compatibility wrappers so existing
+commands continue to work. Install the repository in editable mode with
+`pip install -e .` before using those wrappers.
 
 The planned FastAPI layer will wrap these modules. HTTP routes and browser code will
 not duplicate ranking, availability, or recommendation logic.

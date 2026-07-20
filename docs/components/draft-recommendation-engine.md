@@ -4,6 +4,8 @@ The recommendation engine evaluates an active `DraftSession` without calling a
 language model. Its structured response will become the factual recommendation input
 for the future conversational layer.
 
+Implementation: `src/fantasy_draft/draft/recommendations.py`.
+
 ## Usage
 
 ```bash

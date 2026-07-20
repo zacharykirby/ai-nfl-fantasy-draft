@@ -3,6 +3,9 @@
 The live model layer explains and compares deterministic draft evidence. It does not
 own player facts, availability, rankings, or session state.
 
+Implementation: `src/fantasy_draft/assistant/service.py`, with the OpenRouter adapter
+in `src/fantasy_draft/providers/openrouter.py`.
+
 ## Usage
 
 ```bash

@@ -21,23 +21,23 @@ This directory contains detailed documentation for each component of the NFL Fan
   - OpenRouter integration for intelligent suggestions
   - Personalized draft advice
 
-- **[Draft Board](draft-board.md)** - `draft_board.py`
+- **[Draft Board](draft-board.md)** - `fantasy_draft.board.builder`
   - Position-first JSON contract for live draft clients
   - Projection source and schema health validation
 
-- **[Live Draft Session](live-draft-session.md)** - `draft_session.py`, `live_draft.py`
+- **[Live Draft Session](live-draft-session.md)** - `fantasy_draft.draft.session`
   - Crash-safe selection, undo, roster, and availability state
   - Event-backed persistence with safe player matching
 
-- **[Draft Recommendation Engine](draft-recommendation-engine.md)** - `draft_recommendation_engine.py`
+- **[Draft Recommendation Engine](draft-recommendation-engine.md)** - `fantasy_draft.draft.recommendations`
   - Offline safe, balanced, and upside recommendations
   - Auditable roster, tier, run, risk, and survival signals
 
-- **[Model Reasoning Layer](model-reasoning-layer.md)** - `draft_assistant.py`
+- **[Model Reasoning Layer](model-reasoning-layer.md)** - `fantasy_draft.assistant.service`
   - Bounded live-draft context and candidate allowlist
   - Structured validation with deterministic fallback
 
-- **[Draft-Night CLI](draft-night-cli.md)** - `draft_night_cli.py`
+- **[Draft-Night CLI](draft-night-cli.md)** - `fantasy_draft.cli`
   - Integrated interactive dashboard and keyboard workflow
   - Explicit mutations with natural-language read-only questions
 
@@ -55,14 +55,19 @@ This directory contains detailed documentation for each component of the NFL Fan
 
 ## 🔗 Component Dependencies
 
+```text
+Data CLI (`scripts/cli.py`)
+├── Ingestion, projections, news, and ranking scripts
+└── Packaged board and validation services
+
+Live CLI (`fantasy_draft.cli`)
+├── Draft session domain service
+├── Deterministic recommendation service
+└── Controlled assistant service
 ```
-CLI (cli.py)
-├── Data Ingestion (data_ingest.py)
-├── News Fetcher (news_fetcher.py)
-├── News Analyzer (news_analyzer.py)
-├── Player Ranker (ranker.py)
-└── Draft Recommender (draft_recommender.py)
-```
+
+The live runtime is packaged under `src/fantasy_draft`. Files with matching names
+under `scripts/` are compatibility wrappers for existing commands.
 
 ## 🛠️ Development
 

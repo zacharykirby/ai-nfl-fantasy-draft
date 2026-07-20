@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fantasy-draft-assistant"
+version = "0.1.0"
+description = "Private, data-driven fantasy football draft assistant"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+dependencies = [
+  "pandas>=2.0.0",
+  "python-dotenv>=1.0.0",
+  "requests>=2.31.0",
+]
+
+[project.scripts]
+live-draft = "fantasy_draft.cli.live_draft:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+

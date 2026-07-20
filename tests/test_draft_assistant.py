@@ -5,16 +5,16 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "src"))
 
-from draft_assistant import (
+from fantasy_draft.assistant.service import (
     AssistantResponseError,
     DraftAssistantContextBuilder,
     LiveDraftAssistant,
     build_messages,
     validate_model_response,
 )
-from draft_session import DraftSession
+from fantasy_draft.draft.session import DraftSession
 
 
 class FakeClient:

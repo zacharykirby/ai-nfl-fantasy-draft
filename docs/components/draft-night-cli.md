@@ -3,6 +3,9 @@
 The interactive CLI combines session state, deterministic recommendations, and the
 controlled model layer in one laptop-friendly loop.
 
+Implementation: `src/fantasy_draft/cli/`. The packaged `live-draft` command and the
+legacy `scripts/live_draft.py` entry point use the same code.
+
 ## Start
 
 ```bash

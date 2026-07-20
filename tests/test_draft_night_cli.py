@@ -3,10 +3,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "src"))
 
-from draft_night_cli import DraftNightShell
-from draft_session import DraftSession
+from fantasy_draft.cli.draft_night import DraftNightShell
+from fantasy_draft.draft.session import DraftSession
 
 
 class OfflineClient:

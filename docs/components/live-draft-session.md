@@ -4,6 +4,9 @@ The live session engine records draft state independently of any language model.
 uses a ready `outputs/draft_board.json`, snapshots its players, and persists an event
 history after every selection or undo.
 
+Implementation: `src/fantasy_draft/draft/session.py`. Existing commands continue
+through the `scripts/live_draft.py` compatibility entry point.
+
 ## Commands
 
 ```bash

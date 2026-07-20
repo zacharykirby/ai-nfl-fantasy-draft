@@ -5,10 +5,10 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "src"))
 
-from draft_recommendation_engine import DraftRecommendationEngine, survival_probability
-from draft_session import DraftSession
+from fantasy_draft.draft.recommendations import DraftRecommendationEngine, survival_probability
+from fantasy_draft.draft.session import DraftSession
 
 
 def player(name, position, rank, pos_rank, vorp, tier=1, flags=None, injury=False, risk="Low", adp=None):

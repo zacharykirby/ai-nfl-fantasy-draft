@@ -4,6 +4,9 @@
 reasoning. It prioritizes players independently within QB, RB, WR, and TE and does
 not prescribe a snake-draft sequence.
 
+Implementation: `src/fantasy_draft/board/builder.py`. The legacy
+`scripts/draft_board.py` module is a compatibility wrapper.
+
 ## Build and inspect
 
 ```bash
