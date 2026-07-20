@@ -10,6 +10,9 @@ const state = {
   board: null,
   createRequestId: null,
   pendingDelete: null,
+  view: "cockpit",
+  boardPosition: "ALL",
+  detailPlayer: null,
 };
 
 const byId = (id) => document.getElementById(id);
@@ -86,6 +89,16 @@ function render(cockpit) {
   );
   byId("health").textContent = `${cockpit.health.board} · ${cockpit.health.model}`;
   byId("undo-last").disabled = cockpit.recent_picks.length === 0;
+  const teamSelect = byId("log-team");
+  const selectedTeam = teamSelect.value;
+  teamSelect.innerHTML = `<option value="">All teams</option>${Array.from(
+    { length: Number(cockpit.league.league_size) },
+    (_item, index) => `<option value="${index + 1}">Team ${index + 1}</option>`,
+  ).join("")}`;
+  teamSelect.value = selectedTeam;
+  if (state.view !== "cockpit") {
+    queueMicrotask(() => refreshActiveView().catch((error) => showNotice(error.message)));
+  }
 }
 
 function renderAvailable() {
@@ -94,6 +107,118 @@ function renderAvailable() {
     ? state.cockpit.best_available
     : state.cockpit.top_available_by_position[state.position] || [];
   setList(byId("best-available"), players.map(playerRow).join(""), "No players available");
+}
+
+async function showView(view) {
+  state.view = view;
+  document.querySelectorAll(".view-panel").forEach((panel) => {
+    panel.hidden = panel.id !== `view-${view}`;
+  });
+  document.querySelectorAll(".view-tab").forEach((button) => {
+    button.classList.toggle("active", button.dataset.view === view);
+  });
+  await refreshActiveView();
+}
+
+async function refreshActiveView() {
+  if (!state.session || state.view === "cockpit") return;
+  if (state.view === "board") await loadBoardView();
+  if (state.view === "roster") await loadRosterView();
+  if (state.view === "log") await loadDraftLogView();
+}
+
+async function loadBoardView() {
+  byId("full-board").innerHTML = `<div class="view-loading">Loading board…</div>`;
+  const position = state.boardPosition === "ALL" ? "" : `&position=${state.boardPosition}`;
+  const available = byId("board-available-only").checked;
+  const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/board?available_only=${available}${position}`);
+  const html = Object.entries(result.positions).map(([role, group]) => {
+    const tiers = group.tiers.map((tier) => `<section class="tier-section">
+      <div class="tier-heading"><span>Tier ${tier.tier === 99 ? "—" : tier.tier}</span><span>${tier.count} player${tier.count === 1 ? "" : "s"}</span></div>
+      ${tier.players.map((player) => `<button class="board-player ${player.available ? "" : "drafted"}" type="button" data-player-id="${escapeHtml(player.player_id)}">
+        ${playerRow(player)}
+      </button>`).join("")}
+    </section>`).join("");
+    return `<div class="position-heading"><h2>${role}</h2><span class="small-meta">${group.count} shown</span></div>${tiers || `<div class="card empty-state">No ${role} players match.</div>`}`;
+  }).join("");
+  byId("full-board").innerHTML = html || `<div class="card empty-state">No players match this board filter.</div>`;
+}
+
+async function loadRosterView() {
+  const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/roster`);
+  byId("roster-title").textContent = `Team ${result.team} · ${result.players.length} selections`;
+  byId("roster-needs").innerHTML = ["QB", "RB", "WR", "TE"].map((position) => {
+    const need = result.needs[position];
+    return `<div class="need-card ${need.open_base_slots ? "open" : ""}"><strong>${position}</strong><span>${need.rostered}/${need.base_starters} · ${need.open_base_slots} open</span></div>`;
+  }).join("");
+  byId("bye-status").textContent = result.bye_summary.conflict_count
+    ? `${result.bye_summary.conflict_count} conflict${result.bye_summary.conflict_count === 1 ? "" : "s"}`
+    : "No conflicts";
+  setList(
+    byId("bye-summary"),
+    result.bye_summary.weeks.map((item) => compactRow(
+      `Week ${item.week}${item.conflict ? " · conflict" : ""}`,
+      item.players.join(", "),
+    )).join("") + (result.bye_summary.missing.length
+      ? compactRow("Bye unknown", result.bye_summary.missing.join(", ")) : ""),
+    "No rostered bye weeks yet",
+  );
+  byId("roster-count").textContent = `${result.players.length} player${result.players.length === 1 ? "" : "s"}`;
+  setList(
+    byId("roster-detail-list"),
+    result.players.map((player) => `<button class="clickable-row" type="button" data-player-id="${escapeHtml(player.player_id)}">${playerRow(player)}<span class="player-detail">Pick ${player.drafted_at.overall_pick} · Round ${player.drafted_at.round}</span></button>`).join(""),
+    "No selections yet",
+  );
+}
+
+async function loadDraftLogView() {
+  const params = new URLSearchParams();
+  if (byId("log-team").value) params.set("team", byId("log-team").value);
+  if (byId("log-position").value) params.set("position", byId("log-position").value);
+  const suffix = params.toString() ? `?${params}` : "";
+  const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/draft-log${suffix}`);
+  byId("log-count").textContent = result.count;
+  setList(
+    byId("draft-log-list"),
+    result.picks.slice().reverse().map((pick) => `<button class="clickable-row log-pick ${pick.status}" type="button" data-player-id="${escapeHtml(pick.player_id)}">${compactRow(
+      `${pick.overall_pick}. ${pick.player}${pick.status === "undone" ? " · UNDONE" : ""}`,
+      `${pick.position} · Team ${pick.team} · Round ${pick.round}`,
+    )}</button>`).join(""),
+    "No picks recorded",
+  );
+}
+
+async function openPlayerDetail(playerId) {
+  const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/players/${encodeURIComponent(playerId)}`);
+  const player = result.player;
+  state.detailPlayer = player;
+  byId("player-detail-position").textContent = `${player.position}${player.position_rank || ""} · ${player.team || "FA"}`;
+  byId("player-detail-name").textContent = player.player;
+  byId("player-detail-meta").textContent = player.available
+    ? `Available at pick ${result.current_pick}`
+    : `Drafted at pick ${player.drafted.overall_pick} by Team ${player.drafted.team}`;
+  const stats = [
+    [player.projected_points ?? "—", "Projected"],
+    [player.vorp ?? "—", "VORP"],
+    [player.adp ?? "—", "ADP"],
+    [player.tier ?? "—", "Tier"],
+    [player.bye_week ?? "—", "Bye"],
+    [player.age ?? "—", "Age"],
+  ];
+  byId("player-detail-stats").innerHTML = stats.map(([value, label]) => `<div class="detail-stat"><strong>${escapeHtml(value)}</strong><span>${label}</span></div>`).join("");
+  const evidence = player.evidence || {};
+  const evidenceRows = [
+    ["Projection", player.projection_method || "unknown"],
+    ["Projection source", player.projection_source || "unknown"],
+    ["Historical points", evidence.weighted_historical_points ?? "—"],
+    ["Historical PPG", evidence.weighted_historical_points_per_game ?? "—"],
+    ["Availability rate", evidence.historical_availability_rate != null ? `${Math.round(evidence.historical_availability_rate * 100)}%` : "—"],
+    ["Risk", player.risk?.level || "Unknown"],
+    ["Flags", (player.flags || []).join(", ") || "None"],
+  ];
+  byId("player-detail-evidence").innerHTML = evidenceRows.map(([label, value]) => `<div class="evidence-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("");
+  byId("player-detail-draft").hidden = !player.available;
+  if (!byId("player-detail-dialog").open) byId("player-detail-dialog").showModal();
 }
 
 function savedSession() {
@@ -341,6 +466,32 @@ function escapeHtml(value) {
 }
 
 byId("refresh").addEventListener("click", () => load(state.session).catch((error) => showNotice(error.message)));
+document.querySelectorAll(".view-tab").forEach((button) => {
+  button.addEventListener("click", () => showView(button.dataset.view).catch((error) => showNotice(error.message)));
+});
+document.querySelectorAll(".board-filter").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".board-filter").forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+    state.boardPosition = button.dataset.boardPosition;
+    loadBoardView().catch((error) => showNotice(error.message));
+  });
+});
+byId("board-available-only").addEventListener("change", () => loadBoardView().catch((error) => showNotice(error.message)));
+byId("log-team").addEventListener("change", () => loadDraftLogView().catch((error) => showNotice(error.message)));
+byId("log-position").addEventListener("change", () => loadDraftLogView().catch((error) => showNotice(error.message)));
+document.addEventListener("click", (event) => {
+  const player = event.target.closest("[data-player-id]");
+  if (player) openPlayerDetail(player.dataset.playerId).catch((error) => showNotice(error.message));
+});
+byId("player-detail-close").addEventListener("click", () => byId("player-detail-dialog").close());
+byId("player-detail-draft").addEventListener("click", () => {
+  const player = state.detailPlayer;
+  if (!player?.available) return;
+  byId("player-detail-dialog").close();
+  byId("command-input").value = `draft ${player.player}`;
+  byId("command-form").requestSubmit();
+});
 byId("session-switcher").addEventListener("click", () => {
   showSessionNotice("");
   openSessionManager(false);

@@ -84,9 +84,8 @@ The packaged runtime, cockpit read model, versioned FastAPI API, interactive mob
 page, browser session management, safe mutation controls, and controlled conversational
 assistant are implemented. The active delivery sequence is now:
 
-1. Add full board, roster, and draft-log views.
-2. Deploy privately through Tailscale Serve.
-3. Complete full phone-based draft simulations.
+1. Deploy privately through Tailscale Serve.
+2. Complete full phone-based draft simulations.
 
 ## Installation
 
@@ -254,6 +253,21 @@ confirmation showing its current pick and recorded-selection count. The JSON is 
 to `sessions/.trash/` rather than permanently erased. Deleting the active session
 automatically resumes the next saved draft or opens the new-draft form.
 
+The main navigation provides four mobile views:
+
+- **Cockpit** keeps the current recommendation and quick draft controls above the fold.
+- **Board** groups the full session board by position and tier, hiding drafted players
+  by default. Tap any player for projection, VORP, ADP, historical evidence, risk, and
+  flags; available players can enter the normal confirmation flow from that sheet.
+- **Roster** shows starter openings, FLEX eligibility, selection details, and bye-week
+  conflicts for the user's team.
+- **Draft log** preserves the complete selection history, including undone picks, with
+  team and position filters.
+
+These views refresh on entry, after state changes, through the refresh button, and when
+the browser returns to the foreground. The private single-user deployment intentionally
+does not add websocket infrastructure without evidence that polling is needed.
+
 The server resolves the available player and shows the exact player, overall pick,
 and team in a confirmation dialog. Draft state changes only after confirmation.
 Unique last names are accepted; ambiguous names return candidate choices without
@@ -282,7 +296,11 @@ POST /api/v1/sessions
 GET /api/v1/sessions/{name}
 DELETE /api/v1/sessions/{name}
 GET /api/v1/sessions/{name}/cockpit
+GET /api/v1/sessions/{name}/board
+GET /api/v1/sessions/{name}/roster
+GET /api/v1/sessions/{name}/draft-log
 GET /api/v1/sessions/{name}/players/search
+GET /api/v1/sessions/{name}/players/{player_id}
 GET /api/v1/sessions/{name}/available
 GET /api/v1/sessions/{name}/recommendation
 POST /api/v1/sessions/{name}/commands/interpret

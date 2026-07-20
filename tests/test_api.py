@@ -45,6 +45,10 @@ def test_health_board_and_frontend(web_draft):
     assert "new-session-form" in frontend.text
     assert "Delete session" in frontend.text
     assert "sessions/.trash" in frontend.text
+    assert "Tier-aware priorities" in frontend.text
+    assert "Roster detail" in frontend.text
+    assert "Complete pick log" in frontend.text
+    assert "player-detail-dialog" in frontend.text
     assert frontend.headers["x-frame-options"] == "DENY"
 
 
@@ -198,6 +202,35 @@ def test_available_search_and_recommendation_routes(web_draft):
     assert recommendation.status_code == 200
     assert recommendation.json()["recommendation"]["mode"] == "upside"
     assert len(recommendation.json()["recommendation"]["alternatives"]) == 2
+
+
+def test_full_board_roster_player_detail_and_log_routes(web_draft):
+    client = make_client(web_draft)
+
+    board = client.get("/api/v1/sessions/phone-test/board?position=RB")
+    assert board.status_code == 200
+    assert board.json()["positions"]["RB"]["count"] == 2
+    assert board.json()["available_only"] is True
+
+    all_board = client.get(
+        "/api/v1/sessions/phone-test/board?position=RB&available_only=false"
+    )
+    assert all_board.status_code == 200
+    assert all_board.json()["positions"]["RB"]["count"] == 3
+
+    detail = client.get("/api/v1/sessions/phone-test/players/RB%3Ajahmyr%20gibbs")
+    assert detail.status_code == 200
+    assert detail.json()["player"]["available"] is False
+
+    roster = client.get("/api/v1/sessions/phone-test/roster")
+    assert roster.status_code == 200
+    assert roster.json()["team"] == 2
+    assert roster.json()["needs"]["QB"]["open_base_slots"] == 1
+
+    log = client.get("/api/v1/sessions/phone-test/draft-log?team=1")
+    assert log.status_code == 200
+    assert log.json()["picks"][0]["player"] == "Jahmyr Gibbs"
+    assert log.json()["filters"]["team"] == 1
 
 
 def test_board_summary_reports_canonical_session_capacity(web_draft, tmp_path):

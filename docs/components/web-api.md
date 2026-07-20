@@ -27,7 +27,11 @@ POST /api/v1/sessions
 GET /api/v1/sessions/{name}
 DELETE /api/v1/sessions/{name}
 GET /api/v1/sessions/{name}/cockpit
+GET /api/v1/sessions/{name}/board?position=RB&available_only=true
+GET /api/v1/sessions/{name}/roster
+GET /api/v1/sessions/{name}/draft-log?team=1&position=WR
 GET /api/v1/sessions/{name}/players/search?q=...
+GET /api/v1/sessions/{name}/players/{player_id}
 GET /api/v1/sessions/{name}/available?position=RB&limit=20
 GET /api/v1/sessions/{name}/recommendation?mode=balanced
 POST /api/v1/sessions/{name}/commands/interpret
@@ -65,6 +69,25 @@ The OpenAPI document is available at `/openapi.json` and interactive documentati
 recommendation, best available players, per-position availability, tier alerts,
 position-run state, and local health into one presentation read model. The CLI domain
 objects remain authoritative.
+
+## Full mobile read views
+
+`DraftViewsService` owns three read-only presentation contracts:
+
+- The board groups one or all positions by tier and defaults to available players.
+- Roster detail combines the user's selections with deterministic starter/FLEX needs
+  and bye-week conflicts.
+- The draft log retains active and undone selection attempts and supports team and
+  position filters.
+
+Player detail returns availability, draft ownership, projections, VORP, ADP, evidence,
+risk, news, and flags from the session's immutable board snapshot. Tapping an available
+player can populate the existing explicit draft-confirmation flow; the detail endpoint
+itself never mutates state.
+
+The client refreshes on view entry, mutation, manual refresh, and visibility return.
+No websocket, server-sent event, or background polling layer is included for the
+single-user private deployment.
 
 ## Session management
 

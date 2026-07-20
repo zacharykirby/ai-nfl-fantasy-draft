@@ -23,6 +23,15 @@
 
       <section id="notice" class="notice" hidden></section>
 
+      <nav class="primary-nav" aria-label="Draft views">
+        <button class="view-tab active" type="button" data-view="cockpit">Cockpit</button>
+        <button class="view-tab" type="button" data-view="board">Board</button>
+        <button class="view-tab" type="button" data-view="roster">Roster</button>
+        <button class="view-tab" type="button" data-view="log">Draft log</button>
+      </nav>
+
+      <section id="view-cockpit" class="view-panel">
+
       <section class="pick-strip" aria-label="Current draft position">
         <div>
           <span class="label">Round</span>
@@ -118,6 +127,51 @@
       </section>
 
       <p class="read-only-note">Draft facts stay local · every pick requires confirmation</p>
+      </section>
+
+      <section id="view-board" class="view-panel" hidden>
+        <section class="card view-heading-card">
+          <div class="card-heading">
+            <div><p class="eyebrow">POSITION BOARD</p><h2>Tier-aware priorities</h2></div>
+            <label class="toggle-label"><input id="board-available-only" type="checkbox" checked> Available</label>
+          </div>
+          <nav class="filters board-filters" aria-label="Board position filter">
+            <button class="board-filter active" data-board-position="ALL" type="button">All</button>
+            <button class="board-filter" data-board-position="RB" type="button">RB</button>
+            <button class="board-filter" data-board-position="WR" type="button">WR</button>
+            <button class="board-filter" data-board-position="QB" type="button">QB</button>
+            <button class="board-filter" data-board-position="TE" type="button">TE</button>
+          </nav>
+        </section>
+        <div id="full-board" class="view-loading">Open the board to load players.</div>
+      </section>
+
+      <section id="view-roster" class="view-panel" hidden>
+        <section class="card view-heading-card">
+          <p class="eyebrow">MY TEAM</p>
+          <h2 id="roster-title">Roster detail</h2>
+          <div id="roster-needs" class="needs-grid"></div>
+        </section>
+        <section class="card">
+          <div class="card-heading"><h2>Bye weeks</h2><span id="bye-status" class="pill muted">—</span></div>
+          <div id="bye-summary" class="compact-list empty-state">No rostered bye weeks yet</div>
+        </section>
+        <section class="card">
+          <div class="card-heading"><h2>Selections</h2><span id="roster-count" class="small-meta">0 players</span></div>
+          <div id="roster-detail-list" class="player-list empty-state">No selections yet</div>
+        </section>
+      </section>
+
+      <section id="view-log" class="view-panel" hidden>
+        <section class="card view-heading-card">
+          <div class="card-heading"><div><p class="eyebrow">DRAFT HISTORY</p><h2>Complete pick log</h2></div><span id="log-count" class="pill muted">0</span></div>
+          <div class="log-filters">
+            <label>Team<select id="log-team"><option value="">All teams</option></select></label>
+            <label>Position<select id="log-position"><option value="">All positions</option><option>QB</option><option>RB</option><option>WR</option><option>TE</option></select></label>
+          </div>
+        </section>
+        <section class="card"><div id="draft-log-list" class="compact-list empty-state">No picks recorded</div></section>
+      </section>
     </main>
 
     <form id="command-form" class="composer" autocomplete="off">
@@ -195,6 +249,17 @@
           <button class="dialog-button danger" value="confirm">Delete session</button>
         </div>
       </form>
+    </dialog>
+
+    <dialog id="player-detail-dialog" class="confirmation-dialog player-detail-dialog">
+      <div class="dialog-heading">
+        <div><p id="player-detail-position" class="eyebrow">PLAYER</p><h2 id="player-detail-name">Player detail</h2></div>
+        <button id="player-detail-close" class="icon-button" type="button" aria-label="Close player detail">×</button>
+      </div>
+      <p id="player-detail-meta" class="player-meta"></p>
+      <div id="player-detail-stats" class="detail-stats"></div>
+      <div id="player-detail-evidence" class="evidence-list"></div>
+      <button id="player-detail-draft" class="dialog-button primary full-width" type="button">Draft this player</button>
     </dialog>
 
     <dialog id="undo-dialog" class="confirmation-dialog">

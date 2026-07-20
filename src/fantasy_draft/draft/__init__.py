@@ -8,6 +8,7 @@ from .mutations import (
 )
 from .recommendations import DraftRecommendationEngine
 from .session import DraftSession
+from .views import DraftViewsService
 
 __all__ = [
     "DraftCockpitService",
@@ -16,4 +17,5 @@ __all__ = [
     "DraftSessionDeletionService",
     "DraftRecommendationEngine",
     "DraftSession",
+    "DraftViewsService",
 ]

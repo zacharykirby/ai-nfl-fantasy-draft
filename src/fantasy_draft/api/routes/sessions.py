@@ -21,7 +21,11 @@ from fantasy_draft.api.schemas import (
     MutationResponse,
     PickRequest,
     PlayerListResponse,
+    PlayerDetailResponse,
     RecommendationResponse,
+    RosterDetailResponse,
+    SessionBoardResponse,
+    DraftLogResponse,
     SessionDetailResponse,
     SessionCreateRequest,
     SessionCreateResponse,
@@ -39,6 +43,7 @@ from fantasy_draft.draft.mutations import (
     DraftSessionDeletionService,
 )
 from fantasy_draft.draft.recommendations import DraftRecommendationEngine, MODES
+from fantasy_draft.draft.views import DraftViewsService
 
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
@@ -125,6 +130,49 @@ def search_players(
         q, position=position, limit=limit
     )
     return {"players": players, "count": len(players)}
+
+
+@router.get("/{session_name}/players/{player_id}", response_model=PlayerDetailResponse)
+def player_detail(
+    session_name: str,
+    player_id: str,
+    repository: SessionRepository = Depends(session_repository),
+) -> Dict[str, Any]:
+    return DraftViewsService(repository.load(session_name)).player_detail(player_id)
+
+
+@router.get("/{session_name}/board", response_model=SessionBoardResponse)
+def session_board(
+    session_name: str,
+    position: Optional[str] = Query(None),
+    available_only: bool = Query(True),
+    repository: SessionRepository = Depends(session_repository),
+) -> Dict[str, Any]:
+    return DraftViewsService(repository.load(session_name)).board(
+        position=position,
+        available_only=available_only,
+    )
+
+
+@router.get("/{session_name}/roster", response_model=RosterDetailResponse)
+def roster_detail(
+    session_name: str,
+    repository: SessionRepository = Depends(session_repository),
+) -> Dict[str, Any]:
+    return DraftViewsService(repository.load(session_name)).roster()
+
+
+@router.get("/{session_name}/draft-log", response_model=DraftLogResponse)
+def draft_log(
+    session_name: str,
+    team: Optional[int] = Query(None, ge=1),
+    position: Optional[str] = Query(None),
+    repository: SessionRepository = Depends(session_repository),
+) -> Dict[str, Any]:
+    return DraftViewsService(repository.load(session_name)).draft_log(
+        team=team,
+        position=position,
+    )
 
 
 @router.get("/{session_name}/available", response_model=PlayerListResponse)

@@ -565,6 +565,9 @@ Exit criteria:
 
 ### Milestone 4 — Board, roster, and draft-log views
 
+**Status: Complete. Tier-aware board, evidence sheets, roster needs/byes, and the
+filterable audit log are available from the mobile navigation.**
+
 Deliverables:
 
 - Add tier-aware position board with available-only default.
@@ -729,10 +732,9 @@ turning into an operations project.
 
 The next implementation session should proceed in this order:
 
-1. Add the full position board, roster detail, and draft-log views.
-2. Add the Tailscale Serve startup command and private deployment runbook.
-3. Test delayed responses and real phone double taps over Tailscale.
-4. Add process-level file locking only if multiple server workers become supported.
+1. Add the Tailscale Serve startup command and private deployment runbook.
+2. Test delayed responses and real phone double taps over Tailscale.
+3. Add process-level file locking only if multiple server workers become supported.
 
 The next visible demo should support safe undo from the phone and conversational
 questions in the same composer without allowing the model to mutate state.

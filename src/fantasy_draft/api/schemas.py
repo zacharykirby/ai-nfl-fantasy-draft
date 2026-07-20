@@ -91,6 +91,37 @@ class PlayerListResponse(BaseModel):
     count: int
 
 
+class SessionBoardResponse(BaseModel):
+    schema_version: str
+    available_only: bool
+    positions: Dict[str, Any]
+    current_pick: int
+
+
+class PlayerDetailResponse(BaseModel):
+    player: Dict[str, Any]
+    current_pick: int
+
+
+class RosterDetailResponse(BaseModel):
+    schema_version: str
+    team: int
+    players: List[Dict[str, Any]]
+    counts: Dict[str, int]
+    needs: Dict[str, Any]
+    bye_summary: Dict[str, Any]
+    current_pick: int
+
+
+class DraftLogResponse(BaseModel):
+    schema_version: str
+    filters: Dict[str, Any]
+    league_size: int
+    picks: List[Dict[str, Any]]
+    count: int
+    current_pick: int
+
+
 class RecommendationResponse(BaseModel):
     recommendation: Dict[str, Any]
 
