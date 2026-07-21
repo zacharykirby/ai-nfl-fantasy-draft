@@ -82,6 +82,7 @@ def test_recommendation_has_auditable_contract_and_signals(tmp_path):
     assert result["schema_version"] == "1.0"
     assert result["primary"]["player"]
     assert len(result["alternatives"]) == 3
+    assert "bye_week" in result["primary"]
     assert result["primary"]["score_components"]
     assert result["primary"]["reasons"]
     assert result["signals"]["roster_needs"]["RB"]["needed"] is True

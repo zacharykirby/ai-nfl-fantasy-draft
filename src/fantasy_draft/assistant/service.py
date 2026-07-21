@@ -29,6 +29,7 @@ def compact_player(player: Dict[str, Any]) -> Dict[str, Any]:
         "projected_points": player.get("projected_points"),
         "vorp": player.get("vorp"),
         "adp": player.get("adp"),
+        "bye_week": player.get("bye_week"),
         "projection_method": player.get("projection_method"),
         "risk": player.get("risk", {}),
         "flags": player.get("flags", []),
@@ -94,6 +95,11 @@ Use only facts in DRAFT_CONTEXT. Do not use memory for player teams, projections
 rankings, availability, or draft state. You cannot change draft state. Recommend only
 players listed in constraints.candidate_names. If the user asks to record a pick,
 explain that they must use the explicit draft command.
+
+Consider the supplied bye_week for candidates and the user's roster when answering
+who to draft next. Mention the recommended player's bye week in the answer, and call
+out a same-week roster conflict when it materially affects the choice. Treat a null
+bye_week as unknown rather than inventing one.
 
 Return only one JSON object with exactly these fields:
 - schema_version: "1.0"

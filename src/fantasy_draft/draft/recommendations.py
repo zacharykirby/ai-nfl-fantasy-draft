@@ -226,6 +226,7 @@ class DraftRecommendationEngine:
                 "projected_points": player.get("projected_points"),
                 "vorp": player.get("vorp"),
                 "adp": player.get("adp"),
+                "bye_week": player.get("bye_week"),
                 "survival_to_next_pick": survival_probability(player.get("adp"), next_user_pick),
                 "recommendation_score": score,
                 "score_components": {key: round(value, 3) for key, value in components.items()},

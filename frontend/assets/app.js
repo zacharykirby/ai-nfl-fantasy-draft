@@ -485,9 +485,18 @@ function renderAssistant(question, result) {
   byId("assistant-question").textContent = question;
   byId("assistant-source").textContent = `${stale ? "STALE · " : ""}${source} · ${result.latency_ms}ms`;
   byId("assistant-answer").textContent = answer.answer;
+  const recommendedPlayer = [
+    state.cockpit?.recommendation?.primary,
+    ...(state.cockpit?.recommendation?.alternatives || []),
+    ...(state.cockpit?.best_available || []),
+    ...Object.values(state.cockpit?.top_available_by_position || {}).flat(),
+  ].find((player) => player?.player === answer.recommendation);
+  const recommendationBye = recommendedPlayer?.bye_week == null
+    ? ""
+    : ` · Bye ${recommendedPlayer.bye_week}`;
   byId("assistant-recommendation").textContent = stale
     ? `Previous recommendation: ${answer.recommendation || "none"} — ask again`
-    : answer.recommendation ? `Recommendation: ${answer.recommendation}` : "No single-player recommendation";
+    : answer.recommendation ? `Recommendation: ${answer.recommendation}${recommendationBye}` : "No single-player recommendation";
   byId("assistant-rationale").innerHTML = (answer.rationale || []).slice(0, 4)
     .map((item) => `<li>${escapeHtml(item)}</li>`).join("");
   byId("assistant-cautions").innerHTML = (answer.cautions || []).slice(0, 3)

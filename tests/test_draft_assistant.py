@@ -46,6 +46,7 @@ def player(name, position, rank):
         "projected_points": 250 - rank,
         "vorp": 70 - rank,
         "adp": rank,
+        "bye_week": 7 + (rank % 4),
         "projection_method": "published",
         "risk": {"level": "Low", "injury_flag": False},
         "flags": ["High Projection"],
@@ -94,6 +95,8 @@ def test_context_is_bounded_and_contains_deterministic_facts(tmp_path):
     assert len(context["candidate_pool"]) < context["deterministic_recommendation"]["generated_for"].get("available", 999)
     assert context["constraints"]["state_mutation_allowed"] is False
     assert context["deterministic_recommendation"]["primary"]["player"] == "Receiver One"
+    assert context["deterministic_recommendation"]["primary"]["bye_week"] == 9
+    assert all("bye_week" in candidate for candidate in context["candidate_pool"])
     assert set(context["top_available_by_position"]) == {"QB", "RB", "WR", "TE"}
 
 
@@ -103,7 +106,9 @@ def test_prompt_forbids_memory_facts_and_state_mutation(tmp_path):
 
     assert "Use only facts in DRAFT_CONTEXT" in messages[0]["content"]
     assert "cannot change draft state" in messages[0]["content"]
+    assert "Mention the recommended player's bye week" in messages[0]["content"]
     assert "Runner One" in messages[1]["content"]
+    assert '"bye_week":9' in messages[1]["content"]
 
 
 def test_valid_model_response_is_returned_and_request_is_bounded(tmp_path):
