@@ -29,7 +29,7 @@ private_url() {
 funnel_is_clear() {
   local funnel_status
   funnel_status="$(tailscale funnel status)"
-  [[ -z "$funnel_status" || "$funnel_status" == *"(tailnet only)"* ]]
+  [[ -z "$funnel_status" || "$funnel_status" == "No serve config" || "$funnel_status" == *"(tailnet only)"* ]]
 }
 
 server_is_running() {
