@@ -174,6 +174,20 @@ The terminal shows:
 State changes always require explicit `draft` or `undo` commands. Ordinary sentences
 are treated as read-only assistant questions.
 
+### 4. Run privately on a phone
+
+With Tailscale installed and connected on the PC and phone, start the checked private
+deployment:
+
+```bash
+scripts/draft-night-server start
+```
+
+The command validates the board, binds FastAPI to localhost, configures private
+Tailscale Serve, and prints the phone URL. See the
+[draft-night runbook](docs/draft-night-runbook.md) for verification, recovery, and
+shutdown instructions.
+
 ## Live Draft Commands
 
 Record and reverse selections:

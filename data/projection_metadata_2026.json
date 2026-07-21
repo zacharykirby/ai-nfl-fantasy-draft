@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "season": 2026,
-  "retrieved_at": "2026-07-11T00:36:22.675470+00:00",
+  "retrieved_at": "2026-07-20T23:55:25.122054+00:00",
   "output_file": "data/players_2026_positions_bye.csv",
   "sources": {
     "projections": [
@@ -11,20 +11,20 @@
   },
   "provider": "espn",
   "scoring": "half_ppr",
-  "row_count": 446,
+  "row_count": 455,
   "position_counts": {
-    "WR": 192,
-    "RB": 133,
+    "WR": 194,
+    "RB": 139,
     "TE": 80,
-    "QB": 41
+    "QB": 42
   },
   "projection_method_counts": {
     "published": 405,
-    "adp_estimate": 41
+    "adp_estimate": 50
   },
-  "missing_team_count": 8,
-  "missing_bye_week_count": 180,
-  "missing_adp_count": 172,
+  "missing_team_count": 10,
+  "missing_bye_week_count": 152,
+  "missing_adp_count": 142,
   "duplicate_player_position_count": 0,
   "team_conflict_count": 0,
   "team_conflict_examples": []

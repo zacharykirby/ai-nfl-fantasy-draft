@@ -14,8 +14,9 @@ draft-server
 
 Open `http://127.0.0.1:8000`. Use `?session=NAME` to choose a saved session.
 
-The server binds to localhost by default. Tailscale Serve deployment is intentionally
-deferred until the state-changing routes and confirmation UI are complete.
+The server binds to localhost by default. For private phone access, use the
+[draft-night runbook](../draft-night-runbook.md) and its checked launcher; the
+launcher refuses to start when Tailscale Funnel is configured.
 
 ## HTTP contract
 

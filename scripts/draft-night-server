@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PYTHON="$PROJECT_ROOT/venv/bin/python"
+SERVER="$PROJECT_ROOT/venv/bin/draft-server"
+LOG_FILE="$PROJECT_ROOT/draft-server.log"
+SYSTEMD_UNIT="fantasy-draft-assistant.service"
+HOST="127.0.0.1"
+PORT="${DRAFT_SERVER_PORT:-8000}"
+LOCAL_URL="http://${HOST}:${PORT}"
+
+fail() {
+  echo "Error: $*" >&2
+  exit 1
+}
+
+require_runtime() {
+  command -v tailscale >/dev/null || fail "tailscale is not installed"
+  [[ -x "$PYTHON" && -x "$SERVER" ]] || fail "venv is missing; follow the README setup steps"
+  systemctl is-active --quiet tailscaled || fail "tailscaled is stopped; run: sudo systemctl enable --now tailscaled"
+  [[ "$(tailscale status --json | "$PYTHON" -c 'import json,sys; print(json.load(sys.stdin).get("BackendState", ""))')" == "Running" ]] || fail "Tailscale is not connected; run: sudo tailscale up"
+}
+
+private_url() {
+  tailscale status --json | "$PYTHON" -c 'import json,sys; name=json.load(sys.stdin)["Self"]["DNSName"].rstrip("."); print("https://" + name)'
+}
+
+funnel_is_clear() {
+  local funnel_status
+  funnel_status="$(tailscale funnel status)"
+  [[ -z "$funnel_status" || "$funnel_status" == *"(tailnet only)"* ]]
+}
+
+server_is_running() {
+  systemctl --user is-active --quiet "$SYSTEMD_UNIT"
+}
+
+start() {
+  require_runtime
+  funnel_is_clear || fail "Tailscale Funnel is configured; run 'tailscale funnel reset' after reviewing it"
+
+  cd "$PROJECT_ROOT"
+  "$PYTHON" scripts/cli.py --validate-board
+
+  if server_is_running; then
+    echo "Draft server is already running."
+  else
+    systemctl --user reset-failed "$SYSTEMD_UNIT" 2>/dev/null || true
+    systemd-run --user \
+      --unit="${SYSTEMD_UNIT%.service}" \
+      --description="Private NFL fantasy draft cockpit" \
+      --property="WorkingDirectory=$PROJECT_ROOT" \
+      --property="Restart=on-failure" \
+      --property="RestartSec=2s" \
+      --property="StandardOutput=append:$LOG_FILE" \
+      --property="StandardError=append:$LOG_FILE" \
+      "$SERVER" --host "$HOST" --port "$PORT" >/dev/null
+  fi
+
+  local ready=false
+  for _ in {1..30}; do
+    if "$PYTHON" -c "import urllib.request; urllib.request.urlopen('${LOCAL_URL}/api/v1/health', timeout=1).read()" 2>/dev/null; then
+      ready=true
+      break
+    fi
+    sleep 0.2
+  done
+  if [[ "$ready" != true ]]; then
+    echo "Server failed to become healthy; inspect $LOG_FILE" >&2
+    stop_server
+    exit 1
+  fi
+
+  local serve_output
+  if ! serve_output="$(timeout 20 tailscale serve --bg --yes "$LOCAL_URL" 2>&1)"; then
+    stop_server
+    echo "$serve_output" >&2
+    fail "Tailscale Serve could not be configured; follow the Tailscale message above"
+  fi
+  echo "Draft cockpit ready: $(private_url)"
+  echo "Local health: ${LOCAL_URL}/api/v1/health"
+  echo "Log: $LOG_FILE"
+}
+
+stop_server() {
+  if server_is_running; then
+    systemctl --user stop "$SYSTEMD_UNIT"
+  fi
+}
+
+stop() {
+  require_runtime
+  timeout 20 tailscale serve reset || fail "could not clear Serve; check Tailscale operator permission"
+  stop_server
+  echo "Draft server stopped and Tailscale Serve cleared."
+}
+
+status() {
+  require_runtime
+  if server_is_running; then
+    local main_pid
+    main_pid="$(systemctl --user show "$SYSTEMD_UNIT" --property=MainPID --value)"
+    echo "Draft server: running (PID $main_pid)"
+  else
+    echo "Draft server: stopped"
+  fi
+  echo "Private URL: $(private_url)"
+  echo "Funnel clear: $(funnel_is_clear && echo yes || echo NO)"
+  tailscale serve status
+}
+
+case "${1:-start}" in
+  start) start ;;
+  status) status ;;
+  stop) stop ;;
+  *) fail "usage: scripts/draft-night-server [start|status|stop]" ;;
+esac
