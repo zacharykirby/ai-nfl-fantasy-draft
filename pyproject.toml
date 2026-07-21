@@ -30,3 +30,6 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+  "browser: headless Firefox smoke tests for the mobile cockpit",
+]
