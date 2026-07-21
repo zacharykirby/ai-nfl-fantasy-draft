@@ -28,6 +28,7 @@ NAME_SUFFIX_PATTERN = re.compile(r"\s+(?:JR\.?|SR\.?|II|III|IV|V)$", re.IGNORECA
 PLAYER_NAME_ALIASES = {
     "kenny gainwell": "kenneth gainwell",
     "chig okonkwo": "chigoziem okonkwo",
+    "ken walker": "kenneth walker",
 }
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

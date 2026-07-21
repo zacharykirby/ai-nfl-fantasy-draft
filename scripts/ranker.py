@@ -120,6 +120,26 @@ class PlayerRanker:
             logger.info(f"Loaded {len(df)} historical records from {stats_file_general.name}")
             logger.info(f"Historical data columns: {df.columns.tolist()}")
             logger.info(f"Historical data shape: {df.shape}")
+            df['player_match_name'] = df['player_name'].apply(normalize_player_name)
+            identity_columns = ['player_match_name']
+            if 'position' in df.columns:
+                identity_columns.append('position')
+            df = df.sort_values(identity_columns + ['season'], ascending=[True] * len(identity_columns) + [False])
+            canonical_names = df.drop_duplicates(identity_columns).set_index(identity_columns)['player_name']
+            if len(identity_columns) == 1:
+                df['player_name'] = df['player_match_name'].map(canonical_names)
+            else:
+                df['player_name'] = [
+                    canonical_names.get((row['player_match_name'], row['position']), row['player_name'])
+                    for _, row in df.iterrows()
+                ]
+            season_identity = identity_columns + ['season']
+            before_identity_dedup = len(df)
+            df = df.drop_duplicates(subset=season_identity, keep='first')
+            logger.info(
+                "Collapsed %s historical alias rows by normalized player identity",
+                before_identity_dedup - len(df),
+            )
             historical_features = self.build_historical_features(df)
             
             # Load target-season projections with bye weeks if available
@@ -164,8 +184,11 @@ class PlayerRanker:
                 logger.info(f"{self.target_season} projections file not found")
             
             # Get the most recent season data for each player
-            df = df.sort_values(['player_name', 'season'], ascending=[True, False])
-            df = df.drop_duplicates(subset=['player_name'], keep='first')
+            df = df.sort_values(['player_match_name', 'season'], ascending=[True, False])
+            latest_identity = ['player_match_name']
+            if 'position' in df.columns:
+                latest_identity.append('position')
+            df = df.drop_duplicates(subset=latest_identity, keep='first')
             df['player_match_name'] = df['player_name'].apply(normalize_player_name)
             logger.info(f"After deduplication: {len(df)} unique players from historical data")
             if not historical_features.empty:

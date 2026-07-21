@@ -124,6 +124,7 @@ def test_build_deduplicates_name_aliases_and_backfills_role_limit(tmp_path):
     players = complete_players() + [
         ranking("D.J. Moore", "WR", 3, 30, 210, score=80),
         ranking("DJ Moore", "WR", 4, 29, 209, score=79),
+        ranking("D.J. Moore Jr.", "WR", 6, 18, 190, score=68),
         ranking("Backfill Receiver", "WR", 5, 20, 200, score=70),
     ]
     board = DraftBoardBuilder(write_rankings(tmp_path, players)).build(

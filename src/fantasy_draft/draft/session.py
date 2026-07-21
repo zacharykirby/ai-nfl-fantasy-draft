@@ -39,7 +39,9 @@ def utc_now() -> str:
 
 def normalize_name(value: Any) -> str:
     text = str(value or "").strip().casefold().replace("’", "'").replace(".", "")
-    return re.sub(r"[^a-z0-9']+", " ", text).strip()
+    text = re.sub(r"\s+(?:jr|sr|ii|iii|iv|v)$", "", text, flags=re.IGNORECASE)
+    normalized = re.sub(r"[^a-z0-9']+", " ", text).strip()
+    return {"ken walker": "kenneth walker"}.get(normalized, normalized)
 
 
 def snake_team_for_pick(overall_pick: int, league_size: int) -> int:

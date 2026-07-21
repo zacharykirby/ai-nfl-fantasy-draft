@@ -18,11 +18,15 @@ from fantasy_draft.validation.projections import validate_projection_file
 POSITIONS = ("QB", "RB", "WR", "TE")
 DEFAULT_POSITION_LIMITS = {"QB": 20, "RB": 50, "WR": 60, "TE": 20}
 SCHEMA_VERSION = "1.0"
+NAME_SUFFIX_PATTERN = re.compile(r"\s+(?:jr|sr|ii|iii|iv|v)$", re.IGNORECASE)
+PLAYER_NAME_ALIASES = {"ken walker": "kenneth walker"}
 
 
 def normalize_player_identity(value: Any) -> str:
     text = str(value or "").strip().casefold().replace("’", "'").replace(".", "")
-    return re.sub(r"[^a-z0-9']+", " ", text).strip()
+    text = NAME_SUFFIX_PATTERN.sub("", text)
+    normalized = re.sub(r"[^a-z0-9']+", " ", text).strip()
+    return PLAYER_NAME_ALIASES.get(normalized, normalized)
 
 
 @dataclass

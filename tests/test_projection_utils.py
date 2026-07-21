@@ -41,6 +41,7 @@ def test_player_name_normalization_matches_provider_suffixes():
     assert normalize_player_name("Kyle Pitts Sr.") == normalize_player_name("Kyle Pitts")
     assert normalize_player_name("D.J. Moore") == normalize_player_name("DJ Moore")
     assert normalize_player_name("Kenny Gainwell") == normalize_player_name("Kenneth Gainwell")
+    assert normalize_player_name("Ken Walker III") == normalize_player_name("Kenneth Walker")
 
 
 def test_estimates_points_and_overall_rank_from_position_curves():

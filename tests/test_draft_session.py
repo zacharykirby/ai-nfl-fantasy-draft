@@ -77,6 +77,16 @@ def test_unique_last_name_matches_player(tmp_path):
     assert next_pick_for_team(12, team=1, league_size=4, max_rounds=3) is None
 
 
+def test_player_matching_ignores_common_name_suffixes(tmp_path):
+    board_path = write_board(tmp_path)
+    board = json.loads(board_path.read_text(encoding="utf-8"))
+    board["roles"]["RB"][0]["player"] = "Kenneth Walker III"
+    board_path.write_text(json.dumps(board), encoding="utf-8")
+    session = DraftSession.create(tmp_path / "suffix.json", board_path, "suffix", 4, 2, 2)
+
+    assert session.match_player("Ken Walker")["player"] == "Kenneth Walker III"
+
+
 def test_create_snapshots_ready_board_and_persists(tmp_path):
     session = create_session(tmp_path)
 

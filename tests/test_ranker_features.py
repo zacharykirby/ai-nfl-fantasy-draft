@@ -340,3 +340,46 @@ def test_projection_suffix_matches_historical_player_name(tmp_path):
     assert player["name"] == "James Cook"
     assert player["projected_fantasy_points"] == 260
     assert player["weighted_historical_points"] == 300
+
+
+def test_historical_aliases_collapse_to_one_ranked_identity(tmp_path):
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    pd.DataFrame(
+        [
+            {
+                "player_name": "Kenneth Walker",
+                "season": 2025,
+                "position": "RB",
+                "team": "SEA",
+                "fantasy_points": 180,
+                "fantasy_points_ppr": 210,
+                "games": 15,
+            },
+            {
+                "player_name": "Kenneth Walker III",
+                "season": 2025,
+                "position": "RB",
+                "team": "SEA",
+                "fantasy_points": 180,
+                "fantasy_points_ppr": 210,
+                "games": 15,
+            },
+        ]
+    ).to_csv(data_dir / "nfl_player_data.csv", index=False)
+    pd.DataFrame(
+        [
+            {
+                "name": "Ken Walker III",
+                "position": "RB",
+                "team": "KC",
+                "projected_fantasy_points": 235,
+                "rank": 20,
+            }
+        ]
+    ).to_csv(data_dir / "players_2026_positions_bye.csv", index=False)
+
+    loaded = PlayerRanker(data_dir=data_dir, target_season=2026).load_data()
+
+    assert len(loaded) == 1
+    assert loaded.iloc[0]["projected_fantasy_points"] == 235
