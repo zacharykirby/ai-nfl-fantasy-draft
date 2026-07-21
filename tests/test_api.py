@@ -56,6 +56,37 @@ def test_health_board_and_frontend(web_draft):
     assert 'id="health-autosave"' in frontend.text
     assert 'id="health-connectivity"' in frontend.text
     assert frontend.headers["x-frame-options"] == "DENY"
+    assert "default-src 'self'" in frontend.headers["content-security-policy"]
+
+
+def test_private_host_origin_and_request_size_boundaries(web_draft):
+    client = make_client(web_draft)
+
+    untrusted_host = client.get("/api/v1/health", headers={"host": "public.example"})
+    assert untrusted_host.status_code == 400
+
+    cross_origin = client.post(
+        "/api/v1/sessions/phone-test/commands/interpret",
+        headers={"origin": "https://attacker.example"},
+        json={"text": "someone got Bijan"},
+    )
+    assert cross_origin.status_code == 403
+    assert cross_origin.json()["error"]["code"] == "cross_origin_request"
+
+    same_origin = client.post(
+        "/api/v1/sessions/phone-test/commands/interpret",
+        headers={"origin": "https://testserver"},
+        json={"text": "someone got Bijan"},
+    )
+    assert same_origin.status_code == 200
+
+    too_large = client.post(
+        "/api/v1/sessions/phone-test/commands/interpret",
+        content=b"x" * (64 * 1024 + 1),
+        headers={"content-type": "application/json"},
+    )
+    assert too_large.status_code == 413
+    assert too_large.json()["error"]["code"] == "request_too_large"
 
 
 def test_session_reads_match_domain_state(web_draft):
