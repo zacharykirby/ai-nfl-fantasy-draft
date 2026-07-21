@@ -175,6 +175,28 @@ def assign_tiers(df: pd.DataFrame) -> pd.Series:
     ).astype(int)
 
 
+def fill_bye_weeks_from_team(df: pd.DataFrame) -> pd.DataFrame:
+    """Fill missing bye weeks from teammates in the provider data.
+
+    Bye weeks belong to teams, but the ADP feed does not contain every player
+    returned by the projection feed.  Propagating the provider's team-level
+    value keeps projection-only players from losing their bye during the outer
+    merge without maintaining a second schedule by hand.
+    """
+    result = df.copy()
+    result["bye_week"] = result["bye_week"].astype("object")
+    bye_text = result["bye_week"].fillna("").astype(str).str.strip()
+    known = ~bye_text.isin(["", "N/A", "nan"])
+    team_byes = (
+        result.loc[known & result["team"].fillna("").ne(""), ["team", "bye_week"]]
+        .drop_duplicates("team")
+        .set_index("team")["bye_week"]
+    )
+    missing = ~known
+    result.loc[missing, "bye_week"] = result.loc[missing, "team"].map(team_byes).fillna("N/A")
+    return result
+
+
 def build_projection_file(
     season: int = DEFAULT_SEASON,
     scoring: str = "half_ppr",
@@ -216,6 +238,7 @@ def build_projection_file(
     merged.loc[missing_rank, "rank"] = merged[missing_rank].apply(estimate_overall_rank, axis=1)
     merged["adp"] = pd.to_numeric(merged["adp"], errors="coerce")
     merged["bye_week"] = merged["bye_week"].fillna("N/A")
+    merged = fill_bye_weeks_from_team(merged)
     merged["projected_fantasy_points"] = pd.to_numeric(
         merged["projected_fantasy_points"], errors="coerce"
     )

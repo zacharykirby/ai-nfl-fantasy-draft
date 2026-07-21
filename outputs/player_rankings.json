@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generated_at": "2026-07-20T19:43:10.199179",
+    "generated_at": "2026-07-20T19:51:16.427191",
     "target_season": 2026,
     "projection_source": "data/players_2026_positions_bye.csv",
     "news_source": "none",
@@ -7295,7 +7295,7 @@
         "news_component": 0.0,
         "availability_component": -6.18
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Dawson Knox",
@@ -7339,7 +7339,7 @@
         "news_component": 0.0,
         "availability_component": -1.59
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Tyreek Hill",
@@ -7649,7 +7649,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Jalen Coker",
@@ -7781,7 +7781,7 @@
         "news_component": 0.0,
         "availability_component": -1.94
       },
-      "bye_week": "N/A"
+      "bye_week": "5.0"
     },
     {
       "name": "Rashod Bateman",
@@ -7915,7 +7915,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "9.0"
     },
     {
       "name": "Cole Kmet",
@@ -7959,7 +7959,7 @@
         "news_component": 0.0,
         "availability_component": -1.59
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Tyler Higbee",
@@ -8005,7 +8005,7 @@
         "news_component": 0.0,
         "availability_component": -8.65
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Brian Robinson",
@@ -8094,7 +8094,7 @@
         "news_component": 0.0,
         "availability_component": -3.18
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Michael Mayer",
@@ -8139,7 +8139,7 @@
         "news_component": 0.0,
         "availability_component": -4.24
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Cooper Kupp",
@@ -8230,7 +8230,7 @@
         "news_component": 0.0,
         "availability_component": -3.35
       },
-      "bye_week": "N/A"
+      "bye_week": "5.0"
     },
     {
       "name": "Travis Hunter",
@@ -8365,7 +8365,7 @@
         "news_component": 0.0,
         "availability_component": -2.12
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Tyler Allgeier",
@@ -8498,7 +8498,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "5.0"
     },
     {
       "name": "Malik Washington",
@@ -8719,7 +8719,7 @@
         "news_component": 0.0,
         "availability_component": -7.94
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Josh Oliver",
@@ -8764,7 +8764,7 @@
         "news_component": 0.0,
         "availability_component": -4.76
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Dylan Sampson",
@@ -8942,7 +8942,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "James Conner",
@@ -9166,7 +9166,7 @@
         "news_component": 0.0,
         "availability_component": -2.65
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Keon Coleman",
@@ -9301,7 +9301,7 @@
         "news_component": 0.0,
         "availability_component": -4.06
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     },
     {
       "name": "Tanner Hudson",
@@ -9347,7 +9347,7 @@
         "news_component": 0.0,
         "availability_component": -6.53
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Kareem Hunt",
@@ -9437,7 +9437,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Marquise Brown",
@@ -9482,7 +9482,7 @@
         "news_component": 0.0,
         "availability_component": -5.82
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Andrei Iosivas",
@@ -9659,7 +9659,7 @@
         "news_component": 0.0,
         "availability_component": -1.06
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     },
     {
       "name": "Kayshon Boutte",
@@ -9749,7 +9749,7 @@
         "news_component": 0.0,
         "availability_component": -4.76
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Ryan Flournoy",
@@ -9839,7 +9839,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Jaylin Noel",
@@ -9928,7 +9928,7 @@
         "news_component": 0.0,
         "availability_component": -6.0
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Brock Wright",
@@ -9973,7 +9973,7 @@
         "news_component": 0.0,
         "availability_component": -7.24
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Adam Trautman",
@@ -10018,7 +10018,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Cade Stover",
@@ -10063,7 +10063,7 @@
         "news_component": 0.0,
         "availability_component": -7.24
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "KaVontae Turpin",
@@ -10152,7 +10152,7 @@
         "news_component": 0.0,
         "availability_component": -5.65
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Troy Franklin",
@@ -10330,7 +10330,7 @@
         "news_component": 0.0,
         "availability_component": -2.65
       },
-      "bye_week": "N/A"
+      "bye_week": "5.0"
     },
     {
       "name": "Davis Allen",
@@ -10375,7 +10375,7 @@
         "news_component": 0.0,
         "availability_component": -4.94
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Mo Alie-Cox",
@@ -10421,7 +10421,7 @@
         "news_component": 0.0,
         "availability_component": -4.94
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Eli Stowers",
@@ -10511,7 +10511,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Daniel Bellinger",
@@ -10556,7 +10556,7 @@
         "news_component": 0.0,
         "availability_component": -5.65
       },
-      "bye_week": "N/A"
+      "bye_week": "9.0"
     },
     {
       "name": "Dontayvion Wicks",
@@ -10690,7 +10690,7 @@
         "news_component": 0.0,
         "availability_component": -3.0
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Christian Kirk",
@@ -10869,7 +10869,7 @@
         "news_component": 0.0,
         "availability_component": -0.88
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Emari Demercado",
@@ -11138,7 +11138,7 @@
         "news_component": 0.0,
         "availability_component": -4.41
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     },
     {
       "name": "Tre Harris",
@@ -11182,7 +11182,7 @@
         "news_component": 0.0,
         "availability_component": -0.88
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Luke Farrell",
@@ -11227,7 +11227,7 @@
         "news_component": 0.0,
         "availability_component": -4.59
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Ray Davis",
@@ -11316,7 +11316,7 @@
         "news_component": 0.0,
         "availability_component": -7.59
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "John Bates",
@@ -11361,7 +11361,7 @@
         "news_component": 0.0,
         "availability_component": -6.18
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Charlie Kolar",
@@ -11406,7 +11406,7 @@
         "news_component": 0.0,
         "availability_component": -5.65
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Payne Durham",
@@ -11451,7 +11451,7 @@
         "news_component": 0.0,
         "availability_component": -9.0
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Ben Sinnott",
@@ -11496,7 +11496,7 @@
         "news_component": 0.0,
         "availability_component": -8.82
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Sincere McCormick",
@@ -11587,7 +11587,7 @@
         "news_component": 0.0,
         "availability_component": -6.71
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Nick Chubb",
@@ -11721,7 +11721,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Kimani Vidal",
@@ -11811,7 +11811,7 @@
         "news_component": 0.0,
         "availability_component": -3.88
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Trey Benson",
@@ -11990,7 +11990,7 @@
         "news_component": 0.0,
         "availability_component": -2.29
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Denzel Boston",
@@ -12124,7 +12124,7 @@
         "news_component": 0.0,
         "availability_component": -3.35
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Max Klare",
@@ -12169,7 +12169,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Nate Boerkircher",
@@ -12214,7 +12214,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Germie Bernard",
@@ -12303,7 +12303,7 @@
         "news_component": 0.0,
         "availability_component": -2.29
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Jahan Dotson",
@@ -12481,7 +12481,7 @@
         "news_component": 0.0,
         "availability_component": -12.0
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Keaton Mitchell",
@@ -12571,7 +12571,7 @@
         "news_component": 0.0,
         "availability_component": -5.47
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Austin Ekeler",
@@ -12930,7 +12930,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Tez Johnson",
@@ -12974,7 +12974,7 @@
         "news_component": 0.0,
         "availability_component": -1.76
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Antonio Williams",
@@ -13064,7 +13064,7 @@
         "news_component": 0.0,
         "availability_component": -7.76
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "MarShawn Lloyd",
@@ -13290,7 +13290,7 @@
         "news_component": 0.0,
         "availability_component": -3.35
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     },
     {
       "name": "Isaiah Davis",
@@ -13379,7 +13379,7 @@
         "news_component": 0.0,
         "availability_component": -1.59
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Raheim Sanders",
@@ -13514,7 +13514,7 @@
         "news_component": 0.0,
         "availability_component": -4.94
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Chris Bell",
@@ -13694,7 +13694,7 @@
         "news_component": 0.0,
         "availability_component": -8.82
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Jaylin Lane",
@@ -13738,7 +13738,7 @@
         "news_component": 0.0,
         "availability_component": -1.76
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Jawhar Jordan",
@@ -13918,7 +13918,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Chris Brooks",
@@ -14051,7 +14051,7 @@
         "news_component": 0.0,
         "availability_component": -2.65
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Caleb Douglas",
@@ -14186,7 +14186,7 @@
         "news_component": 0.0,
         "availability_component": -1.59
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Cedric Tillman",
@@ -14231,7 +14231,7 @@
         "news_component": 0.0,
         "availability_component": -5.47
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Pierre Strong",
@@ -14365,7 +14365,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "9.0"
     },
     {
       "name": "Emmett Johnson",
@@ -14634,7 +14634,7 @@
         "news_component": 0.0,
         "availability_component": -10.06
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "De'Zhaun Stribling",
@@ -14724,7 +14724,7 @@
         "news_component": 0.0,
         "availability_component": -3.0
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     },
     {
       "name": "Cam Ward",
@@ -15260,7 +15260,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Jarquez Hunter",
@@ -15439,7 +15439,7 @@
         "news_component": 0.0,
         "availability_component": -5.29
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Ashton Dulin",
@@ -15484,7 +15484,7 @@
         "news_component": 0.0,
         "availability_component": -5.47
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Kendre Miller",
@@ -15573,7 +15573,7 @@
         "news_component": 0.0,
         "availability_component": -0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Adam Randall",
@@ -15798,7 +15798,7 @@
         "news_component": 0.0,
         "availability_component": -7.94
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Hollywood Brown",
@@ -16023,7 +16023,7 @@
         "news_component": 0.0,
         "availability_component": -11.47
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Jacob Cowing",
@@ -16068,7 +16068,7 @@
         "news_component": 0.0,
         "availability_component": -12.35
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Khalil Herbert",
@@ -16248,7 +16248,7 @@
         "news_component": 0.0,
         "availability_component": -13.24
       },
-      "bye_week": "N/A"
+      "bye_week": "5.0"
     },
     {
       "name": "Treylon Burks",
@@ -16293,7 +16293,7 @@
         "news_component": 0.0,
         "availability_component": -9.0
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Chris Brazzell II",
@@ -16383,7 +16383,7 @@
         "news_component": 0.0,
         "availability_component": -5.47
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "JuJu Smith-Schuster",
@@ -16427,7 +16427,7 @@
         "news_component": 0.0,
         "availability_component": -2.12
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Tyler Badie",
@@ -16517,7 +16517,7 @@
         "news_component": 0.0,
         "availability_component": -13.24
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Kyle Juszczyk",
@@ -16607,7 +16607,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Jeshaun Jones",
@@ -16652,7 +16652,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Demond Claiborne",
@@ -16832,7 +16832,7 @@
         "news_component": 0.0,
         "availability_component": -6.71
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Julius Chestnut",
@@ -16966,7 +16966,7 @@
         "news_component": 0.0,
         "availability_component": -9.71
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Luke McCaffrey",
@@ -17056,7 +17056,7 @@
         "news_component": 0.0,
         "availability_component": -5.29
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "DeeJay Dallas",
@@ -17101,7 +17101,7 @@
         "news_component": 0.0,
         "availability_component": -9.88
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "George Holani",
@@ -17236,7 +17236,7 @@
         "news_component": 0.0,
         "availability_component": -8.12
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     },
     {
       "name": "Darius Cooper",
@@ -17281,7 +17281,7 @@
         "news_component": 0.0,
         "availability_component": -9.71
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Nicholas Singleton",
@@ -17372,7 +17372,7 @@
         "news_component": 0.0,
         "availability_component": -7.94
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Tahj Brooks",
@@ -17552,7 +17552,7 @@
         "news_component": 0.0,
         "availability_component": -5.29
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Kaytron Allen",
@@ -17642,7 +17642,7 @@
         "news_component": 0.0,
         "availability_component": -8.12
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Max Bredeson",
@@ -17687,7 +17687,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Tua Tagovailoa",
@@ -17776,7 +17776,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "9.0"
     },
     {
       "name": "Andrew Beck",
@@ -17821,7 +17821,7 @@
         "news_component": 0.0,
         "availability_component": -5.29
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Connor Heyward",
@@ -17866,7 +17866,7 @@
         "news_component": 0.0,
         "availability_component": -5.82
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Nikko Remigio",
@@ -17911,7 +17911,7 @@
         "news_component": 0.0,
         "availability_component": -7.24
       },
-      "bye_week": "N/A"
+      "bye_week": "5.0"
     },
     {
       "name": "Mason Tipton",
@@ -17956,7 +17956,7 @@
         "news_component": 0.0,
         "availability_component": -7.59
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Brycen Tremayne",
@@ -18001,7 +18001,7 @@
         "news_component": 0.0,
         "availability_component": -6.71
       },
-      "bye_week": "N/A"
+      "bye_week": "5.0"
     },
     {
       "name": "Kene Nwangwu",
@@ -18046,7 +18046,7 @@
         "news_component": 0.0,
         "availability_component": -9.35
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Adam Prentice",
@@ -18091,7 +18091,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Dareke Young",
@@ -18136,7 +18136,7 @@
         "news_component": 0.0,
         "availability_component": -7.94
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Brenen Thompson",
@@ -18226,7 +18226,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Mason Kinsey",
@@ -18271,7 +18271,7 @@
         "news_component": 0.0,
         "availability_component": -11.12
       },
-      "bye_week": "N/A"
+      "bye_week": "9.0"
     },
     {
       "name": "LaJohntay Wester",
@@ -18316,7 +18316,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Alec Ingold",
@@ -18361,7 +18361,7 @@
         "news_component": 0.0,
         "availability_component": -7.06
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "KeAndre Lambert-Smith",
@@ -18406,7 +18406,7 @@
         "news_component": 0.0,
         "availability_component": -6.18
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Kyle T. Williams",
@@ -18451,7 +18451,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Ben Skowronek",
@@ -18496,7 +18496,7 @@
         "news_component": 0.0,
         "availability_component": -5.12
       },
-      "bye_week": "N/A"
+      "bye_week": "9.0"
     },
     {
       "name": "Michael Burton",
@@ -18542,7 +18542,7 @@
         "news_component": 0.0,
         "availability_component": -5.29
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Jonathan Mingo",
@@ -18587,7 +18587,7 @@
         "news_component": 0.0,
         "availability_component": -7.41
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     },
     {
       "name": "Anthony Gould",
@@ -18632,7 +18632,7 @@
         "news_component": 0.0,
         "availability_component": -8.82
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Kaden Wetjen",
@@ -18677,7 +18677,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "9.0"
     },
     {
       "name": "Malik Benson",
@@ -18767,7 +18767,7 @@
         "news_component": 0.0,
         "availability_component": -6.88
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Kaleb Johnson",
@@ -18857,7 +18857,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Barion Brown",
@@ -18902,7 +18902,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Jimmy Horn Jr.",
@@ -18947,7 +18947,7 @@
         "news_component": 0.0,
         "availability_component": -6.18
       },
-      "bye_week": "N/A"
+      "bye_week": "5.0"
     },
     {
       "name": "David Moore",
@@ -18993,7 +18993,7 @@
         "news_component": 0.0,
         "availability_component": -8.47
       },
-      "bye_week": "N/A"
+      "bye_week": "5.0"
     },
     {
       "name": "Gage Larvadain",
@@ -19038,7 +19038,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Dylan Laube",
@@ -19082,7 +19082,7 @@
         "news_component": 0.0,
         "availability_component": -0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Charlie Jones",
@@ -19127,7 +19127,7 @@
         "news_component": 0.0,
         "availability_component": -6.88
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Arian Smith",
@@ -19172,7 +19172,7 @@
         "news_component": 0.0,
         "availability_component": -3.53
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Derius Davis",
@@ -19217,7 +19217,7 @@
         "news_component": 0.0,
         "availability_component": -5.29
       },
-      "bye_week": "N/A"
+      "bye_week": "7.0"
     },
     {
       "name": "Tai Felton",
@@ -19262,7 +19262,7 @@
         "news_component": 0.0,
         "availability_component": -4.41
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Britain Covey",
@@ -19307,7 +19307,7 @@
         "news_component": 0.0,
         "availability_component": -10.76
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Kameron Johnson",
@@ -19352,7 +19352,7 @@
         "news_component": 0.0,
         "availability_component": -4.94
       },
-      "bye_week": "N/A"
+      "bye_week": "10.0"
     },
     {
       "name": "Deshaun Watson",
@@ -19396,7 +19396,7 @@
         "news_component": 0.0,
         "availability_component": -8.82
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Reggie Virgil",
@@ -19441,7 +19441,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     },
     {
       "name": "British Brooks",
@@ -19486,7 +19486,7 @@
         "news_component": 0.0,
         "availability_component": -10.41
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Efton Chism III",
@@ -19531,7 +19531,7 @@
         "news_component": 0.0,
         "availability_component": -7.94
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Braxton Berrios",
@@ -19576,7 +19576,7 @@
         "news_component": 0.0,
         "availability_component": -11.47
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Ke'Shawn Williams",
@@ -19621,7 +19621,7 @@
         "news_component": 0.0,
         "availability_component": -5.29
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Reggie Gilliam",
@@ -19666,7 +19666,7 @@
         "news_component": 0.0,
         "availability_component": -8.47
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Devin Duvernay",
@@ -19711,7 +19711,7 @@
         "news_component": 0.0,
         "availability_component": -2.47
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     },
     {
       "name": "Patrick Ricard",
@@ -19757,7 +19757,7 @@
         "news_component": 0.0,
         "availability_component": -10.59
       },
-      "bye_week": "N/A"
+      "bye_week": "8.0"
     },
     {
       "name": "Michael Penix Jr.",
@@ -19846,7 +19846,7 @@
         "news_component": 0.0,
         "availability_component": -7.94
       },
-      "bye_week": "N/A"
+      "bye_week": "11.0"
     },
     {
       "name": "Fernando Mendoza",
@@ -19935,7 +19935,7 @@
         "news_component": 0.0,
         "availability_component": -6.71
       },
-      "bye_week": "N/A"
+      "bye_week": "5.0"
     },
     {
       "name": "J.J. McCarthy",
@@ -19980,7 +19980,7 @@
         "news_component": 0.0,
         "availability_component": -6.18
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Kirk Cousins",
@@ -20026,7 +20026,7 @@
         "news_component": 0.0,
         "availability_component": -4.76
       },
-      "bye_week": "N/A"
+      "bye_week": "13.0"
     },
     {
       "name": "Malik Cunningham",
@@ -20116,7 +20116,7 @@
         "news_component": 0.0,
         "availability_component": -5.65
       },
-      "bye_week": "N/A"
+      "bye_week": "6.0"
     },
     {
       "name": "Joe Milton III",
@@ -20161,7 +20161,7 @@
         "news_component": 0.0,
         "availability_component": -12.53
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     },
     {
       "name": "Carson Beck",
@@ -20206,7 +20206,7 @@
         "news_component": 0.0,
         "availability_component": 0.0
       },
-      "bye_week": "N/A"
+      "bye_week": "14.0"
     }
   ]
 }

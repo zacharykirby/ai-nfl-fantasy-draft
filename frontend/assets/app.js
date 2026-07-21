@@ -46,7 +46,7 @@ function playerRow(player) {
   return `<div class="player-row">
     <div>
       <div class="player-name">${escapeHtml(player.player)}</div>
-      <div class="player-detail">${escapeHtml(player.position)} · ${escapeHtml(player.team || "FA")} · Tier ${player.tier ?? "—"}</div>
+      <div class="player-detail">${escapeHtml(player.position)} · ${escapeHtml(player.team || "FA")} · Bye ${player.bye_week ?? "—"} · Tier ${player.tier ?? "—"}</div>
     </div>
     <div class="rank-badge">${escapeHtml(player.position)}${player.position_rank ?? "—"}</div>
   </div>`;
@@ -84,7 +84,7 @@ function render(cockpit) {
   const primary = recommendation?.primary;
   byId("primary-player").textContent = primary?.player || "Draft complete";
   byId("primary-meta").textContent = primary
-    ? `${primary.position}${primary.position_rank} · ${primary.team || "FA"} · Tier ${primary.tier} · ${Number(primary.vorp || 0).toFixed(1)} VORP`
+    ? `${primary.position}${primary.position_rank} · ${primary.team || "FA"} · Bye ${primary.bye_week ?? "—"} · Tier ${primary.tier} · ${Number(primary.vorp || 0).toFixed(1)} VORP`
     : "No active recommendation";
   byId("confidence").textContent = recommendation ? `${Math.round(recommendation.confidence * 100)}%` : "—";
   byId("mode").textContent = recommendation?.mode || "complete";

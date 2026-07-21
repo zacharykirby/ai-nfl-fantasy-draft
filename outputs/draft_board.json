@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
   "metadata": {
-    "generated_at": "2026-07-20T19:43:23.681877",
+    "generated_at": "2026-07-20T19:51:17.073440",
     "season": 2026,
     "source_rankings": "outputs/player_rankings.json",
-    "source_generated_at": "2026-07-20T19:43:10.199179",
+    "source_generated_at": "2026-07-20T19:51:16.427191",
     "projection_source": "data/players_2026_positions_bye.csv",
     "news_source": "none",
     "ranking_method": "blended_score_then_vorp_then_source_rank",
@@ -6786,7 +6786,7 @@
       {
         "severity": "warning",
         "code": "bye_week_coverage_low",
-        "message": "151 players are missing bye week data (33.3%)"
+        "message": "10 players are missing bye week data (2.2%)"
       }
     ]
   }

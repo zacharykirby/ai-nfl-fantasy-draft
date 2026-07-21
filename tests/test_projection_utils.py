@@ -11,6 +11,7 @@ from fetch_2026_projections import (
     assign_tiers,
     estimate_overall_rank,
     estimate_points_from_adp,
+    fill_bye_weeks_from_team,
     flatten_columns,
     parse_position_rank,
     parse_position_rank_number,
@@ -56,6 +57,20 @@ def test_assign_tiers_uses_overall_rank_bins():
     df = pd.DataFrame({"rank": [1, 25, 61, 101, 200]})
 
     assert assign_tiers(df).tolist() == [1, 2, 3, 4, 5]
+
+
+def test_fill_bye_weeks_from_team_covers_projection_only_players():
+    df = pd.DataFrame(
+        [
+            {"name": "ADP player", "team": "BUF", "bye_week": 7},
+            {"name": "Projection player", "team": "BUF", "bye_week": None},
+            {"name": "Free agent", "team": "", "bye_week": None},
+        ]
+    )
+
+    result = fill_bye_weeks_from_team(df)
+
+    assert result["bye_week"].tolist() == [7, 7, "N/A"]
 
 
 def test_flatten_columns_handles_multiindex_and_duplicates():
