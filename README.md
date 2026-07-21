@@ -188,6 +188,15 @@ Tailscale Serve, and prints the phone URL. See the
 [draft-night runbook](docs/draft-night-runbook.md) for verification, recovery, and
 shutdown instructions.
 
+Generate the static emergency board before draft night:
+
+```bash
+venv/bin/python scripts/generate_emergency_cheatsheet.py
+```
+
+The printable fallback is written to `outputs/emergency_draft_cheatsheet.md`. It does
+not track selections; cross off drafted players manually.
+
 ## Live Draft Commands
 
 Record and reverse selections:
