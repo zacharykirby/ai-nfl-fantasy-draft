@@ -1429,7 +1429,10 @@ def main():
     """Main function to run the ranking system"""
     try:
         # Initialize ranker
-        ranker = PlayerRanker(max_players=200)
+        # Keep the standalone entry point aligned with the pipeline default. A
+        # 200-player global cutoff prevents the deeper canonical board from being
+        # populated even when the projection source contains enough players.
+        ranker = PlayerRanker(max_players=500)
         
         # Generate rankings
         logger.info("Starting player ranking process...")

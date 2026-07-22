@@ -25,7 +25,8 @@ used instead.
 ## State guarantees
 
 - Session creation is blocked unless board health is `ready`.
-- The board must contain at least as many players as planned draft selections.
+- The board must cover all planned selections plus a meaningful reserve: at least
+  one additional league round or 10% of scheduled picks, whichever is larger.
 - Snake-order ownership is validated for every pick.
 - A player cannot be selected twice.
 - Ambiguous fuzzy matches never mutate state.

@@ -64,10 +64,10 @@ def make_session(tmp_path):
             "bench_size": 2,
         },
         "roles": {
-            "QB": [player("Quarterback One", "QB", 7), player("Quarterback Two", "QB", 8)],
+            "QB": [player("Quarterback One", "QB", 7), player("Quarterback Two", "QB", 8), player("Quarterback Reserve", "QB", 97)],
             "RB": [player("Runner One", "RB", 1), player("Runner Two", "RB", 4)],
             "WR": [player("Receiver One", "WR", 2), player("Receiver Two", "WR", 5)],
-            "TE": [player("Tight End One", "TE", 3), player("Tight End Two", "TE", 6)],
+            "TE": [player("Tight End One", "TE", 3), player("Tight End Two", "TE", 6), player("Tight End Reserve", "TE", 98)],
         },
     }
     board_path = tmp_path / "board.json"

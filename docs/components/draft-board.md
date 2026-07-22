@@ -15,8 +15,14 @@ python scripts/cli.py --show-board --position WR --top 15
 python scripts/cli.py --validate-board
 ```
 
-Default role limits are QB 20, RB 50, WR 60, and TE 20. Use `--board-top N` to
-apply one limit to every role.
+The canonical default is 330 players: QB 40, RB 110, WR 140, and TE 40. The
+RB/WR weighting preserves late-round skill-position depth. Use `--board-top N`
+to apply one explicit limit to every role.
+
+Board metadata reports the source ranking count, eligible counts after the
+positive-projection/position/identity filters, final role counts, and exclusions
+caused by role limits. This makes a shallow upstream source distinguishable from a
+deliberately capped board.
 
 ## Top-level structure
 

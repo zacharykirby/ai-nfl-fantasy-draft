@@ -13,6 +13,7 @@ from fantasy_draft.draft.session import (
     DraftSessionError,
     PlayerNotFoundError,
     next_pick_for_team,
+    required_board_capacity,
     snake_team_for_pick,
 )
 
@@ -41,10 +42,10 @@ def write_board(tmp_path, ready=True):
         },
         "health": {"status": "ready" if ready else "not_ready"},
         "roles": {
-            "QB": [player("Josh Allen", "QB", 1, 12), player("Joe Burrow", "QB", 2, 20)],
-            "RB": [player("Jahmyr Gibbs", "RB", 1, 1), player("Josh Jacobs", "RB", 2, 8)],
-            "WR": [player("Ja'Marr Chase", "WR", 1, 2), player("Puka Nacua", "WR", 2, 3)],
-            "TE": [player("Brock Bowers", "TE", 1, 15), player("Trey McBride", "TE", 2, 18)],
+            "QB": [player("Josh Allen", "QB", 1, 12), player("Joe Burrow", "QB", 2, 20), player("Lamar Jackson", "QB", 3, 24)],
+            "RB": [player("Jahmyr Gibbs", "RB", 1, 1), player("Josh Jacobs", "RB", 2, 8), player("Bijan Robinson", "RB", 3, 9)],
+            "WR": [player("Ja'Marr Chase", "WR", 1, 2), player("Puka Nacua", "WR", 2, 3), player("CeeDee Lamb", "WR", 3, 4)],
+            "TE": [player("Brock Bowers", "TE", 1, 15), player("Trey McBride", "TE", 2, 18), player("George Kittle", "TE", 3, 22)],
         },
     }
     path = tmp_path / "draft_board.json"
@@ -93,7 +94,7 @@ def test_create_snapshots_ready_board_and_persists(tmp_path):
     assert session.path.exists()
     assert session.current_pick == 1
     assert session.current_team == 1
-    assert session.payload["board"]["player_count"] == 8
+    assert session.payload["board"]["player_count"] == 12
     assert session.summary()["next_user_pick"] == 2
     assert DraftSession.load(session.path).payload["session"]["id"] == session.payload["session"]["id"]
 
@@ -105,8 +106,11 @@ def test_not_ready_board_cannot_start_live_session(tmp_path):
         )
 
 
-def test_board_must_cover_every_planned_pick(tmp_path):
-    with pytest.raises(DraftSessionError, match="requires 12"):
+def test_board_requires_meaningful_capacity_above_planned_picks(tmp_path):
+    assert required_board_capacity(4, 2) == (12, 4)
+    assert required_board_capacity(12, 20) == (264, 24)
+
+    with pytest.raises(DraftSessionError, match="requires at least 16"):
         DraftSession.create(
             tmp_path / "session.json", write_board(tmp_path), "too-deep", 4, 3, 1
         )
@@ -162,7 +166,7 @@ def test_available_players_are_position_filtered_and_board_ordered(tmp_path):
     session = create_session(tmp_path)
 
     assert [item["player"] for item in session.available_players("WR")] == [
-        "Ja'Marr Chase", "Puka Nacua"
+        "Ja'Marr Chase", "Puka Nacua", "CeeDee Lamb"
     ]
 
 
@@ -192,7 +196,7 @@ def test_full_draft_simulation_survives_reload(tmp_path):
     assert resumed.payload["session"]["status"] == "complete"
     assert resumed.current_pick == 9
     assert resumed.current_team is None
-    assert resumed.available_players() == []
+    assert len(resumed.available_players()) == 4
     assert [item["player"] for item in resumed.roster(team=2)] == ["Ja'Marr Chase", "Trey McBride"]
 
 

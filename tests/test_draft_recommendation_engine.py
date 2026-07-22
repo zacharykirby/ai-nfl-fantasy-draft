@@ -48,6 +48,7 @@ def make_session(tmp_path, user_team=1):
         "TE": [
             player("Tight End One", "TE", 15, 1, 35),
             player("Tight End Two", "TE", 35, 2, 10, tier=2),
+            player("Tight End Reserve", "TE", 99, 3, -20, tier=3),
         ],
     }
     board = {

@@ -2,6 +2,7 @@
 """Persistent, event-backed live fantasy draft sessions."""
 
 import json
+import math
 import os
 import re
 from dataclasses import dataclass
@@ -14,6 +15,7 @@ from uuid import uuid4
 
 SESSION_SCHEMA_VERSION = "1.0"
 BOARD_POSITIONS = ("QB", "RB", "WR", "TE")
+MINIMUM_CAPACITY_RESERVE_FRACTION = 0.10
 
 
 class DraftSessionError(ValueError):
@@ -58,6 +60,22 @@ def next_pick_for_team(current_pick: int, team: int, league_size: int, max_round
         if snake_team_for_pick(pick, league_size) == team:
             return pick
     return None
+
+
+def required_board_capacity(league_size: int, rounds: int) -> Tuple[int, int]:
+    """Return required capacity and reserve for a planned draft.
+
+    The reserve is at least one full round and otherwise ten percent of the
+    scheduled picks. This keeps the canonical universe meaningfully deeper than
+    the draft itself instead of accepting a board that is exhausted at the final
+    selection.
+    """
+    scheduled_picks = league_size * rounds
+    reserve = max(
+        league_size,
+        int(math.ceil(scheduled_picks * MINIMUM_CAPACITY_RESERVE_FRACTION)),
+    )
+    return scheduled_picks + reserve, reserve
 
 
 def load_json(path: Path) -> Dict[str, Any]:
@@ -135,11 +153,14 @@ class DraftSession:
         players = board_players(board)
         if not players:
             raise DraftSessionError("Draft board contains no players")
-        required_players = league_size * rounds
+        scheduled_picks = league_size * rounds
+        required_players, reserve_players = required_board_capacity(league_size, rounds)
         if len(players) < required_players:
             raise DraftSessionError(
-                "Draft board has {} players but this draft requires {}. Rebuild with larger role limits.".format(
-                    len(players), required_players
+                "Draft board has {} players but this {}-pick draft requires at least {} "
+                "({} picks plus a {}-player reserve). Rebuild with larger role limits.".format(
+                    len(players), scheduled_picks, required_players,
+                    scheduled_picks, reserve_players,
                 )
             )
 

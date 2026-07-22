@@ -16,7 +16,10 @@ from fantasy_draft.validation.projections import validate_projection_file
 
 
 POSITIONS = ("QB", "RB", "WR", "TE")
-DEFAULT_POSITION_LIMITS = {"QB": 20, "RB": 50, "WR": 60, "TE": 20}
+# The canonical live-draft universe is deliberately deeper than a normal league.
+# RB and WR receive most of the reserve because late-round picks, handcuffs, and
+# waiver-adjacent depth are concentrated at those positions.
+DEFAULT_POSITION_LIMITS = {"QB": 40, "RB": 110, "WR": 140, "TE": 40}
 SCHEMA_VERSION = "1.0"
 NAME_SUFFIX_PATTERN = re.compile(r"\s+(?:jr|sr|ii|iii|iv|v)$", re.IGNORECASE)
 PLAYER_NAME_ALIASES = {"ken walker": "kenneth walker"}
@@ -167,6 +170,7 @@ class DraftBoardBuilder:
         metadata, rankings = self.load_rankings()
 
         roles: Dict[str, List[Dict[str, Any]]] = {}
+        eligible_role_counts: Dict[str, int] = {}
         for position in POSITIONS:
             candidates = [
                 player for player in rankings
@@ -184,6 +188,7 @@ class DraftBoardBuilder:
                     continue
                 seen_names.add(identity)
                 unique_candidates.append(player)
+            eligible_role_counts[position] = len(unique_candidates)
             limit = max(0, int(limits.get(position, 0)))
             roles[position] = [
                 self._player(player, index)
@@ -202,6 +207,11 @@ class DraftBoardBuilder:
                 "ranking_method": "blended_score_then_vorp_then_source_rank",
                 "ranking_count": len(rankings),
                 "role_counts": {position: len(players) for position, players in roles.items()},
+                "eligible_role_counts": eligible_role_counts,
+                "role_limit_exclusions": {
+                    position: max(0, eligible_role_counts[position] - len(roles[position]))
+                    for position in POSITIONS
+                },
             },
             "league": asdict(league),
             "roles": roles,

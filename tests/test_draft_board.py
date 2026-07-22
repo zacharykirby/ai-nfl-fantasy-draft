@@ -221,3 +221,33 @@ def test_league_config_and_text_format(tmp_path):
     assert "RB PRIORITIES" in output
     assert "Running Back" in output
     assert "QB PRIORITIES" not in output
+
+
+def test_default_board_universe_is_330_and_weighted_to_rb_wr(tmp_path):
+    players = []
+    available = {"QB": 42, "RB": 138, "WR": 194, "TE": 80}
+    overall = 1
+    for position, count in available.items():
+        for rank in range(1, count + 1):
+            players.append({
+                "name": f"{position} Player {rank}",
+                "pos": position,
+                "team": "TST",
+                "score": 1000 - overall,
+                "VORP": 500 - overall,
+                "projected_fantasy_points": 300 - (rank / 10),
+                "projection_rank": overall,
+            })
+            overall += 1
+
+    path = write_rankings(tmp_path, players)
+    board = DraftBoardBuilder(path).build()
+
+    assert board["metadata"]["role_counts"] == {
+        "QB": 40, "RB": 110, "WR": 140, "TE": 40,
+    }
+    assert sum(board["metadata"]["role_counts"].values()) == 330
+    assert board["metadata"]["eligible_role_counts"] == available
+    assert board["metadata"]["role_limit_exclusions"] == {
+        "QB": 2, "RB": 28, "WR": 54, "TE": 40,
+    }
