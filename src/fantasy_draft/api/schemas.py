@@ -180,6 +180,19 @@ class AssistantAnswerResponse(BaseModel):
     timeout_seconds: int
 
 
+class StrategyRequest(BaseModel):
+    mode: str = "balanced"
+    generated_for_pick: Optional[int] = Field(default=None, ge=1)
+
+
+class StrategyResponse(BaseModel):
+    assessment: Dict[str, Any]
+    freshness: Dict[str, Any]
+    source: str
+    model: Optional[str] = None
+    latency_ms: int
+
+
 class PickRequest(BaseModel):
     player: str = Field(min_length=1, max_length=100)
     request_id: str = Field(min_length=8, max_length=100)

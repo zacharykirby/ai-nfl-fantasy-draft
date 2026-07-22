@@ -88,6 +88,36 @@ def test_player_matching_ignores_common_name_suffixes(tmp_path):
     assert session.match_player("Ken Walker")["player"] == "Kenneth Walker III"
 
 
+def test_loading_legacy_session_collapses_duplicate_player_aliases(tmp_path):
+    session = create_session(tmp_path)
+    template = dict(session.payload["board"]["players"][0])
+    aliases = []
+    for rank, name in enumerate(
+        ["Kenneth Walker", "Kenneth Walker III", "Ken Walker III"], start=13
+    ):
+        alias = dict(template)
+        alias.update(
+            player(name, "RB", rank, rank),
+            player_id="RB:{}".format(name.casefold()),
+        )
+        aliases.append(alias)
+    session.payload["board"]["players"].extend(aliases)
+    session.payload["board"]["player_count"] += len(aliases)
+    session.path.write_text(json.dumps(session.payload), encoding="utf-8")
+
+    loaded = DraftSession.load(session.path)
+
+    matches = [
+        item for item in loaded.available_players("RB")
+        if item["player_id"] == "RB:kenneth walker"
+    ]
+    assert len(matches) == 1
+    assert loaded.match_player("Kenneth Walker")["player"] == "Kenneth Walker"
+    assert loaded.payload["board"]["player_count"] == len(
+        loaded.payload["board"]["players"]
+    )
+
+
 def test_create_snapshots_ready_board_and_persists(tmp_path):
     session = create_session(tmp_path)
 

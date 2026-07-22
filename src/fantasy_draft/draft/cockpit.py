@@ -106,6 +106,7 @@ class DraftCockpitService:
                 "id": session_meta["id"],
                 "name": session_meta["name"],
                 "status": session_meta["status"],
+                "revision": session_meta["updated_at"],
                 "round": min(
                     self.session.rounds,
                     ((current_pick - 1) // self.session.league_size) + 1,

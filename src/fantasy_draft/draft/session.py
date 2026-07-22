@@ -128,7 +128,40 @@ class DraftSession:
     def __init__(self, payload: Dict[str, Any], path: Path):
         self.payload = payload
         self.path = Path(path)
+        self._canonicalize_board_snapshot()
         self._validate_payload()
+
+    def _canonicalize_board_snapshot(self) -> None:
+        """Migrate legacy snapshots that stored aliases as separate players."""
+        board = self.payload.get("board")
+        if not isinstance(board, dict) or not isinstance(board.get("players"), list):
+            return
+
+        canonical_players: List[Dict[str, Any]] = []
+        canonical_ids: Dict[str, str] = {}
+        seen = set()
+        for raw in board["players"]:
+            if not isinstance(raw, dict):
+                continue
+            player = dict(raw)
+            position = str(player.get("position", "")).upper()
+            name = str(player.get("player", "")).strip()
+            canonical_id = "{}:{}".format(position, normalize_name(name))
+            old_id = str(player.get("player_id", canonical_id))
+            canonical_ids[old_id] = canonical_id
+            if not name or canonical_id in seen:
+                continue
+            seen.add(canonical_id)
+            player["player_id"] = canonical_id
+            canonical_players.append(player)
+
+        board["players"] = canonical_players
+        board["player_count"] = len(canonical_players)
+        for event in self.payload.get("events", []):
+            if isinstance(event, dict) and event.get("type") == "selection":
+                event["player_id"] = canonical_ids.get(
+                    str(event.get("player_id")), str(event.get("player_id"))
+                )
 
     @classmethod
     def create(

@@ -1,3 +1,5 @@
+const AUTO_STRATEGY_THRESHOLD = 2;
+
 const state = {
   cockpit: null,
   position: "ALL",
@@ -17,6 +19,11 @@ const state = {
   searchTimer: null,
   searchSequence: 0,
   serverOnline: false,
+  strategyController: null,
+  strategySequence: 0,
+  strategyKey: null,
+  strategyResult: null,
+  strategyAutoAttempts: new Set(),
 };
 
 const byId = (id) => document.getElementById(id);
@@ -124,6 +131,7 @@ function render(cockpit) {
   );
   renderHealth(cockpit.health);
   byId("undo-last").disabled = cockpit.recent_picks.length === 0;
+  syncStrategyForCockpit(cockpit);
   const teamSelect = byId("log-team");
   const selectedTeam = teamSelect.value;
   teamSelect.innerHTML = `<option value="">All teams</option>${Array.from(
@@ -134,6 +142,96 @@ function render(cockpit) {
   if (state.view !== "cockpit") {
     queueMicrotask(() => refreshActiveView().catch((error) => showNotice(error.message)));
   }
+}
+
+function strategyKey(cockpit = state.cockpit) {
+  if (!cockpit?.session || !state.session) return null;
+  return `${state.session}:${cockpit.session.current_pick}:${cockpit.session.revision}:balanced`;
+}
+
+function setStrategyState(status, message) {
+  byId("strategy-status").textContent = status;
+  byId("strategy-summary").textContent = message;
+  byId("strategy-details").hidden = true;
+  byId("strategy-confidence").textContent = "—";
+  const button = byId("analyze-strategy");
+  button.disabled = status === "Analyzing" || !state.cockpit?.recommendation;
+  button.textContent = status === "Analyzing" ? "Analyzing…" : state.strategyResult ? "Refresh strategy" : "Analyze my turn";
+  byId("strategy-card").classList.toggle("stale", status === "Stale");
+}
+
+function syncStrategyForCockpit(cockpit) {
+  const key = strategyKey(cockpit);
+  let changed = false;
+  if (state.strategyKey && state.strategyKey !== key) {
+    changed = true;
+    state.strategyController?.abort();
+    state.strategySequence += 1;
+    state.strategyKey = null;
+    state.strategyResult = null;
+    setStrategyState("Stale", "The draft changed. Refreshing strategy when appropriate.");
+  }
+  const session = cockpit.session;
+  const eligible = session.status === "active" && session.next_user_pick != null;
+  if (!eligible) {
+    setStrategyState("Unavailable", "No upcoming user pick remains.");
+    return;
+  }
+  if (session.picks_until_user <= AUTO_STRATEGY_THRESHOLD && !state.strategyAutoAttempts.has(key)) {
+    state.strategyAutoAttempts.add(key);
+    queueMicrotask(() => requestStrategy(true));
+  } else if (!changed && !state.strategyResult && !state.strategyController) {
+    setStrategyState("Not requested", "Analyze positional urgency for your upcoming turn.");
+  }
+}
+
+async function requestStrategy(automatic = false) {
+  if (!state.session || !state.cockpit?.recommendation || state.strategyController) return;
+  const requestedKey = strategyKey();
+  const requestedPick = state.cockpit.session.current_pick;
+  const sequence = ++state.strategySequence;
+  const controller = new AbortController();
+  state.strategyController = controller;
+  state.strategyKey = requestedKey;
+  setStrategyState("Analyzing", automatic ? "Building a plan before your turn…" : "Analyzing your upcoming turn…");
+  try {
+    const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/assistant/strategy`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "balanced", generated_for_pick: requestedPick }),
+      signal: controller.signal,
+    });
+    if (sequence !== state.strategySequence || requestedKey !== strategyKey()) return;
+    if (result.freshness.stale || result.freshness.current_revision !== state.cockpit.session.revision) {
+      state.strategyResult = null;
+      setStrategyState("Stale", "Draft state changed while the plan was being prepared.");
+      return;
+    }
+    state.strategyKey = requestedKey;
+    state.strategyResult = result;
+    renderStrategy(result);
+  } catch (error) {
+    if (error.name === "AbortError" || sequence !== state.strategySequence) return;
+    setStrategyState("Unavailable", "Strategy analysis is unavailable. The recommendation above remains current.");
+  } finally {
+    if (state.strategyController === controller) state.strategyController = null;
+  }
+}
+
+function renderStrategy(result) {
+  const assessment = result.assessment;
+  const fallback = result.source !== "model";
+  byId("strategy-status").textContent = fallback ? "Local fallback" : "Ready";
+  byId("strategy-confidence").textContent = `${Math.round(assessment.confidence * 100)}%`;
+  byId("strategy-summary").textContent = assessment.summary;
+  byId("strategy-primary").textContent = assessment.primary_player ? `Priority: ${assessment.primary_player}` : "Priority: Best positional value";
+  byId("strategy-fallbacks").textContent = assessment.fallback_players.length ? `Fallback: ${assessment.fallback_players.join(", ")}` : "";
+  byId("strategy-wait").textContent = assessment.wait_positions.length ? `Can wait: ${assessment.wait_positions.join(", ")}` : "";
+  byId("strategy-cautions").innerHTML = assessment.cautions.slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  byId("strategy-details").hidden = false;
+  byId("analyze-strategy").disabled = false;
+  byId("analyze-strategy").textContent = "Refresh strategy";
+  byId("strategy-card").classList.remove("stale");
 }
 
 function renderAvailable() {
@@ -710,6 +808,7 @@ byId("new-session-form").addEventListener("submit", async (event) => {
   }
 });
 byId("assistant-cancel").addEventListener("click", () => state.askController?.abort());
+byId("analyze-strategy").addEventListener("click", () => requestStrategy(false));
 document.querySelectorAll(".prompt-chip").forEach((button) => {
   button.addEventListener("click", () => {
     byId("command-input").value = button.textContent.trim();

@@ -383,6 +383,33 @@ def test_read_only_assistant_route_uses_deterministic_fallback(web_draft):
     assert web_draft["session"].path.read_bytes() == before
 
 
+def test_read_only_strategy_route_falls_back_without_mutation(web_draft):
+    class OfflineClient:
+        model = "offline/test"
+
+        def chat(self, **kwargs):
+            assert kwargs["timeout"] == 5
+            return "Error: simulated offline model"
+
+    api = make_client(web_draft, assistant_client_factory=OfflineClient)
+    path = web_draft["session"].path
+    before = path.read_bytes()
+
+    response = api.post(
+        "/api/v1/sessions/phone-test/assistant/strategy",
+        json={"mode": "balanced", "generated_for_pick": 2},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["source"] == "deterministic_fallback"
+    assert payload["assessment"]["primary_player"] == "Bijan Robinson"
+    assert payload["freshness"]["stale"] is False
+    assert DraftSession.load(path).current_pick == 2
+    assert len(DraftSession.load(path).payload["events"]) == 1
+    assert path.read_bytes() == before
+
+
 def test_undo_route_returns_refreshed_cockpit(web_draft):
     client = make_client(web_draft)
 

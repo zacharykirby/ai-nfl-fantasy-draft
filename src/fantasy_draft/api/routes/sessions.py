@@ -32,9 +32,11 @@ from fantasy_draft.api.schemas import (
     SessionDeleteRequest,
     SessionDeleteResponse,
     SessionListResponse,
+    StrategyRequest,
+    StrategyResponse,
     UndoRequest,
 )
-from fantasy_draft.assistant import DraftAssistantQueryService
+from fantasy_draft.assistant import DraftAssistantQueryService, DraftStrategyService
 from fantasy_draft.draft.cockpit import DraftCockpitService, player_view
 from fantasy_draft.draft.commands import bulk_pick_queries, pick_query
 from fantasy_draft.draft.mutations import (
@@ -245,6 +247,18 @@ def ask_assistant(
         client=client,
         timeout=12,
     ).ask(request.question, mode=request.mode)
+
+
+@router.post("/{session_name}/assistant/strategy", response_model=StrategyResponse)
+def assess_strategy(
+    session_name: str,
+    request: StrategyRequest,
+    repository: SessionRepository = Depends(session_repository),
+    client: Any = Depends(assistant_client),
+) -> Dict[str, Any]:
+    return DraftStrategyService(
+        repository.path(session_name), client=client, timeout=5
+    ).assess(mode=request.mode, generated_for_pick=request.generated_for_pick)
 
 
 @router.post("/{session_name}/picks", response_model=MutationResponse)

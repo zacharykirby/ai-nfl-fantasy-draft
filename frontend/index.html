@@ -69,6 +69,21 @@
         <button id="draft-primary" class="quick-draft primary-quick-draft" type="button" disabled>Draft recommendation</button>
       </section>
 
+      <section id="strategy-card" class="card strategy-card" aria-live="polite">
+        <div class="card-heading">
+          <div><p class="eyebrow">DRAFT PLAN</p><h2 id="strategy-status">Not requested</h2></div>
+          <span id="strategy-confidence" class="pill muted">—</span>
+        </div>
+        <p id="strategy-summary" class="assistant-answer">Analyze positional urgency for your upcoming turn.</p>
+        <div id="strategy-details" hidden>
+          <p id="strategy-primary" class="assistant-recommendation"></p>
+          <p id="strategy-fallbacks" class="player-meta"></p>
+          <p id="strategy-wait" class="player-meta"></p>
+          <ul id="strategy-cautions" class="caution-list"></ul>
+        </div>
+        <button id="analyze-strategy" class="action-button strategy-button" type="button">Analyze my turn</button>
+      </section>
+
       <section id="assistant-card" class="card assistant-card" hidden aria-live="polite">
         <div class="card-heading">
           <div>
