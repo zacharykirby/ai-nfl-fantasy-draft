@@ -56,9 +56,9 @@ class Colors:
 class FantasyCLI:
     """Main CLI class for the NFL Fantasy Draft Assistant"""
     
-    def __init__(self):
+    def __init__(self, league_size: int = 10):
         self.data_ingester = FantasyDataIngester()
-        self.ranker = PlayerRanker()
+        self.ranker = PlayerRanker(league_size=league_size)
         self.draft_recommender = None  # Initialize lazily to avoid connection issues
         
     def print_banner(self):
@@ -909,7 +909,7 @@ Examples:
     args = parser.parse_args()
     
     # Initialize CLI
-    cli = FantasyCLI()
+    cli = FantasyCLI(league_size=args.league_size)
     
     try:
         if args.pipeline:

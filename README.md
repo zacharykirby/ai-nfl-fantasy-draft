@@ -65,7 +65,8 @@ draft-night readiness.
 - Undo and session recovery
 - Best available players by position
 - Safe, balanced, and upside recommendation modes
-- Tier cliffs, roster needs, recent position runs, and next-pick survival estimates
+- League-aware replacement value, round-sensitive roster needs, tier cliffs, recent
+  position runs, and disclosed player/tier survival estimates
 
 ### Optional model reasoning
 

@@ -42,7 +42,7 @@ def test_build_score_features_uses_explicit_weighted_components():
             "historical_points_component": 65.0,
             "consistency_component": 11.25,
             "usage_component": 1.0,
-            "team_offense_component": 10.0,
+            "team_offense_component": 0.0,
             "projection_tier_component": 15.0,
             "projection_rank_component": 10.0,
             "news_component": 0.0,
@@ -50,6 +50,17 @@ def test_build_score_features_uses_explicit_weighted_components():
         }
     )
     assert ranker.calculate_raw_score(sample_player_row()) == pytest.approx(sum(features.values()))
+
+
+def test_unsourced_static_team_quality_buckets_are_not_scored():
+    ranker = PlayerRanker()
+
+    buffalo = ranker.build_score_features(sample_player_row(team="BUF"))
+    carolina = ranker.build_score_features(sample_player_row(team="CAR"))
+
+    assert buffalo["team_offense_component"] == 0.0
+    assert carolina["team_offense_component"] == 0.0
+    assert not hasattr(ranker, "team_tiers")
 
 
 def test_build_historical_features_weights_recent_seasons():
@@ -248,6 +259,8 @@ def test_export_rankings_includes_score_breakdown(tmp_path):
 
     payload = json.loads((tmp_path / "player_rankings.json").read_text())
     player = payload["rankings"][0]
+    assert payload["metadata"]["replacement_model"]["league_size"] == 10
+    assert payload["metadata"]["replacement_model"]["starters"]["FLEX"] == 1
     assert set(player["score_breakdown"]) == set(ranker.score_feature_columns)
     assert sum(player["score_breakdown"].values()) == pytest.approx(player["raw_score"], abs=0.02)
     assert "news_component" in player["score_breakdown"]
@@ -256,7 +269,7 @@ def test_export_rankings_includes_score_breakdown(tmp_path):
     assert "projection_data_source" in player
 
 
-def test_vorp_baseline_uses_replacement_range_average():
+def test_vorp_baseline_uses_league_replacement_rank_window():
     ranker = PlayerRanker()
     df = pd.DataFrame(
         {
@@ -267,7 +280,21 @@ def test_vorp_baseline_uses_replacement_range_average():
 
     baseline = ranker.calculate_vorp_baseline(df, "QB")
 
-    assert baseline == pytest.approx(30.0)
+    assert baseline == pytest.approx(40.0)
+
+
+def test_ranker_vorp_baseline_changes_with_league_size():
+    frame = pd.DataFrame(
+        {
+            "position": ["QB"] * 16,
+            "adjusted_score": list(range(160, 0, -10)),
+        }
+    )
+
+    eight_team = PlayerRanker(league_size=8).calculate_vorp_baseline(frame, "QB")
+    twelve_team = PlayerRanker(league_size=12).calculate_vorp_baseline(frame, "QB")
+
+    assert eight_team > twelve_team
 
 
 def test_projection_team_is_preferred_over_historical_team(tmp_path):

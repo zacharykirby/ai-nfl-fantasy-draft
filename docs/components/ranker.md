@@ -2,6 +2,13 @@
 
 ## Overview
 
+The ranker no longer applies manually maintained NFL team-quality buckets. The
+`team_offense_component` remains in exported score breakdowns as a zero-valued
+compatibility field until a dated, sourced team projection feed exists. VORP baselines
+are derived from configured league size, starter counts, and projection-based FLEX
+allocation rather than fixed positional rank ranges; the export records that
+replacement model in metadata.
+
 The Player Ranking Module (`ranker.py`) is the core component of the NFL Fantasy Draft Assistant that combines historical player statistics with recent news sentiment to generate comprehensive fantasy football draft rankings.
 
 ## 🎯 Key Features
@@ -13,7 +20,7 @@ The ranking system uses a sophisticated 7-component scoring algorithm:
 2. **Current Form (25%)** - Recent performance trends and consistency
 3. **Injury Risk (-15%)** - Age, experience, and position-based injury assessment
 4. **Experience Bonus (10%)** - Rookie potential vs veteran reliability
-5. **Team Context (10%)** - Team performance tiers and offensive efficiency
+5. **Team Context (disabled)** - Reserved for a future sourced projection feed
 6. **News Sentiment (10%)** - Recent buzz and sentiment analysis
 7. **Consistency (5%)** - Weekly performance stability
 
@@ -22,19 +29,14 @@ Each position has tailored scoring weights:
 
 - **QB**: Higher experience bonus, consistency focus
 - **RB**: Increased injury risk penalty, form emphasis
-- **WR**: Enhanced news sentiment, team context importance
+- **WR**: Enhanced news sentiment and usage importance
 - **TE**: Moderate experience bonus, consistency focus
-- **K**: High consistency and team context requirements
-- **DST**: Heavy team context dependency
+- **K/DST**: Not part of the canonical live-draft board
 
-### Team Performance Tiers
-Teams are categorized into performance tiers that influence player scores:
+### Team context
 
-- **Elite** (1.2x): KC, SF, BAL, BUF, DAL, PHI
-- **Good** (1.1x): MIA, DET, CIN, GB, LAR, HOU, IND
-- **Average** (1.0x): NYJ, ATL, MIN, JAX, TB, PIT, CLE
-- **Below Average** (0.9x): LV, LAC, DEN, NE, NYG, WAS, CHI
-- **Poor** (0.8x): ARI, CAR, TEN, SEA
+No team-quality multiplier is applied. A future adjustment must identify a dated
+source and retrieval time before it can affect ranking output.
 
 ## 📊 Scoring Components
 

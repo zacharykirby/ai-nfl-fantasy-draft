@@ -9,7 +9,7 @@ This module creates comprehensive player rankings using:
 - Age-based decline penalties
 - Position-specific VORP calculations
 - Consistency and usage metrics
-- Team context adjustments
+- No unsourced team-quality adjustment
 - Injury risk assessment
 """
 
@@ -30,7 +30,8 @@ class PlayerRanker:
     """Comprehensive VORP-based player ranking system for fantasy football"""
     
     def __init__(self, data_dir: str = "data", outputs_dir: str = "outputs", news_dir: str = "news",
-                 max_players: int = 500, target_season: int = None):
+                 max_players: int = 500, target_season: int = None,
+                 league_size: int = 10, starters: Optional[Dict[str, int]] = None):
         self.data_dir = Path(data_dir)
         self.outputs_dir = Path(outputs_dir)
         self.news_dir = Path(news_dir)
@@ -38,6 +39,9 @@ class PlayerRanker:
         self.target_season = target_season or datetime.now().year
         self.projection_source = "unknown"
         self.news_source = "none"
+        self.league_size = int(league_size)
+        self.starters = {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1}
+        self.starters.update(starters or {})
         self.outputs_dir.mkdir(exist_ok=True)
         
         # Core scoring weights for raw_score calculation
@@ -46,7 +50,9 @@ class PlayerRanker:
             'weighted_avg_last_2': 0.25,     # Weighted average of last 2 seasons
             'consistency_score': 0.15,       # Performance consistency
             'usage_score': 0.10,             # Snap share and touches/routes
-            'team_offense_score': 0.10       # Team scoring environment
+            # Retained as a zero-weight compatibility field until a dated,
+            # sourced team projection feed is available.
+            'team_offense_score': 0.0
         }
         
         # Position-specific age decline curves (less aggressive)
@@ -55,28 +61,6 @@ class PlayerRanker:
             'RB': {'start_age': 28, 'gradual_rate': 0.06, 'steep_rate': 0.10, 'steep_age': 31},
             'WR': {'start_age': 32, 'gradual_rate': 0.04, 'steep_rate': 0.08, 'steep_age': 35},
             'TE': {'start_age': 32, 'gradual_rate': 0.03, 'steep_rate': 0.06, 'steep_age': 35}
-        }
-        
-        # Team performance tiers for offense scoring
-        self.team_tiers = {
-            'elite': ['KC', 'SF', 'BAL', 'BUF', 'DAL', 'PHI', 'MIA'],
-            'good': ['DET', 'CIN', 'GB', 'LAR', 'HOU', 'IND', 'TB'],
-            'average': ['NYJ', 'ATL', 'MIN', 'JAX', 'PIT', 'CLE', 'DEN'],
-            'below_average': ['LV', 'LAC', 'NE', 'NYG', 'WAS', 'CHI', 'TEN'],
-            'poor': ['ARI', 'CAR', 'SEA', 'LA']
-        }
-        
-        self.team_scores = {
-            'elite': 1.15, 'good': 1.08, 'average': 1.0, 
-            'below_average': 0.92, 'poor': 0.85
-        }
-        
-        # VORP baseline ranges by position
-        self.vorp_baseline_ranges = {
-            'QB': (10, 14),    # QB10-QB14
-            'RB': (24, 28),    # RB24-RB28
-            'WR': (24, 28),    # WR24-WR28
-            'TE': (8, 12)      # TE8-TE12
         }
         
         # Tier assignment percentiles (fixed order)
@@ -904,22 +888,8 @@ class PlayerRanker:
         return projected_pts
     
     def calculate_team_offense_score(self, row: pd.Series) -> float:
-        """Calculate team offense score based on team performance tier"""
-        team = str(row.get('team', 'Unknown'))
-        
-        # Find team tier
-        team_tier = 'average'  # Default
-        for tier, teams in self.team_tiers.items():
-            if team in teams:
-                team_tier = tier
-                break
-        
-        # Get team score multiplier
-        team_multiplier = self.team_scores.get(team_tier, 1.0)
-        
-        # Convert to 0-100 scale
-        team_score = (team_multiplier - 0.85) / (1.15 - 0.85) * 100
-        return max(0, min(100, team_score))
+        """Return no team adjustment without a current, sourced team projection."""
+        return 0.0
 
     def calculate_news_adjustment(self, row: pd.Series) -> float:
         """Calculate a small, explainable news adjustment."""
@@ -1109,37 +1079,62 @@ class PlayerRanker:
             logger.warning(f"Error calculating rank score for rank {rank}: {e}")
             return 0.0
     
-    def calculate_vorp_baseline(self, df: pd.DataFrame, position: str) -> float:
-        """Calculate VORP baseline for a position using rank-based method"""
+    def calculate_vorp_baseline(
+        self, df: pd.DataFrame, position: str, replacement_rank: Optional[int] = None
+    ) -> float:
+        """Calculate a smoothed baseline at the configured replacement rank."""
         pos_df = df[df['position'] == position].copy()
         if len(pos_df) == 0:
             return 0.0
-        
-        # Sort by adjusted score
         pos_df = pos_df.sort_values('adjusted_score', ascending=False).reset_index(drop=True)
-        
-        # Get baseline range
-        baseline_range = self.vorp_baseline_ranges.get(position, (10, 14))
-        start_rank = baseline_range[0] - 1  # Convert to 0-based index
-        end_rank = baseline_range[1] - 1
-        
-        # Calculate average score of baseline range
-        if len(pos_df) > start_rank:
-            baseline_players = pos_df.iloc[start_rank:min(end_rank + 1, len(pos_df))]
-            baseline_score = baseline_players['adjusted_score'].mean()
-            return baseline_score
-        
-        return pos_df['adjusted_score'].mean() if len(pos_df) > 0 else 0.0
+        demand = self.league_size * max(0, int(self.starters.get(position, 0)))
+        rank = replacement_rank if replacement_rank is not None else demand + 1
+        rank = max(1, min(int(rank), len(pos_df)))
+        index = rank - 1
+        baseline_players = pos_df.iloc[max(0, index - 1):min(len(pos_df), index + 2)]
+        return baseline_players['adjusted_score'].mean()
+
+    def replacement_ranks(self, df: pd.DataFrame) -> Dict[str, int]:
+        """Allocate configured starter and FLEX demand across current projections."""
+        positions = ['QB', 'RB', 'WR', 'TE']
+        sort_column = (
+            'projected_fantasy_points'
+            if 'projected_fantasy_points' in df.columns
+            else 'adjusted_score'
+        )
+        base_demand = {
+            position: self.league_size * max(0, int(self.starters.get(position, 0)))
+            for position in positions
+        }
+        flex_candidates = []
+        for position in ['RB', 'WR', 'TE']:
+            pool = df[df['position'] == position].sort_values(
+                sort_column, ascending=False
+            )
+            flex_candidates.append(pool.iloc[base_demand[position]:])
+        flex_pool = pd.concat(flex_candidates, ignore_index=True)
+        flex_pool = flex_pool.sort_values(sort_column, ascending=False)
+        flex_count = self.league_size * max(0, int(self.starters.get('FLEX', 0)))
+        allocations = flex_pool.head(flex_count)['position'].value_counts().to_dict()
+        return {
+            position: base_demand[position] + int(allocations.get(position, 0)) + 1
+            for position in positions
+        }
     
     def calculate_vorp_scores(self, df: pd.DataFrame) -> pd.DataFrame:
         """Calculate VORP scores for all players"""
         df = df.copy()
         
-        # Calculate VORP baselines for each position
+        replacement_ranks = self.replacement_ranks(df)
         vorp_baselines = {}
         for position in ['QB', 'RB', 'WR', 'TE']:
-            vorp_baselines[position] = self.calculate_vorp_baseline(df, position)
-            logger.info(f"{position} VORP baseline: {vorp_baselines[position]:.2f}")
+            vorp_baselines[position] = self.calculate_vorp_baseline(
+                df, position, replacement_ranks[position]
+            )
+            logger.info(
+                "%s VORP baseline at %s: %.2f",
+                position, replacement_ranks[position], vorp_baselines[position]
+            )
         
         # Calculate VORP for each player
         df['VORP'] = 0.0
@@ -1372,6 +1367,11 @@ class PlayerRanker:
                     "projection_source": self.projection_source,
                     "news_source": self.news_source,
                     "ranking_count": len(output_data),
+                    "replacement_model": {
+                        "league_size": self.league_size,
+                        "starters": self.starters,
+                        "method": "league_starters_flex_projection_allocation",
+                    },
                 },
                 "rankings": output_data,
             }

@@ -72,11 +72,25 @@ def test_copilot_validation_rejects_unknown_drafted_and_changed_evidence(web_dra
     with pytest.raises(CopilotResponseError, match="unavailable"):
         validate_copilot_response(drafted, context)
 
+    changed_primary = valid_copilot_response(context)
+    changed_primary["primary_option"] = {
+        **changed_primary["safe_option"],
+        "label": "Model/data lean",
+    }
+    changed_primary["safe_option"] = None
+    with pytest.raises(CopilotResponseError, match="primary lean"):
+        validate_copilot_response(changed_primary, context)
+
     changed = valid_copilot_response(context)
     changed["evidence_summary"] = dict(changed["evidence_summary"])
     changed["evidence_summary"]["close_call"] = not changed["evidence_summary"]["close_call"]
     with pytest.raises(CopilotResponseError, match="deterministic facts"):
         validate_copilot_response(changed, context)
+
+    changed_wait = valid_copilot_response(context)
+    changed_wait["can_wait"] = "yes" if changed_wait["can_wait"] != "yes" else "no"
+    with pytest.raises(CopilotResponseError, match="wait assessment"):
+        validate_copilot_response(changed_wait, context)
 
 
 def test_oh_god_service_uses_explicit_revision_without_mutating(web_draft):

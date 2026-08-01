@@ -64,6 +64,11 @@ def write_rankings(tmp_path, players, projection_source=None):
                     "target_season": 2026,
                     "generated_at": "2026-07-10T00:00:00",
                     "projection_source": str(projection_source),
+                    "replacement_model": {
+                        "league_size": 10,
+                        "starters": {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1},
+                        "method": "league_starters_flex_projection_allocation",
+                    },
                 },
                 "rankings": players,
             }
@@ -94,6 +99,7 @@ def test_build_groups_and_ranks_players_by_position(tmp_path):
     assert [player["player"] for player in board["roles"]["RB"]] == ["RB Two", "Running Back"]
     assert [player["position_rank"] for player in board["roles"]["RB"]] == [1, 2]
     assert board["metadata"]["role_counts"] == {"QB": 1, "RB": 2, "WR": 1, "TE": 1}
+    assert board["metadata"]["ranking_replacement_model"]["league_size"] == 10
     assert board["health"]["status"] == "ready"
 
 

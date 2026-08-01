@@ -10,6 +10,7 @@ from fantasy_draft.draft.recommendations import (
     DEFAULT_STARTERS,
     DraftRecommendationEngine,
     survival_probability,
+    tier_number,
 )
 from fantasy_draft.draft.session import (
     BOARD_POSITIONS,
@@ -218,6 +219,9 @@ class OhGodContextBuilder:
                 "forecast_uncertainty": "estimated"
                 if projection_method == "adp_estimate" else "known",
                 "vorp": item.get("vorp"),
+                "source_vorp": item.get("source_vorp"),
+                "replacement_rank": item.get("replacement_rank"),
+                "replacement_points": item.get("replacement_points"),
                 "tier": item.get("tier"),
                 "players_left_in_tier": tiers[item["position"]]["remaining_in_best_tier"],
                 "adp": item.get("adp"),
@@ -227,6 +231,9 @@ class OhGodContextBuilder:
                 "survival_to_next_pick": survival_probability(
                     item.get("adp"), following_pick
                 ),
+                "tier_survival_to_next_pick": engine.tier_survival_probability(
+                    item["position"], tier_number(item.get("tier")), following_pick
+                ),
                 "bye_week": item.get("bye_week"),
                 "risk": risk,
                 "flags": list(player.get("flags", []))[:6],
@@ -235,6 +242,7 @@ class OhGodContextBuilder:
                     "injury_flag": bool(risk.get("injury_flag")),
                 },
                 "reasons": list(item.get("reasons") or [])[:4],
+                "caveats": list(item.get("caveats") or [])[:3],
             })
         score_gap = None
         if balanced["alternatives"]:
@@ -276,20 +284,11 @@ class OhGodContextBuilder:
             situation_type = "roster_pressure"
         else:
             situation_type = "normal_board"
-        primary_survival = survival_probability(
-            primary.get("adp") if primary else None,
-            following_pick,
-        )
-        if following_pick is None or primary_survival is None:
-            can_wait = "unknown"
-        elif primary_survival >= 0.7:
-            can_wait = "yes"
-        elif primary_survival >= 0.45:
-            can_wait = "probably"
-        elif primary_survival >= 0.2:
-            can_wait = "risky"
-        else:
-            can_wait = "no"
+        primary_wait = engine.wait_assessment(primary, following_pick) if primary else {
+            "status": "unknown",
+            "reason": "No available candidate can be assessed.",
+        }
+        can_wait = primary_wait["status"]
 
         recent_events = self.session.active_selections()[-8:]
         fallers = []
@@ -365,7 +364,7 @@ class OhGodContextBuilder:
                     position: needs[position]["open_base_slots"]
                     for position in BOARD_POSITIONS
                 },
-                "warnings": [],
+                "warnings": balanced["signals"]["roster_balance_warnings"],
             },
             "recent_draft": {
                 "selections": [
@@ -399,6 +398,7 @@ class OhGodContextBuilder:
                 "urgency": urgency,
                 "situation_type": situation_type,
                 "can_wait": can_wait,
+                "can_wait_reason": primary_wait["reason"],
                 "close_score_threshold": CLOSE_SCORE_THRESHOLD,
                 "leader_gap": score_gap,
             },
@@ -483,6 +483,10 @@ def validate_copilot_response(
         raise CopilotResponseError("Invalid situation type")
     if payload["can_wait"] not in WAIT_VALUES:
         raise CopilotResponseError("Invalid can_wait value")
+    assessment = context["deterministic_assessment"]
+    if payload["can_wait"] != assessment["can_wait"]:
+        raise CopilotResponseError("Model changed the deterministic wait assessment")
+    _bounded_text(payload["can_wait_reason"], "can_wait_reason", 1, 180)
     allowed = set(context["constraints"]["available_player_ids"])
     options = {
         "primary_option": _validate_option(
@@ -498,6 +502,12 @@ def validate_copilot_response(
     ids = [option["player_id"] for option in options.values() if option]
     if len(ids) != len(set(ids)):
         raise CopilotResponseError("OH GOD options must be distinct")
+    expected_primary = assessment["primary_player_id"]
+    if expected_primary and (
+        options["primary_option"] is None
+        or options["primary_option"]["player_id"] != expected_primary
+    ):
+        raise CopilotResponseError("Model changed the deterministic primary lean")
     caveats = payload["caveats"]
     if not isinstance(caveats, list) or len(caveats) > 3:
         raise CopilotResponseError("caveats must contain at most three strings")
@@ -512,9 +522,21 @@ def validate_copilot_response(
         raise CopilotResponseError("Model evidence summary changed deterministic facts")
     required_warnings = context["constraints"]["must_disclose_warning_codes"]
     warning_caveats = ["Data warning: {}.".format(code) for code in required_warnings]
+    primary = options["primary_option"]
+    primary_candidate = next(
+        (
+            item for item in context["candidates"]
+            if primary and item["player_id"] == primary["player_id"]
+        ),
+        {},
+    )
+    grounded_caveats = warning_caveats + list(primary_candidate.get("caveats", []))
+    grounded_caveats.extend(
+        warning["message"] for warning in context["user_roster"]["warnings"]
+    )
     cleaned_caveats = (
-        warning_caveats
-        + [item for item in cleaned_caveats if item not in warning_caveats]
+        grounded_caveats
+        + [item for item in cleaned_caveats if item not in grounded_caveats]
     )[:3]
     return {
         "schema_version": COPILOT_SCHEMA_VERSION,
@@ -524,9 +546,7 @@ def validate_copilot_response(
         "explanation": _bounded_text(payload["explanation"], "explanation", 1, 320),
         **options,
         "can_wait": payload["can_wait"],
-        "can_wait_reason": _bounded_text(
-            payload["can_wait_reason"], "can_wait_reason", 1, 180
-        ),
+        "can_wait_reason": assessment["can_wait_reason"],
         "caveats": cleaned_caveats,
         "evidence_summary": canonical_evidence,
         "draft_revision": payload["draft_revision"],
@@ -566,17 +586,23 @@ def local_copilot(context: Dict[str, Any], _error: str) -> Dict[str, Any]:
         )
     explanation += "."
     can_wait = assessment["can_wait"]
-    wait_reason = {
-        "yes": "The current lean has a strong estimated chance to reach the following turn.",
-        "probably": "Waiting is reasonable, although the room can still surprise you.",
-        "risky": "Waiting may work, but the current lean is more likely than not to disappear.",
-        "no": "The current lean has a low estimated chance to survive another full turn.",
-        "unknown": "The available ADP evidence is not strong enough to estimate survival.",
-    }[can_wait]
-    caveats = [
+    wait_reason = assessment["can_wait_reason"]
+    evidence_caveats = [
         "Data warning: {}.".format(code)
         for code in context["constraints"]["must_disclose_warning_codes"]
-    ][:2]
+    ]
+    primary_candidate = next(
+        (
+            item for item in context["candidates"]
+            if primary and item["player_id"] == primary["player_id"]
+        ),
+        {},
+    )
+    evidence_caveats.extend(primary_candidate.get("caveats", []))
+    evidence_caveats.extend(
+        warning["message"] for warning in context["user_roster"]["warnings"]
+    )
+    caveats = evidence_caveats[:2]
     caveats.append("Model interpretation unavailable; this card uses deterministic draft signals.")
     return {
         "schema_version": COPILOT_SCHEMA_VERSION,

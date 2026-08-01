@@ -208,6 +208,7 @@ class DraftBoardBuilder:
                 "source_generated_at": metadata.get("generated_at"),
                 "projection_source": metadata.get("projection_source"),
                 "news_source": metadata.get("news_source", "none"),
+                "ranking_replacement_model": metadata.get("replacement_model"),
                 "ranking_method": "blended_score_then_vorp_then_source_rank",
                 "ranking_count": len(rankings),
                 "role_counts": {position: len(players) for position, players in roles.items()},

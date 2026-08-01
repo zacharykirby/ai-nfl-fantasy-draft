@@ -75,12 +75,12 @@ def make_session(tmp_path):
     return DraftSession.create(tmp_path / "session.json", board_path, "assistant", 2, 4, 1)
 
 
-def model_payload(recommendation="Receiver One", agreement=True):
+def model_payload(recommendation="Tight End One", agreement=True):
     return {
         "schema_version": "1.0",
-        "answer": "Take Receiver One because it is the strongest supplied value.",
+        "answer": "Tight End One is the strongest supplied deterministic value.",
         "recommendation": recommendation,
-        "alternatives": ["Runner One", "Tight End One"],
+        "alternatives": ["Runner One", "Receiver One"],
         "confidence": 0.82,
         "rationale": ["Highest deterministic value", "Fills an open starter slot"],
         "cautions": [],
@@ -94,8 +94,8 @@ def test_context_is_bounded_and_contains_deterministic_facts(tmp_path):
     assert len(context["candidate_pool"]) <= 18
     assert len(context["candidate_pool"]) < context["deterministic_recommendation"]["generated_for"].get("available", 999)
     assert context["constraints"]["state_mutation_allowed"] is False
-    assert context["deterministic_recommendation"]["primary"]["player"] == "Receiver One"
-    assert context["deterministic_recommendation"]["primary"]["bye_week"] == 9
+    assert context["deterministic_recommendation"]["primary"]["player"] == "Tight End One"
+    assert context["deterministic_recommendation"]["primary"]["bye_week"] == 10
     assert all("bye_week" in candidate for candidate in context["candidate_pool"])
     assert set(context["top_available_by_position"]) == {"QB", "RB", "WR", "TE"}
 
@@ -118,7 +118,7 @@ def test_valid_model_response_is_returned_and_request_is_bounded(tmp_path):
     result = assistant.ask("Who should I take?")
 
     assert result["source"] == "model"
-    assert result["recommendation"] == "Receiver One"
+    assert result["recommendation"] == "Tight End One"
     assert result["model"] == "test/model"
     assert client.calls[0]["response_format"] == {"type": "json_object"}
     assert client.calls[0]["max_tokens"] == 700
@@ -131,7 +131,7 @@ def test_api_error_falls_back_to_deterministic_recommendation(tmp_path):
     ).ask("Who should I take?")
 
     assert result["source"] == "deterministic_fallback"
-    assert result["recommendation"] == "Receiver One"
+    assert result["recommendation"] == "Tight End One"
     assert "network unavailable" in result["cautions"][0]
 
 
@@ -163,12 +163,12 @@ def test_response_validator_checks_agreement_and_alternatives():
     allowed = {"Runner One", "Receiver One", "Tight End One"}
     bad_agreement = model_payload(agreement=False)
     with pytest.raises(AssistantResponseError, match="inconsistent"):
-        validate_model_response(bad_agreement, allowed, "Receiver One")
+        validate_model_response(bad_agreement, allowed, "Tight End One")
 
     bad_alternative = model_payload()
     bad_alternative["alternatives"] = ["Unavailable"]
     with pytest.raises(AssistantResponseError, match="unavailable alternatives"):
-        validate_model_response(bad_alternative, allowed, "Receiver One")
+        validate_model_response(bad_alternative, allowed, "Tight End One")
 
 
 def test_empty_question_and_invalid_mode_are_rejected(tmp_path):
@@ -185,7 +185,7 @@ def test_query_service_marks_answer_stale_when_state_changes_in_flight(tmp_path)
     class MutatingClient(FakeClient):
         def chat(self, **kwargs):
             self.calls.append(kwargs)
-            DraftSession.load(session.path).draft("Receiver One")
+            DraftSession.load(session.path).draft("Tight End One")
             return self.response
 
     client = MutatingClient(json.dumps(model_payload()))
