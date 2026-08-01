@@ -14,6 +14,7 @@
         <div>
           <p class="eyebrow">LIVE DRAFT COCKPIT</p>
           <h1 id="session-name">Loading session…</h1>
+          <p id="league-context" class="league-context">Loading league settings…</p>
         </div>
         <div class="topbar-actions">
           <button id="session-switcher" class="text-button" type="button">Drafts</button>
@@ -48,6 +49,16 @@
         <div class="accent-stat">
           <span class="label">You in</span>
           <strong id="your-turn">—</strong>
+        </div>
+      </section>
+
+      <section id="completion-card" class="card completion-card" hidden aria-live="polite">
+        <p class="eyebrow">DRAFT RESULTS</p>
+        <h2>Draft complete</h2>
+        <p class="player-meta">Review your final roster construction or the complete pick log.</p>
+        <div class="completion-actions">
+          <button type="button" data-results-view="roster">View roster</button>
+          <button type="button" data-results-view="log">View draft log</button>
         </div>
       </section>
 
@@ -124,15 +135,15 @@
 
       <section class="card">
         <div class="card-heading">
-          <h2>Best available</h2>
+          <h2 id="best-available-title">Best available</h2>
           <span id="available-count" class="small-meta">—</span>
         </div>
         <nav class="filters" aria-label="Position filter">
-          <button class="filter active" data-position="ALL" type="button">All</button>
-          <button class="filter" data-position="RB" type="button">RB</button>
-          <button class="filter" data-position="WR" type="button">WR</button>
-          <button class="filter" data-position="QB" type="button">QB</button>
-          <button class="filter" data-position="TE" type="button">TE</button>
+          <button class="filter active" data-position="ALL" type="button" aria-pressed="true">All</button>
+          <button class="filter" data-position="RB" type="button" aria-pressed="false">RB</button>
+          <button class="filter" data-position="WR" type="button" aria-pressed="false">WR</button>
+          <button class="filter" data-position="QB" type="button" aria-pressed="false">QB</button>
+          <button class="filter" data-position="TE" type="button" aria-pressed="false">TE</button>
         </nav>
         <div id="best-available" class="player-list empty-state">No players available</div>
       </section>
@@ -173,11 +184,11 @@
             <label class="toggle-label"><input id="board-available-only" type="checkbox" checked> Available</label>
           </div>
           <nav class="filters board-filters" aria-label="Board position filter">
-            <button class="board-filter active" data-board-position="ALL" type="button">All</button>
-            <button class="board-filter" data-board-position="RB" type="button">RB</button>
-            <button class="board-filter" data-board-position="WR" type="button">WR</button>
-            <button class="board-filter" data-board-position="QB" type="button">QB</button>
-            <button class="board-filter" data-board-position="TE" type="button">TE</button>
+            <button class="board-filter active" data-board-position="ALL" type="button" aria-pressed="true">All</button>
+            <button class="board-filter" data-board-position="RB" type="button" aria-pressed="false">RB</button>
+            <button class="board-filter" data-board-position="WR" type="button" aria-pressed="false">WR</button>
+            <button class="board-filter" data-board-position="QB" type="button" aria-pressed="false">QB</button>
+            <button class="board-filter" data-board-position="TE" type="button" aria-pressed="false">TE</button>
           </nav>
         </section>
         <div id="full-board" class="view-loading">Open the board to load players.</div>
@@ -259,6 +270,7 @@
           </label>
         </div>
         <p id="new-session-capacity" class="player-meta"></p>
+        <p id="new-session-format" class="format-note">Scoring is inherited from the loaded draft board.</p>
         <button id="create-session" class="dialog-button primary full-width" type="submit">Create draft</button>
       </form>
     </dialog>

@@ -28,6 +28,14 @@ const state = {
 
 const byId = (id) => document.getElementById(id);
 
+function formatScoring(value) {
+  const scoring = String(value || "unknown").toLowerCase();
+  if (scoring === "half_ppr") return "Half-PPR";
+  if (scoring === "ppr") return "PPR";
+  if (scoring === "standard") return "Standard";
+  return scoring.replaceAll("_", " ");
+}
+
 async function api(path, options = {}) {
   let response;
   try {
@@ -79,13 +87,17 @@ function render(cockpit) {
   state.cockpit = cockpit;
   const session = cockpit.session;
   byId("session-name").textContent = session.name;
+  const roundCount = Number(cockpit.league.rounds);
+  byId("league-context").textContent = `${formatScoring(cockpit.league.scoring)} · ${cockpit.league.league_size} teams · ${roundCount} round${roundCount === 1 ? "" : "s"}`;
   byId("round").textContent = session.round;
   byId("current-pick").textContent = session.current_pick;
   byId("current-team").textContent = session.current_team == null
     ? "Done"
     : session.current_team === session.user_team ? "You" : `T${session.current_team}`;
   byId("your-turn").textContent = session.picks_until_user === 0 ? "Now" : session.picks_until_user ?? "Done";
-  byId("available-count").textContent = `${session.available} available`;
+  byId("available-count").textContent = `${session.available} total`;
+  const draftComplete = session.status === "complete";
+  byId("completion-card").hidden = !draftComplete;
 
   const recommendation = cockpit.recommendation;
   const primary = recommendation?.primary;
@@ -106,6 +118,15 @@ function render(cockpit) {
     "No alternatives available",
   );
   renderAvailable();
+  document.querySelectorAll("[data-draft-player]").forEach((button) => {
+    button.disabled = draftComplete;
+  });
+  byId("player-search").disabled = draftComplete;
+  if (draftComplete) {
+    state.searchSequence += 1;
+    byId("player-search").value = "";
+    setList(byId("player-search-results"), "", "Draft complete · player selection is closed");
+  }
   setList(
     byId("roster"),
     cockpit.user_roster.map((player) => compactRow(player.player, player.position)).join(""),
@@ -131,6 +152,7 @@ function render(cockpit) {
   );
   renderHealth(cockpit.health);
   byId("undo-last").disabled = cockpit.recent_picks.length === 0;
+  byId("catch-up").disabled = draftComplete;
   syncStrategyForCockpit(cockpit);
   const teamSelect = byId("log-team");
   const selectedTeam = teamSelect.value;
@@ -244,6 +266,14 @@ function renderAvailable() {
     players.map((player) => actionablePlayerRow(player)).join(""),
     "No players available",
   );
+  byId("best-available-title").textContent = state.position === "ALL"
+    ? "Best available"
+    : `Best available · ${state.position}`;
+  document.querySelectorAll(".filter").forEach((button) => {
+    const selected = button.dataset.position === state.position;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
 }
 
 function setHealth(id, text, healthy = true) {
@@ -342,10 +372,22 @@ async function loadBoardView() {
 async function loadRosterView() {
   const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/roster`);
   byId("roster-title").textContent = `Team ${result.team} · ${result.players.length} selections`;
-  byId("roster-needs").innerHTML = ["QB", "RB", "WR", "TE"].map((position) => {
+  const positionCards = ["QB", "RB", "WR", "TE"].map((position) => {
     const need = result.needs[position];
     return `<div class="need-card ${need.open_base_slots ? "open" : ""}"><strong>${position}</strong><span>${need.rostered}/${need.base_starters} · ${need.open_base_slots} open</span></div>`;
-  }).join("");
+  });
+  const flexSlots = Number(state.cockpit?.league?.starters?.FLEX || 0);
+  if (flexSlots) {
+    const eligible = ["RB", "WR", "TE"];
+    const extraEligible = eligible.reduce((total, position) => {
+      const need = result.needs[position];
+      return total + Math.max(0, Number(need.rostered) - Number(need.base_starters));
+    }, 0);
+    const filledFlex = Math.min(flexSlots, extraEligible);
+    const openFlex = flexSlots - filledFlex;
+    positionCards.push(`<div class="need-card ${openFlex ? "open" : ""}"><strong>FLEX</strong><span>${filledFlex}/${flexSlots} · ${openFlex} open</span></div>`);
+  }
+  byId("roster-needs").innerHTML = positionCards.join("");
   byId("bye-status").textContent = result.bye_summary.conflict_count
     ? `${result.bye_summary.conflict_count} conflict${result.bye_summary.conflict_count === 1 ? "" : "s"}`
     : "No conflicts";
@@ -412,7 +454,7 @@ async function openPlayerDetail(playerId) {
     ["Flags", (player.flags || []).join(", ") || "None"],
   ];
   byId("player-detail-evidence").innerHTML = evidenceRows.map(([label, value]) => `<div class="evidence-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("");
-  byId("player-detail-draft").hidden = !player.available;
+  byId("player-detail-draft").hidden = !player.available || state.cockpit?.session?.status === "complete";
   if (!byId("player-detail-dialog").open) byId("player-detail-dialog").showModal();
 }
 
@@ -494,6 +536,7 @@ function updateSessionCapacity() {
   byId("new-user-team").max = Math.max(1, teams);
   if (Number(byId("new-user-team").value) > teams) byId("new-user-team").value = teams;
   byId("new-session-capacity").textContent = `${total} ranked players · up to ${maxRounds} rounds for ${teams || "—"} teams`;
+  byId("new-session-format").textContent = `Scoring: ${formatScoring(state.board?.league?.scoring)} · ${Number(state.board?.league?.starters?.FLEX || 0)} FLEX · ${Number(state.board?.league?.bench_size || 0)} bench`;
   byId("create-session").disabled = state.board?.health?.status !== "ready" || maxRounds < 1;
 }
 
@@ -680,10 +723,16 @@ byId("refresh").addEventListener("click", () => load(state.session).catch((error
 document.querySelectorAll(".view-tab").forEach((button) => {
   button.addEventListener("click", () => showView(button.dataset.view).catch((error) => showNotice(error.message)));
 });
+document.querySelectorAll("[data-results-view]").forEach((button) => {
+  button.addEventListener("click", () => showView(button.dataset.resultsView).catch((error) => showNotice(error.message)));
+});
 document.querySelectorAll(".board-filter").forEach((button) => {
   button.addEventListener("click", () => {
-    document.querySelectorAll(".board-filter").forEach((item) => item.classList.remove("active"));
-    button.classList.add("active");
+    document.querySelectorAll(".board-filter").forEach((item) => {
+      const selected = item === button;
+      item.classList.toggle("active", selected);
+      item.setAttribute("aria-pressed", String(selected));
+    });
     state.boardPosition = button.dataset.boardPosition;
     loadBoardView().catch((error) => showNotice(error.message));
   });
@@ -800,6 +849,7 @@ byId("new-session-form").addEventListener("submit", async (event) => {
     state.createRequestId = null;
     byId("new-session-form").reset();
     await load(name);
+    await showView("cockpit");
     showNotice(`Created and opened ${name}.`, true);
   } catch (error) {
     showSessionNotice(error.message);
@@ -832,8 +882,6 @@ byId("catch-up").addEventListener("click", () => {
 });
 document.querySelectorAll(".filter").forEach((button) => {
   button.addEventListener("click", () => {
-    document.querySelectorAll(".filter").forEach((item) => item.classList.remove("active"));
-    button.classList.add("active");
     state.position = button.dataset.position;
     renderAvailable();
   });

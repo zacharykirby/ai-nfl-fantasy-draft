@@ -62,6 +62,7 @@ button { font: inherit; }
 h1, h2, p { margin-top: 0; }
 h1 { margin-bottom: 0; font-size: 1.35rem; line-height: 1.15; }
 h2 { margin-bottom: 0; font-size: 1rem; }
+.league-context { margin: 4px 0 0; color: var(--muted); font-size: 0.75rem; }
 
 .eyebrow,
 .label {
@@ -144,6 +145,10 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 }
 
 .recommendation-card { border-color: rgba(94, 224, 176, 0.42); }
+.completion-card { border-color: rgba(94, 224, 176, 0.55); background: linear-gradient(145deg, rgba(22, 70, 63, 0.9), rgba(11, 35, 40, 0.96)); }
+.completion-card h2 { font-size: 1.25rem; }
+.completion-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.completion-actions button { min-height: 44px; border: 1px solid rgba(94, 224, 176, 0.45); border-radius: 11px; background: var(--accent-soft); color: var(--accent); font-weight: 800; }
 .recommendation-card h2 { font-size: 1.45rem; }
 .strategy-card { border-color: rgba(95, 167, 255, 0.32); }
 .strategy-card.stale { border-color: rgba(255, 209, 139, 0.42); }
@@ -235,7 +240,7 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 .compact-card { min-width: 0; }
 .compact-row { font-size: 0.82rem; }
 .clickable-row { width: 100%; border: 0; background: transparent; color: var(--text); text-align: left; }
-.needs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 14px; }
+.needs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 7px; margin-top: 14px; }
 .need-card { padding: 9px 5px; border: 1px solid var(--border); border-radius: 11px; text-align: center; }
 .need-card strong, .need-card span { display: block; }
 .need-card strong { font-size: 0.82rem; }
@@ -411,6 +416,7 @@ h2 { margin-bottom: 0; font-size: 1rem; }
   font-size: 1.05rem;
 }
 .recovery-note { margin: 12px 0 0; color: #ffd18b; font-size: 0.8rem; line-height: 1.45; }
+.format-note { margin: 8px 0 14px; color: #c9d5e2; font-size: 0.78rem; }
 .recovery-note code { color: inherit; }
 .player-detail-dialog { max-height: min(90vh, 680px); overflow-y: auto; }
 .detail-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
