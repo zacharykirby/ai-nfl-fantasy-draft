@@ -69,6 +69,12 @@ The projection manifest records source URLs, retrieval time, coverage, estimates
 missing values, duplicates, and player/team conflicts. Runtime clients receive the
 same split health report from `/api/v1/health` and `/api/v1/board/summary`.
 
+The normalized 2026 projection snapshot is intentionally packaged at
+`data/players_2026_positions_bye.csv` so a clean checkout can reproduce runtime
+validation. Board writes add a canonical `metadata.board_fingerprint`. The emergency
+sheet prints that same fingerprint, and draft-night preflight regenerates the sheet
+and fails unless both artifacts match exactly.
+
 The primary provider parses the official ESPN Mike Clay projection guide and merges
 it with FantasyPros ADP/bye context. Its PPR totals can be converted to PPR,
 half-PPR, or standard scoring using projected receptions. A provider-neutral CSV

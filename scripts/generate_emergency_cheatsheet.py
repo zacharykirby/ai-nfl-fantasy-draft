@@ -5,7 +5,7 @@ import argparse
 import json
 from pathlib import Path
 
-from fantasy_draft.board import validate_board, write_cheatsheet
+from fantasy_draft.board import stamp_board_fingerprint, validate_board_path, write_cheatsheet
 
 
 def main() -> None:
@@ -18,9 +18,16 @@ def main() -> None:
 
     with args.board.open("r", encoding="utf-8") as handle:
         board = json.load(handle)
-    health = validate_board(board, project_root=Path.cwd())
+    fingerprint = stamp_board_fingerprint(board)
+    temporary = args.board.with_suffix(args.board.suffix + ".tmp")
+    temporary.write_text(json.dumps(board, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(args.board)
+    health = validate_board_path(args.board)
     output = write_cheatsheet(board, args.output, health)
-    print(f"Wrote {output} ({health['status']}, {len(health['issues'])} issues)")
+    print(
+        f"Wrote {output} ({health['status']}, {len(health['issues'])} issues, "
+        f"{fingerprint})"
+    )
 
 
 if __name__ == "__main__":

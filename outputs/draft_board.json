@@ -26,7 +26,8 @@
       "RB": 28,
       "WR": 54,
       "TE": 40
-    }
+    },
+    "board_fingerprint": "sha256:b53e828ed4432b84b5299369de02d809d3260e202da2770ffce61065c7700773"
   },
   "league": {
     "name": "Default half-PPR league",

@@ -6,14 +6,14 @@
 
 - Status: **READY**
 - Season/scoring: 2026 / half-ppr 
-- Board generated: 2026-07-20T19:43:23.681877
-- League: 10 teams; starters QB 1, RB 2, WR 2, TE 1, FLEX 1; bench 6
+- Board generated: 2026-07-21T19:06:08.153141
+- Board fingerprint: `sha256:b53e828ed4432b84b5299369de02d809d3260e202da2770ffce61065c7700773`
+- League: 8 teams; starters QB 1, RB 2, WR 2, TE 1, FLEX 1; bench 6
 
 ### Data warnings
 
 - **WARNING — estimated_projections_present:** 49 players use ADP-derived projection estimates
-- **WARNING — team_coverage_low:** 10 players are missing team data (2.2%)
-- **WARNING — bye_week_coverage_low:** 151 players are missing bye week data (33.3%)
+- **WARNING — bye_week_coverage_low:** 10 players are missing bye week data (2.2%)
 
 ## Overall Priorities by VORP
 

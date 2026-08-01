@@ -1,0 +1,455 @@
+rank,name,position,team,bye_week,projected_fantasy_points,tier,adp,projection_method,team_conflict,source
+1,Jahmyr Gibbs,RB,DET,6.0,331.0,1,1.52,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+2,Bijan Robinson,RB,ATL,11.0,314.0,1,1.99,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+4,Puka Nacua,WR,LAR,11.0,294.5,1,4.66,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+7,Jonathan Taylor,RB,IND,13.0,285.5,1,6.56,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+3,Ja'Marr Chase,WR,CIN,6.0,276.5,1,3.05,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+5,Christian McCaffrey,RB,SF,8.0,310.0,1,5.54,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+20,De'Von Achane,RB,MIA,6.0,260.5,1,18.12,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+8,Amon-Ra St. Brown,WR,DET,6.0,265.0,1,8.75,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+9,James Cook,RB,BUF,7.0,261.0,1,9.17,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+15,Saquon Barkley,RB,PHI,10.0,251.5,1,16.45,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+6,Jaxon Smith-Njigba,WR,SEA,11.0,267.5,1,6.26,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+28,Josh Allen,QB,BUF,7.0,369.0,2,29.44,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+30,Josh Jacobs,RB,GB,11.0,255.0,2,31.99,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+21,Chase Brown,RB,CIN,6.0,240.0,1,20.98,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+10,CeeDee Lamb,WR,DAL,14.0,243.0,1,11.08,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+24,Trey McBride,TE,ARI,14.0,196.0,1,24.99,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+25,Rashee Rice,WR,KC,5.0,222.0,2,27.36,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+13,Kenneth Walker III,RB,KC,5.0,248.0,1,15.92,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+12,Ashton Jeanty,RB,LV,13.0,248.5,1,13.33,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+19,Omarion Hampton,RB,LAC,7.0,251.0,1,17.95,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+29,Kyren Williams,RB,LAR,11.0,215.5,2,30.0,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+11,Justin Jefferson,WR,MIN,6.0,237.5,1,12.31,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+23,Brock Bowers,TE,LV,13.0,191.0,1,21.98,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+34,Breece Hall,RB,NYJ,13.0,247.0,2,34.63,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+37,Javonte Williams,RB,DAL,14.0,240.5,2,36.57,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+16,Drake London,WR,ATL,11.0,219.0,1,17.44,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+14,Nico Collins,WR,HOU,8.0,206.0,1,16.16,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+17,Derrick Henry,RB,BAL,13.0,263.5,1,17.53,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+38,Lamar Jackson,QB,BAL,13.0,322.0,2,38.41,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+22,George Pickens,WR,DAL,14.0,199.0,1,21.47,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+59,Jalen Hurts,QB,PHI,10.0,320.0,2,59.49,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+50,Davante Adams,WR,LAR,11.0,199.0,2,52.5,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+45,Cam Skattebo,RB,NYG,8.0,217.5,2,47.19,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+18,A.J. Brown,WR,NE,11.0,205.0,1,17.82,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+39,Travis Etienne,RB,NO,8.0,218.5,2,40.04,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+46,Bucky Irving,RB,TB,10.0,197.5,2,48.06,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+35,Zay Flowers,WR,BAL,13.0,198.0,2,35.86,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+115,George Kittle,TE,SF,8.0,153.0,4,129.36,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+43,Garrett Wilson,WR,NYJ,13.0,205.5,2,44.68,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+32,Tee Higgins,WR,CIN,6.0,181.5,2,33.76,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+58,Tyler Warren,TE,IND,13.0,164.5,2,58.79,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+42,Drake Maye,QB,NE,11.0,319.0,2,42.63,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+48,Quinshon Judkins,RB,CLE,11.0,209.0,2,50.87,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+36,DeVonta Smith,WR,PHI,10.0,194.0,2,36.01,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+53,D'Andre Swift,RB,CHI,10.0,197.0,2,54.69,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+27,Chris Olave,WR,NO,8.0,200.0,2,29.37,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+47,Joe Burrow,QB,CIN,6.0,304.0,2,50.01,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+57,Jayden Daniels,QB,WAS,7.0,318.0,2,56.95,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+126,Patrick Mahomes,QB,KC,5.0,290.0,4,152.13,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+31,Malik Nabers,WR,NYG,8.0,180.0,2,32.2,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+56,Jameson Williams,WR,DET,6.0,177.0,2,56.61,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+41,Colston Loveland,TE,CHI,10.0,166.0,2,42.59,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+40,Emeka Egbuka,WR,TB,10.0,194.0,2,40.72,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+33,Tetairoa McMillan,WR,CAR,5.0,197.5,2,34.58,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+52,David Montgomery,RB,HOU,8.0,176.5,2,54.35,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+84,Harold Fannin Jr.,TE,CLE,11.0,145.5,3,89.81,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+49,TreVeyon Henderson,RB,NE,11.0,186.5,2,52.16,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+96,Sam LaPorta,TE,DET,6.0,150.0,3,101.1,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+120,Brock Purdy,QB,SF,8.0,293.0,4,144.67,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+44,Ladd McConkey,WR,LAC,7.0,180.0,2,46.89,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+61,Tucker Kraft,TE,GB,11.0,130.0,3,64.15,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+152,Bo Nix,QB,DEN,10.0,295.0,4,181.78,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+75,Rico Dowdle,RB,PIT,9.0,170.5,3,75.63,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+86,Courtland Sutton,WR,DEN,10.0,169.5,3,90.61,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+65,DJ Moore,WR,BUF,7.0,176.5,3,66.67,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+54,Terry McLaurin,WR,WAS,7.0,178.5,2,54.69,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+100,Kyle Pitts,TE,ATL,11.0,145.0,3,108.57,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+89,Trevor Lawrence,QB,JAX,7.0,287.0,3,91.82,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+85,Dak Prescott,QB,DAL,14.0,286.0,3,90.47,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+161,Dallas Goedert,TE,PHI,10.0,142.0,5,201.15,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+69,Tony Pollard,RB,TEN,9.0,175.0,3,70.77,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+72,Justin Herbert,QB,LAC,7.0,283.0,3,73.93,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+64,Mike Evans,WR,SF,8.0,156.5,3,65.26,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+67,Jaylen Warren,RB,PIT,9.0,168.0,3,69.69,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+106,Jaxson Dart,QB,NYG,8.0,301.0,4,113.84,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+76,J.K. Dobbins,RB,DEN,10.0,162.5,3,80.04,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+66,Caleb Williams,QB,CHI,10.0,281.0,3,69.27,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+73,Rhamondre Stevenson,RB,NE,11.0,172.0,3,74.7,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+51,Jaylen Waddle,WR,DEN,10.0,174.5,2,52.78,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+148,Mark Andrews,TE,BAL,13.0,140.0,4,176.67,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+82,DK Metcalf,WR,PIT,9.0,162.5,3,86.59,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+151,Travis Kelce,TE,KC,5.0,140.0,4,178.35,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+80,Alec Pierce,WR,IND,13.0,169.0,3,83.78,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+189,Baker Mayfield,QB,TB,10.0,265.0,5,262.7,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+168,Jared Goff,QB,DET,6.0,268.0,5,219.87,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+68,Rome Odunze,WR,CHI,10.0,183.5,3,70.37,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+149,Matthew Stafford,QB,LAR,11.0,293.0,4,176.92,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+71,RJ Harvey,RB,DEN,10.0,142.5,3,72.59,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+164,Jake Ferguson,TE,DAL,14.0,130.5,5,211.56,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+70,Chuba Hubbard,RB,CAR,5.0,164.5,3,72.33,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+81,Brian Thomas Jr.,WR,JAX,7.0,147.5,3,83.93,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+117,Dalton Kincaid,TE,BUF,7.0,126.5,4,137.4,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+63,Christian Watson,WR,GB,11.0,158.5,3,64.6,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+101,Jakobi Meyers,WR,JAX,7.0,147.0,4,110.72,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+108,Michael Pittman,WR,PIT,9.0,153.0,4,116.03,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+92,Rachaad White,RB,WAS,7.0,150.5,3,94.94,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+60,Bhayshul Tuten,RB,JAX,7.0,188.0,2,60.15,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+99,Quentin Johnston,WR,LAC,7.0,138.5,3,103.03,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+190,Hunter Henry,TE,NE,11.0,122.0,5,264.01,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+79,Marvin Harrison Jr.,WR,ARI,14.0,159.5,3,81.63,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+87,Kenneth Gainwell,RB,TB,10.0,146.0,3,91.19,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+97,Chris Godwin Jr.,WR,TB,10.0,127.0,3,102.17,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+133,Khalil Shakir,WR,BUF,7.0,136.0,4,159.12,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+91,Parker Washington,WR,JAX,7.0,155.0,3,94.56,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+200,Juwan Johnson,TE,NO,8.0,111.5,5,276.76,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+77,Kyle Monangai,RB,CHI,10.0,163.0,3,80.41,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+113,Wan'Dale Robinson,WR,TEN,9.0,134.5,4,128.6,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+90,Aaron Jones,RB,MIN,6.0,164.5,3,93.25,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+261,Daniel Jones,QB,IND,13.0,267.0,5,298.45,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+55,Luther Burden III,WR,CHI,10.0,168.5,2,55.12,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+183,Jordan Love,QB,GB,11.0,259.0,5,249.67,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+105,Jordan Addison,WR,MIN,6.0,140.0,4,112.01,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+179,Kyler Murray,QB,MIN,6.0,250.0,5,244.42,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+235,Dalton Schultz,TE,HOU,8.0,103.5,5,295.66,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+112,Xavier Worthy,WR,KC,5.0,145.5,4,124.87,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+98,Michael Wilson,WR,ARI,14.0,133.5,3,102.7,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+109,Jayden Reed,WR,GB,11.0,139.5,4,118.77,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+242,T.J. Hockenson,TE,MIN,6.0,119.0,5,296.49,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+193,Brenton Strange,TE,JAX,7.0,112.5,5,272.12,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+88,Jacory Croskey-Merritt,RB,WAS,7.0,145.5,3,91.29,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+116,Josh Downs,WR,IND,13.0,127.0,4,132.57,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+291,Pat Freiermuth,TE,PIT,9.0,106.0,5,299.55,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+122,Romeo Doubs,WR,NE,11.0,141.0,4,148.57,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+203,Tyler Shough,QB,NO,8.0,264.0,5,280.26,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+26,Jeremiyah Love,RB,ARI,14.0,246.5,2,29.29,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+111,Zach Charbonnet,RB,SEA,11.0,124.0,4,119.88,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+102,Ricky Pearsall,WR,SF,8.0,136.0,4,110.74,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+227,C.J. Stroud,QB,HOU,8.0,246.0,5,293.5,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+157,Isaiah Likely,TE,NYG,8.0,125.0,4,192.6,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+94,Jordan Mason,RB,MIN,6.0,123.5,3,96.99,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+78,Blake Corum,RB,LAR,11.0,150.5,3,80.96,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+110,Woody Marks,RB,HOU,8.0,116.0,4,118.98,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+243,Sam Darnold,QB,SEA,11.0,242.0,5,296.74,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+175,Oronde Gadsden II,TE,LAC,7.0,93.5,5,234.01,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+153,Rashid Shaheed,WR,SEA,11.0,122.5,4,182.94,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+130,Alvin Kamara,RB,NO,8.0,106.5,4,155.97,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+201,Chig Okonkwo,TE,WAS,7.0,95.0,5,279.27,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+127,Tyjae Spears,RB,TEN,9.0,124.0,4,152.6,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+357,Evan Engram,TE,DEN,10.0,82.5,5,299.96,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+359,Mike Gesicki,TE,CIN,6.0,87.0,5,299.96,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+272,Terrance Ferguson,TE,LAR,11.0,113.0,5,299.08,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+137,Matthew Golden,WR,GB,11.0,152.5,4,165.94,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+231,AJ Barner,TE,SEA,11.0,91.5,5,294.55,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+305,Geno Smith,QB,NYJ,13.0,232.0,5,299.72,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+263,Bryce Young,QB,CAR,5.0,237.0,5,298.54,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+274,Gunnar Helm,TE,TEN,9.0,97.0,5,299.24,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+118,Isiah Pacheco,RB,DET,6.0,115.5,4,139.31,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+257,Greg Dulcich,TE,MIA,6.0,93.0,5,298.28,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+202,Calvin Ridley,WR,TEN,9.0,121.0,5,280.12,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+62,Jadarian Price,RB,SEA,11.0,180.5,3,64.3,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+213,Malik Willis,QB,MIA,6.0,237.0,5,289.41,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+236,Kenyon Sadiq,TE,NYJ,13.0,128.5,5,295.8,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+74,Carnell Tate,WR,TEN,9.0,172.0,3,75.12,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+299,Cade Otton,TE,TB,10.0,79.5,5,299.68,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+93,Makai Lemon,WR,PHI,10.0,143.5,3,95.67,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+83,Jordyn Tyson,WR,NO,8.0,154.5,3,86.89,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+284,David Njoku,TE,LAC,7.0,68.5,5,299.51,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+245,Joe Mixon,RB,HOU,N/A,35.0,5,296.97,adp_estimate,False,Local ADP estimate
+159,Stefon Diggs,WR,NE,N/A,95.6,4,196.17,adp_estimate,False,Local ADP estimate
+281,Jacoby Brissett,QB,ARI,14.0,200.0,5,299.43,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+160,Jauan Jennings,WR,MIN,6.0,91.0,4,196.56,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+169,Jerry Jeudy,WR,CLE,11.0,112.5,5,220.74,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+306,Colby Parkinson,TE,LAR,11.0,53.0,5,299.72,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+95,Jonathon Brooks,RB,CAR,5.0,131.0,3,99.39,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+123,Jayden Higgins,WR,HOU,8.0,114.0,4,149.17,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+354,Jake Tonges,TE,SF,8.0,26.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+228,Dawson Knox,TE,BUF,7.0,55.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+204,Tyreek Hill,WR,MIA,N/A,59.6,5,283.72,adp_estimate,False,Local ADP estimate
+178,Tre Tucker,WR,LV,13.0,114.0,5,244.39,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+363,Theo Johnson,TE,NYG,8.0,50.0,5,299.97,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+132,KC Concepcion,WR,CLE,11.0,131.5,4,158.48,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+104,Tyrone Tracy Jr.,RB,NYG,8.0,72.0,4,111.7,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+191,Deebo Samuel Sr.,WR,WAS,N/A,74.0,5,268.59,adp_estimate,False,Local ADP estimate
+264,Mason Taylor,TE,NYJ,13.0,43.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+150,Jalen Coker,WR,CAR,5.0,117.5,4,176.98,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+171,Jalen McMillan,WR,TB,10.0,109.5,5,224.6,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+258,Noah Gray,TE,KC,5.0,48.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+254,Rashod Bateman,WR,BAL,13.0,104.0,5,297.98,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+212,Justice Hill,RB,BAL,13.0,94.5,5,288.59,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+222,Darnell Washington,TE,PIT,9.0,56.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+270,Cole Kmet,TE,CHI,10.0,43.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+318,Tyler Higbee,TE,LAR,11.0,30.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+114,Brian Robinson,RB,ATL,11.0,89.5,4,128.84,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+276,Noah Fant,TE,NO,8.0,34.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+210,Michael Mayer,TE,LV,13.0,62.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+251,Cooper Kupp,WR,SEA,11.0,82.0,5,297.88,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+216,Ja'Tavion Sanders,TE,CAR,5.0,59.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+173,Travis Hunter,WR,JAX,7.0,91.0,5,226.36,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+238,Tank Dell,WR,HOU,8.0,57.0,5,296.0,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+282,Austin Hooper,TE,ATL,11.0,32.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+107,Tyler Allgeier,RB,ARI,14.0,82.0,4,115.7,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+316,Aaron Rodgers,QB,PIT,9.0,218.0,5,299.83,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+246,Tommy Tremble,TE,CAR,5.0,49.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+241,Malik Washington,WR,MIA,6.0,85.5,5,296.37,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+233,Darnell Mooney,WR,NYG,8.0,79.0,5,295.45,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+262,Ty Johnson,RB,BUF,7.0,74.0,5,298.48,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+196,Jalen Nailor,WR,LV,13.0,94.5,5,275.22,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+294,Erick All,TE,CIN,6.0,31.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+312,Josh Oliver,TE,MIN,6.0,29.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+145,Dylan Sampson,RB,CLE,11.0,72.0,4,173.63,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+315,Phil Mafah,RB,DAL,14.0,35.0,5,299.81,adp_estimate,False,Local ADP estimate
+249,Samaje Perine,RB,CIN,6.0,91.5,5,297.67,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+384,Jackson Hawes,TE,BUF,7.0,21.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+172,James Conner,RB,ARI,14.0,43.0,5,225.23,adp_estimate,False,Local ADP estimate
+135,Tank Bigsby,RB,PHI,10.0,62.0,4,161.86,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+103,Chris Rodriguez Jr.,RB,JAX,7.0,69.0,4,111.58,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+184,Adonai Mitchell,WR,NYJ,13.0,96.5,5,250.11,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+200,Jalen Tolbert,WR,MIA,6.0,72.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+304,Keon Coleman,WR,BUF,7.0,50.5,5,299.71,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+355,Keenan Allen,WR,LAC,7.0,35.0,5,299.95,adp_estimate,False,Local ADP estimate
+378,Luke Schoonmaker,TE,DAL,14.0,22.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+366,Tanner Hudson,TE,CIN,6.0,22.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+287,Kareem Hunt,RB,KC,N/A,35.0,5,299.52,adp_estimate,False,Local ADP estimate
+252,Elijah Arroyo,TE,SEA,11.0,49.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+286,Marquise Brown,WR,PHI,10.0,41.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+338,Andrei Iosivas,WR,CIN,6.0,63.5,5,299.88,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+317,Darius Slayton,WR,NYG,8.0,71.5,5,299.84,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+226,Brandon Aiyuk,WR,SF,8.0,47.6,5,293.08,adp_estimate,False,Local ADP estimate
+288,Elijah Higgins,TE,ARI,14.0,32.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+198,Kayshon Boutte,WR,NE,11.0,56.0,5,276.3,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+306,Drew Sample,TE,CIN,6.0,30.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+208,Ryan Flournoy,WR,DAL,14.0,73.0,5,287.81,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+190,Nick Westbrook-Ikhine,WR,IND,13.0,79.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+218,Jaylin Noel,WR,HOU,8.0,84.0,5,292.01,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+426,Foster Moreau,TE,HOU,8.0,15.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+438,Brock Wright,TE,DET,6.0,15.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+372,Adam Trautman,TE,DEN,10.0,23.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+342,Cade Stover,TE,HOU,8.0,27.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+343,KaVontae Turpin,WR,DAL,14.0,58.0,5,299.89,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+360,Luke Musgrave,TE,GB,11.0,25.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+219,Troy Franklin,WR,DEN,10.0,42.5,5,292.26,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+360,Michael Carter,RB,TEN,9.0,35.0,5,299.96,adp_estimate,False,Local ADP estimate
+339,Marvin Mims Jr.,WR,DEN,10.0,58.0,5,299.88,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+336,Mitchell Evans,TE,CAR,5.0,27.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+420,Davis Allen,TE,LAR,11.0,16.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+390,Mo Alie-Cox,TE,IND,13.0,21.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+297,Eli Stowers,TE,PHI,10.0,31.0,5,299.65,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+300,Will Kacmarek,TE,MIA,6.0,31.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+402,Daniel Bellinger,TE,TEN,9.0,20.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+246,Dontayvion Wicks,WR,PHI,10.0,54.0,5,297.06,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+154,Braelon Allen,RB,NYJ,13.0,80.5,4,183.69,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+408,Jeremy Ruckert,TE,NYJ,13.0,19.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+278,Christian Kirk,WR,SF,8.0,55.5,5,299.38,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+205,Isaac TeSlaa,WR,DET,6.0,61.0,5,286.58,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+265,Tyquan Thornton,WR,KC,5.0,65.0,5,298.82,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+268,DeMario Douglas,WR,NE,11.0,49.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+237,Emari Demercado,RB,KC,5.0,55.0,5,295.8,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+352,Devaughn Vele,WR,NO,8.0,48.5,5,299.93,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+252,Pat Bryant,WR,DEN,10.0,59.0,5,297.9,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+318,Xavier Legette,WR,CAR,5.0,57.5,5,299.84,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+295,Tory Horton,WR,SEA,11.0,54.0,5,299.61,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+486,Brevyn Spann-Ford,TE,DAL,14.0,8.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+203,Tre Harris,WR,LAC,7.0,71.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+474,Luke Farrell,TE,SF,8.0,8.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+177,Ray Davis,RB,BUF,7.0,34.0,5,242.28,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+432,Nate Adkins,TE,DEN,10.0,15.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+348,John Bates,TE,WAS,7.0,27.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+456,Charlie Kolar,TE,LAC,7.0,14.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+450,Payne Durham,TE,TB,10.0,14.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+396,Ben Sinnott,TE,WAS,7.0,21.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+346,Sincere McCormick,RB,SF,8.0,35.0,5,299.9,adp_estimate,False,Local ADP estimate
+414,Durham Smythe,TE,BAL,13.0,19.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+283,Nick Chubb,RB,HOU,N/A,35.0,5,299.49,adp_estimate,False,Local ADP estimate
+176,Sean Tucker,RB,TB,10.0,33.0,5,241.76,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+330,Eli Raridon,TE,NE,11.0,29.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+182,Kimani Vidal,RB,LAC,7.0,35.0,5,248.24,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+211,Dyami Brown,WR,WAS,7.0,70.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+207,Trey Benson,RB,ARI,14.0,35.0,5,287.34,adp_estimate,False,Local ADP estimate
+264,Chimere Dike,WR,TEN,9.0,26.5,5,298.68,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+223,Devin Neal,RB,NO,8.0,35.0,5,292.69,adp_estimate,False,Local ADP estimate
+229,Van Jefferson,WR,WAS,7.0,61.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+167,Denzel Boston,WR,CLE,11.0,106.0,5,216.7,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+256,Najee Harris,RB,LAC,7.0,35.0,5,298.08,adp_estimate,False,Local ADP estimate
+304,Josh Palmer,WR,BUF,7.0,36.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+480,Max Klare,TE,LAR,11.0,8.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+444,Nate Boerkircher,TE,JAX,7.0,14.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+250,Germie Bernard,WR,PIT,9.0,103.5,5,297.79,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+317,Olamide Zaccheaus,WR,ATL,11.0,31.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+296,Jahan Dotson,WR,ATL,11.0,68.0,5,299.62,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+289,Isaac Guerendo,RB,SF,8.0,1.0,5,299.54,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+286,Devin Singletary,RB,NYG,8.0,25.0,5,299.52,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+462,Ben Sims,TE,MIA,6.0,11.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+125,Keaton Mitchell,RB,LAC,7.0,58.0,4,150.76,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+281,Tutu Atwell,WR,MIA,6.0,43.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+340,Austin Ekeler,RB,WAS,N/A,35.0,5,299.88,adp_estimate,False,Local ADP estimate
+279,Jack Bech,WR,LV,13.0,72.0,5,299.42,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+293,Jerome Ford,RB,WAS,7.0,35.0,5,299.59,adp_estimate,False,Local ADP estimate
+199,Jaylen Wright,RB,MIA,6.0,39.5,5,276.41,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+325,Mack Hollins,WR,NE,11.0,22.5,5,299.85,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+215,Ollie Gordon II,RB,MIA,6.0,33.0,5,290.4,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+276,Elic Ayomanor,WR,TEN,9.0,13.0,5,299.33,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+492,CJ Dippre,TE,NE,11.0,7.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+351,Tez Johnson,WR,TB,10.0,18.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+195,Antonio Williams,WR,WAS,7.0,95.5,5,273.58,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+468,Blake Whiteheart,TE,CLE,11.0,11.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+192,MarShawn Lloyd,RB,GB,11.0,59.0,5,268.75,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+302,Jaleel McLaughlin,RB,DEN,10.0,35.0,5,299.69,adp_estimate,False,Local ADP estimate
+216,Jaydon Blue,RB,DAL,14.0,42.5,5,290.64,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+244,Malik Davis,RB,DAL,14.0,34.0,5,296.75,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+291,Kendrick Bourne,WR,ARI,14.0,38.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+273,Isaiah Davis,RB,NYJ,13.0,32.5,5,299.13,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+312,Xavier Hutchinson,WR,HOU,8.0,34.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+356,Raheim Sanders,RB,CLE,11.0,35.0,5,299.95,adp_estimate,False,Local ADP estimate
+165,Omar Cooper Jr.,WR,NYJ,13.0,85.0,5,214.96,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+315,Jordan Whittington,WR,LAR,11.0,34.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+269,Chris Bell,WR,MIA,6.0,72.0,5,299.05,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+344,Bam Knight,RB,ARI,14.0,1.0,5,299.89,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+229,Jordan James,RB,SF,8.0,60.0,5,294.24,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+390,Tyrell Shavers,WR,BUF,7.0,9.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+263,Jaylin Lane,WR,WAS,7.0,52.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+347,Jawhar Jordan,RB,HOU,8.0,7.0,5,299.9,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+320,Ja'Kobi Lane,WR,BAL,13.0,69.0,5,299.84,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+354,Calvin Austin III,WR,NYG,8.0,17.0,5,299.94,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+294,Kalif Raymond,WR,CHI,10.0,38.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+240,Chris Brooks,RB,GB,11.0,36.0,5,296.37,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+368,Jeremy McNichols,RB,WAS,7.0,35.0,5,299.98,adp_estimate,False,Local ADP estimate
+369,Greg Dortch,WR,DET,6.0,14.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+298,Caleb Douglas,WR,MIA,6.0,64.5,5,299.65,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+271,Savion Williams,WR,GB,11.0,58.0,5,299.07,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+395,Demarcus Robinson,WR,SF,8.0,8.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+348,Cedric Tillman,WR,CLE,11.0,17.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+288,Pierre Strong,RB,GB,11.0,35.0,5,299.54,adp_estimate,False,Local ADP estimate
+162,Emanuel Wilson,RB,SEA,11.0,9.5,5,208.76,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+194,Cameron Ward,QB,TEN,9.0,219.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+166,Emmett Johnson,RB,KC,5.0,42.0,5,215.97,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+170,Mike Washington Jr.,RB,LV,13.0,61.0,5,223.24,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+234,Zachariah Branch,WR,ATL,11.0,66.5,5,295.63,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+194,Tre' Harris,WR,LAC,7.0,71.6,5,272.22,adp_estimate,False,Local ADP estimate
+275,Brashard Smith,RB,KC,5.0,1.0,5,299.3,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+325,Devontez Walker,WR,BAL,13.0,29.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+253,De'Zhaun Stribling,WR,SF,8.0,51.5,5,297.95,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+243,Hunter Luepke,RB,DAL,14.0,20.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+255,Cam Ward,QB,TEN,9.0,174.0,5,298.0,adp_estimate,False,Local ADP estimate
+303,Elijah Sarratt,WR,BAL,13.0,49.0,5,299.7,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+300,LeQuint Allen Jr.,RB,JAX,7.0,35.0,5,299.69,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+268,Ted Hurst III,WR,TB,10.0,53.5,5,298.95,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+285,Jaydn Ott,RB,KC,5.0,35.0,5,299.52,adp_estimate,False,Local ADP estimate
+311,Kyle Williams,WR,NE,11.0,35.0,5,299.77,adp_estimate,False,Local ADP estimate
+371,Dameon Pierce,RB,PHI,10.0,35.0,5,299.99,adp_estimate,False,Local ADP estimate
+247,Kaelon Black,RB,SF,8.0,32.0,5,297.32,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+121,Jonah Coleman,RB,DEN,10.0,34.5,4,147.7,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+350,Ty Chandler,RB,NO,8.0,35.0,5,299.92,adp_estimate,False,Local ADP estimate
+361,Rasheen Ali,RB,BAL,13.0,35.0,5,299.97,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+283,Kevin Coleman Jr.,WR,MIA,6.0,41.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+314,Jarquez Hunter,RB,LAR,11.0,35.0,5,299.8,adp_estimate,False,Local ADP estimate
+353,Isaiah Bond,WR,CLE,11.0,16.0,5,299.94,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+322,Will Shipley,RB,PHI,10.0,22.5,5,299.85,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+324,Jacob Saylors,RB,DET,6.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+296,Ashton Dulin,WR,IND,13.0,38.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+259,Kendre Miller,RB,NO,8.0,7.0,5,298.39,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+465,Skyy Moore,WR,GB,11.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+280,Adam Randall,RB,BAL,13.0,23.0,5,299.42,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+277,Benny Snell Jr.,RB,Unknown,N/A,35.0,5,299.34,adp_estimate,False,Local ADP estimate
+290,Audric Estime,RB,NO,8.0,35.0,5,299.54,adp_estimate,False,Local ADP estimate
+348,Skyler Bell,WR,BUF,7.0,35.5,5,299.91,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+359,Mitchell Tinsley,WR,CIN,6.0,16.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+364,Hollywood Brown,WR,PHI,10.0,35.0,5,299.97,adp_estimate,False,Local ADP estimate
+310,Eli Heidenreich,RB,PIT,9.0,35.0,5,299.76,adp_estimate,False,Local ADP estimate
+345,Graig Cooper,RB,Unknown,N/A,35.0,5,299.89,adp_estimate,False,Local ADP estimate
+335,J'Mari Taylor,RB,JAX,7.0,35.0,5,299.87,adp_estimate,False,Local ADP estimate
+473,Michael Bandy,WR,DEN,10.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+450,Jacob Cowing,WR,SF,8.0,1.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+349,Khalil Herbert,RB,NYJ,N/A,35.0,5,299.92,adp_estimate,False,Local ADP estimate
+258,DJ Giddens,RB,IND,13.0,31.5,5,298.36,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+370,Konata Mumpfield,WR,LAR,11.0,24.0,5,299.99,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+299,Jalen Royals,WR,KC,5.0,37.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+302,Treylon Burks,WR,WAS,7.0,37.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+292,Chris Brazzell II,WR,CAR,5.0,50.0,5,299.58,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+354,Xavier Smith,WR,LAR,11.0,18.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+429,JuJu Smith-Schuster,WR,NYG,8.0,2.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+309,Tyler Badie,RB,DEN,10.0,15.0,5,299.74,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+333,Josh Williams,RB,TB,10.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+248,Kyle Juszczyk,RB,SF,8.0,35.5,5,297.53,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+478,Josh Cameron,WR,JAX,7.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+481,Jeshaun Jones,WR,MIN,6.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+224,Demond Claiborne,RB,MIN,6.0,21.5,5,292.85,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+365,Bryce Lance,WR,NO,8.0,34.0,5,299.98,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+260,Seth McGowan,RB,IND,13.0,14.0,5,298.42,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+377,Isaiah Williams,WR,NYJ,13.0,12.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+307,Julius Chestnut,RB,TEN,9.0,35.0,5,299.73,adp_estimate,False,Local ADP estimate
+294,Trevor Etienne,RB,CAR,5.0,28.0,5,299.6,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+403,Jahdae Walker,WR,CHI,10.0,7.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+342,Luke McCaffrey,WR,WAS,7.0,1.0,5,299.89,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+330,Dont'e Thornton Jr.,WR,LV,13.0,26.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+330,DeeJay Dallas,RB,JAX,7.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+239,George Holani,RB,SEA,11.0,37.0,5,296.04,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+362,Cyrus Allen,WR,KC,5.0,14.0,5,299.97,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+471,Jalen Brooks,WR,ARI,14.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+408,Darius Cooper,WR,PHI,10.0,6.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+180,Nicholas Singleton,RB,TEN,9.0,18.0,5,245.39,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+320,Odell Beckham Jr.,WR,NYG,8.0,31.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+312,Tahj Brooks,RB,CIN,6.0,18.0,5,299.78,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+367,Zavion Thomas,WR,CHI,10.0,30.0,5,299.98,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+267,Malachi Fields,WR,NYG,8.0,27.5,5,298.93,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+382,Bo Melton,WR,GB,11.0,10.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+186,Kaytron Allen,RB,WAS,7.0,14.0,5,252.61,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+406,Justin Watson,WR,HOU,8.0,7.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+282,Max Bredeson,RB,MIN,6.0,7.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+369,Tua Tagovailoa,QB,ATL,11.0,114.0,5,299.98,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+288,Riley Nowakowski,RB,PIT,9.0,6.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+285,Andrew Beck,RB,NYJ,13.0,6.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+273,Connor Heyward,RB,LV,13.0,8.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+445,Nikko Remigio,WR,KC,5.0,1.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+380,Mason Tipton,WR,NO,8.0,10.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+476,Brycen Tremayne,WR,CAR,5.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+309,Kene Nwangwu,RB,NYJ,13.0,2.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+270,Adam Prentice,RB,DEN,10.0,8.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+468,Dareke Young,WR,LV,13.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+358,Brenen Thompson,WR,LAC,7.0,22.0,5,299.96,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+393,Colbie Young,WR,CIN,6.0,8.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+484,Mason Kinsey,WR,TEN,9.0,35.0,5,,adp_estimate,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+439,LaJohntay Wester,WR,BAL,13.0,2.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+261,Alec Ingold,RB,LAC,7.0,12.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+343,KeAndre Lambert-Smith,WR,LAC,7.0,22.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+346,Kyle T. Williams,WR,NE,11.0,20.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+387,Ben Skowronek,WR,PIT,9.0,9.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+276,Michael Burton,RB,CLE,11.0,8.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+411,Jonathan Mingo,WR,DAL,14.0,6.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+364,Anthony Gould,WR,IND,13.0,14.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+416,Kaden Wetjen,WR,PIT,9.0,7.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+366,Malik Benson,WR,LV,13.0,13.0,5,299.98,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+419,Malachi Corley,WR,CLE,11.0,6.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+230,Kaleb Johnson,RB,PIT,9.0,5.0,5,294.54,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+437,Myles Price,WR,MIN,6.0,2.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+447,Barion Brown,WR,NO,8.0,1.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+426,Jimmy Horn Jr.,WR,CAR,5.0,3.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+398,David Moore,WR,CAR,5.0,7.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+460,Gage Larvadain,WR,CLE,11.0,1.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+321,Dylan Laube,RB,LV,13.0,1.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+434,Charlie Jones,WR,CIN,6.0,2.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+424,Arian Smith,WR,NYJ,13.0,4.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+385,Derius Davis,WR,LAC,7.0,10.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+400,Tai Felton,WR,MIN,6.0,7.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+442,Britain Covey,WR,PHI,10.0,2.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+421,Kameron Johnson,WR,TB,10.0,4.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+220,Deshaun Watson,QB,CLE,11.0,124.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+413,Reggie Virgil,WR,ARI,14.0,6.5,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+306,British Brooks,RB,HOU,8.0,2.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+463,Efton Chism III,WR,NE,11.0,1.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+432,Braxton Berrios,WR,NYG,8.0,2.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+452,Ke'Shawn Williams,WR,CIN,6.0,1.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+291,Reggie Gilliam,RB,NE,11.0,6.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+455,Devin Duvernay,WR,ARI,14.0,1.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+294,Patrick Ricard,RB,NYG,8.0,5.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+313,Michael Penix Jr.,QB,ATL,11.0,113.0,5,299.79,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+239,Shedeur Sanders,QB,CLE,11.0,96.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+301,Fernando Mendoza,QB,LV,13.0,187.0,5,299.69,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+272,Justin Fields,QB,KC,5.0,11.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+252,J.J. McCarthy,QB,MIN,6.0,40.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+246,Kirk Cousins,QB,LV,13.0,46.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+321,Malik Cunningham,QB,DET,6.0,118.0,5,299.85,adp_estimate,False,Local ADP estimate
+278,Joe Flacco,QB,CIN,6.0,10.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+265,Joe Milton III,QB,DAL,14.0,11.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf
+258,Carson Beck,QB,ARI,14.0,29.0,5,,published,False,https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf

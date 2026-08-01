@@ -184,19 +184,31 @@ deployment:
 scripts/draft-night-server start
 ```
 
-The command validates the board, binds FastAPI to localhost, configures private
-Tailscale Serve, and prints the phone URL. See the
+The command runs the complete draft-night preflight, binds one FastAPI worker to
+localhost, configures private Tailscale Serve, and prints the phone URL. See the
 [draft-night runbook](docs/draft-night-runbook.md) for verification, recovery, and
 shutdown instructions.
 
-Generate the static emergency board before draft night:
+Run the same complete preflight without starting the server:
+
+```bash
+venv/bin/python scripts/draft_night_preflight.py --deployment tailscale-linux
+```
+
+It runs unit and browser critical-path tests, validates the board and packaged source,
+regenerates the static emergency board, verifies the matching board fingerprint, and
+checks the supported host and single-worker assumptions. Skipped browser tests make
+the preflight fail.
+
+To regenerate only the static emergency board during development:
 
 ```bash
 venv/bin/python scripts/generate_emergency_cheatsheet.py
 ```
 
-The printable fallback is written to `outputs/emergency_draft_cheatsheet.md`. It does
-not track selections; cross off drafted players manually.
+The printable fallback is written to `outputs/emergency_draft_cheatsheet.md` and
+includes the exact live-board fingerprint. It does not track selections; cross off
+drafted players manually.
 
 ## Live Draft Commands
 

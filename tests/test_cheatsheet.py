@@ -1,5 +1,6 @@
 import json
 
+from fantasy_draft.board import board_fingerprint
 from fantasy_draft.board.cheatsheet import render_cheatsheet, write_cheatsheet
 
 
@@ -13,6 +14,7 @@ def test_emergency_cheatsheet_contains_board_health_tiers_and_recovery(web_draft
     assert "## RB Tiers" in text
     assert "Jahmyr Gibbs" in text
     assert "Static fallback only" in text
+    assert f"Board fingerprint: `{board_fingerprint(board)}`" in text
     assert "scripts/draft-night-server start" in text
     assert "scripts/live_draft.py interactive <session-name>" in text
 

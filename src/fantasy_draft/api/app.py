@@ -1,6 +1,7 @@
 """Private FastAPI application for the mobile draft cockpit."""
 
 import argparse
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Callable, Optional
 from urllib.parse import urlsplit
@@ -12,6 +13,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from fantasy_draft.api.errors import error_payload, install_error_handlers
 from fantasy_draft.api.routes import board, health, sessions
+from fantasy_draft.api.worker_lock import SessionWorkerLock
 from fantasy_draft.config import load_environment
 
 
@@ -50,12 +52,25 @@ def create_app(
     assistant_client_factory: Optional[Callable] = None,
 ) -> FastAPI:
     load_environment()
+    configured_sessions_dir = Path(sessions_dir)
+
+    @asynccontextmanager
+    async def lifespan(application: FastAPI):
+        lock = SessionWorkerLock(configured_sessions_dir)
+        lock.acquire()
+        application.state.worker_lock = lock
+        try:
+            yield
+        finally:
+            lock.release()
+
     app = FastAPI(
         title="NFL Fantasy Draft Assistant",
         version="0.1.0",
         description="Private API for the live fantasy draft cockpit.",
+        lifespan=lifespan,
     )
-    app.state.sessions_dir = Path(sessions_dir)
+    app.state.sessions_dir = configured_sessions_dir
     app.state.board_path = Path(board_path)
     app.state.frontend_dir = Path(frontend_dir or PROJECT_ROOT / "frontend")
     app.state.assistant_client_factory = assistant_client_factory
@@ -124,12 +139,19 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--sessions-dir", type=Path, default=Path("sessions"))
     parser.add_argument("--board", type=Path, default=Path("outputs/draft_board.json"))
+    parser.add_argument(
+        "--workers",
+        type=int,
+        choices=[1],
+        default=1,
+        help="Draft persistence requires exactly one server worker",
+    )
     args = parser.parse_args()
 
     import uvicorn
 
     server_app = create_app(sessions_dir=args.sessions_dir, board_path=args.board)
-    uvicorn.run(server_app, host=args.host, port=args.port)
+    uvicorn.run(server_app, host=args.host, port=args.port, workers=1)
 
 
 if __name__ == "__main__":

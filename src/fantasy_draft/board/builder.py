@@ -225,8 +225,11 @@ class DraftBoardBuilder:
         return board
 
     def write(self, board: Dict[str, Any], output_path: Path = Path("outputs/draft_board.json")) -> Path:
+        from fantasy_draft.board.fingerprint import stamp_board_fingerprint
+
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        stamp_board_fingerprint(board)
         with output_path.open("w", encoding="utf-8") as handle:
             json.dump(board, handle, indent=2)
             handle.write("\n")
@@ -258,6 +261,8 @@ def _health_report(
 
 def _validate_board_snapshot(board: Dict[str, Any]) -> Dict[str, Any]:
     """Validate only the portable board contract, not its external provenance."""
+    from fantasy_draft.board.fingerprint import verify_board_fingerprint
+
     issues: List[ValidationIssue] = []
     metadata = board.get("metadata", {})
     roles = board.get("roles", {})
@@ -266,6 +271,12 @@ def _validate_board_snapshot(board: Dict[str, Any]) -> Dict[str, Any]:
         issues.append(ValidationIssue("error", "schema_version", "Unsupported board schema version"))
     if not metadata.get("season"):
         issues.append(ValidationIssue("error", "missing_season", "Board has no target season"))
+    if metadata.get("board_fingerprint") and not verify_board_fingerprint(board)["matches"]:
+        issues.append(ValidationIssue(
+            "error",
+            "board_fingerprint_mismatch",
+            "Board content no longer matches its saved fingerprint",
+        ))
 
     seen = set()
     for position in POSITIONS:

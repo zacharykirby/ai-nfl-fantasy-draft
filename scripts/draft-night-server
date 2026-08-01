@@ -41,7 +41,7 @@ start() {
   funnel_is_clear || fail "Tailscale Funnel is configured; run 'tailscale funnel reset' after reviewing it"
 
   cd "$PROJECT_ROOT"
-  "$PYTHON" scripts/cli.py --validate-board
+  "$PYTHON" scripts/draft_night_preflight.py --deployment tailscale-linux
 
   if server_is_running; then
     echo "Draft server is already running."
@@ -55,7 +55,7 @@ start() {
       --property="RestartSec=2s" \
       --property="StandardOutput=append:$LOG_FILE" \
       --property="StandardError=append:$LOG_FILE" \
-      "$SERVER" --host "$HOST" --port "$PORT" >/dev/null
+      "$SERVER" --host "$HOST" --port "$PORT" --workers 1 >/dev/null
   fi
 
   local ready=false

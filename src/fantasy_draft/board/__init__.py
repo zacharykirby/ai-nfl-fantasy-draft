@@ -10,6 +10,13 @@ from .builder import (
     validate_board_path,
 )
 from .cheatsheet import render_cheatsheet, write_cheatsheet
+from .fingerprint import (
+    board_fingerprint,
+    cheatsheet_fingerprint,
+    stamp_board_fingerprint,
+    verify_board_fingerprint,
+    verify_fallback_fingerprint,
+)
 
 __all__ = [
     "DraftBoardBuilder",
@@ -21,4 +28,9 @@ __all__ = [
     "validate_board_path",
     "render_cheatsheet",
     "write_cheatsheet",
+    "board_fingerprint",
+    "cheatsheet_fingerprint",
+    "stamp_board_fingerprint",
+    "verify_board_fingerprint",
+    "verify_fallback_fingerprint",
 ]

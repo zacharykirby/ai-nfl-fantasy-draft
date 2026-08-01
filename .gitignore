@@ -51,7 +51,9 @@ Thumbs.db
 
 # Project specific
 data/*.csv
+!data/players_2026_positions_bye.csv
 outputs/*.csv
 news/*.json
 sessions/*.json
+sessions/.draft-server.lock
 *.log 

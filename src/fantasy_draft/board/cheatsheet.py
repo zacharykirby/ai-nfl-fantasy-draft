@@ -1,7 +1,10 @@
 """Generate a compact, printable emergency board from the stable board contract."""
 
+import os
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
+
+from fantasy_draft.board.fingerprint import board_fingerprint
 
 
 POSITION_LIMITS = {"QB": 10, "RB": 18, "WR": 18, "TE": 10}
@@ -64,6 +67,7 @@ def render_cheatsheet(
         ),
     )[:20]
     starters = league.get("starters", {})
+    fingerprint = board_fingerprint(board)
 
     lines = [
         "# Emergency Fantasy Draft Cheatsheet",
@@ -75,6 +79,7 @@ def render_cheatsheet(
         f"- Status: **{str(health.get('status', 'unknown')).upper()}**",
         f"- Season/scoring: {metadata.get('season', '—')} / {str(league.get('scoring', 'unknown')).replace('_', '-')} ",
         f"- Board generated: {metadata.get('generated_at', 'unknown')}",
+        f"- Board fingerprint: `{fingerprint}`",
         f"- League: {league.get('league_size', '—')} teams; starters "
         f"QB {starters.get('QB', 0)}, RB {starters.get('RB', 0)}, WR {starters.get('WR', 0)}, "
         f"TE {starters.get('TE', 0)}, FLEX {starters.get('FLEX', 0)}; bench {league.get('bench_size', '—')}",
@@ -128,5 +133,7 @@ def write_cheatsheet(
 ) -> Path:
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(render_cheatsheet(board, health), encoding="utf-8")
+    temporary = output.with_name(".{}.{}.tmp".format(output.name, os.getpid()))
+    temporary.write_text(render_cheatsheet(board, health), encoding="utf-8")
+    temporary.replace(output)
     return output

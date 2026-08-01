@@ -7,7 +7,7 @@ name = "fantasy-draft-assistant"
 version = "0.1.0"
 description = "Private, data-driven fantasy football draft assistant"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 license = {file = "LICENSE"}
 dependencies = [
   "fastapi>=0.115.0",

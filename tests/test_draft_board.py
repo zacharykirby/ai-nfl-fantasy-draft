@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from fantasy_draft.board.builder import DraftBoardBuilder, LeagueConfig, format_board, validate_board
+from fantasy_draft.board.fingerprint import verify_board_fingerprint
 
 
 def ranking(name, position, rank, vorp=10, points=100, **extra):
@@ -222,6 +223,15 @@ def test_league_config_and_text_format(tmp_path):
     assert "RB PRIORITIES" in output
     assert "Running Back" in output
     assert "QB PRIORITIES" not in output
+
+
+def test_board_writer_stamps_exact_artifact_fingerprint(tmp_path):
+    builder = DraftBoardBuilder(write_rankings(tmp_path, complete_players()))
+    board = builder.build()
+    path = builder.write(board, tmp_path / "outputs" / "draft_board.json")
+
+    saved = json.loads(path.read_text(encoding="utf-8"))
+    assert verify_board_fingerprint(saved)["matches"] is True
 
 
 def test_default_board_universe_is_330_and_weighted_to_rb_wr(tmp_path):

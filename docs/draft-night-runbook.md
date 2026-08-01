@@ -31,11 +31,19 @@ From the repository root, run:
 scripts/draft-night-server start
 ```
 
-The command validates `outputs/draft_board.json`, rejects any active Funnel
-configuration, starts FastAPI as a transient user systemd service on
+The command runs `scripts/draft_night_preflight.py --deployment tailscale-linux`,
+rejects any active Funnel configuration, and starts exactly one FastAPI worker as a
+transient user systemd service on
 `127.0.0.1:8000`, configures Serve, and prints the private
 `https://<machine>.<tailnet>.ts.net` URL. Open that URL on the phone while Tailscale
 is connected.
+
+Preflight runs the unit and browser critical-path suites, requires the browser tests
+to execute rather than skip, validates the packaged projection source, regenerates
+`outputs/emergency_draft_cheatsheet.md`, and requires its SHA-256 board fingerprint
+to match `outputs/draft_board.json`. It also checks Python 3.12+, Linux user-systemd
+and Tailscale commands, a writable sessions directory, and single-worker
+configuration. Any failed check prevents startup.
 
 Check the deployment at any time:
 

@@ -62,6 +62,9 @@ The OpenAPI document is available at `/openapi.json` and interactive documentati
 - Natural-language pick phrases are interpreted without changing state.
 - Pick recording requires a second explicit request after user confirmation.
 - State mutations are serialized per session and accept idempotency request IDs.
+- The server holds an exclusive process lock for its sessions directory. A second
+  worker or server targeting the same drafts fails startup instead of risking
+  last-writer-wins event loss.
 - Undo can require the exact latest event ID shown in its confirmation sheet.
 - Bulk catch-up validates the starting pick and saves the complete batch atomically.
 - Successful mutations return the refreshed cockpit snapshot.
