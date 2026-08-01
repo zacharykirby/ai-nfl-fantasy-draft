@@ -112,6 +112,8 @@ def test_strategy_frontend_contract():
     script = (root / "frontend" / "assets" / "app.js").read_text(encoding="utf-8")
     assert 'id="strategy-card"' in html
     assert 'id="analyze-strategy"' in html
-    assert "AUTO_STRATEGY_THRESHOLD = 2" in script
+    assert "AUTO_STRATEGY_THRESHOLD" not in script
+    assert "requestStrategy(true)" not in script
+    assert 'addEventListener("click", () => requestStrategy())' in script
     assert "result.freshness.stale" in script
     assert "render(cockpit)" in script

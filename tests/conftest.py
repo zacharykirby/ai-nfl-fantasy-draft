@@ -1,5 +1,6 @@
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -46,9 +47,42 @@ def web_draft(tmp_path):
             )
             overall += 1
 
+    projection_path = tmp_path / "players_2026_positions_bye.csv"
+    projection_rows = []
+    for position, count in {"QB": 20, "RB": 40, "WR": 50, "TE": 15}.items():
+        for number in range(count):
+            projection_rows.append(
+                "{rank},Fixture {position} {number},{position},TST,7,100,1,{rank},published,False,Fixture".format(
+                    rank=len(projection_rows) + 1,
+                    position=position,
+                    number=number,
+                )
+            )
+    projection_path.write_text(
+        "rank,name,position,team,bye_week,projected_fantasy_points,tier,adp,projection_method,team_conflict,source\n"
+        + "\n".join(projection_rows)
+        + "\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "projection_metadata_2026.json").write_text(
+        json.dumps(
+            {
+                "season": 2026,
+                "retrieved_at": datetime.now(timezone.utc).isoformat(),
+                "sources": {"projections": ["https://example.test"]},
+            }
+        ),
+        encoding="utf-8",
+    )
+
     board = {
         "schema_version": "1.0",
-        "metadata": {"generated_at": "2026-07-19T12:00:00+00:00", "season": 2026},
+        "metadata": {
+            "generated_at": "2026-07-19T12:00:00+00:00",
+            "season": 2026,
+            "projection_source": str(projection_path),
+            "news_source": "none",
+        },
         "league": {
             "scoring": "half_ppr",
             "league_size": 4,

@@ -1,5 +1,3 @@
-const AUTO_STRATEGY_THRESHOLD = 2;
-
 const state = {
   cockpit: null,
   position: "ALL",
@@ -23,7 +21,6 @@ const state = {
   strategySequence: 0,
   strategyKey: null,
   strategyResult: null,
-  strategyAutoAttempts: new Set(),
 };
 
 const byId = (id) => document.getElementById(id);
@@ -34,6 +31,13 @@ function formatScoring(value) {
   if (scoring === "ppr") return "PPR";
   if (scoring === "standard") return "Standard";
   return scoring.replaceAll("_", " ");
+}
+
+function formatBoardDate(value) {
+  if (!value) return "unknown date";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "unknown date";
+  return parsed.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 async function api(path, options = {}) {
@@ -47,6 +51,7 @@ async function api(path, options = {}) {
     if (error.name !== "AbortError") {
       state.serverOnline = false;
       updateConnectivityIndicator();
+      throw new Error("Server unreachable. The last confirmed draft state is still shown. Reconnect, then Refresh before recording another pick.");
     }
     throw error;
   }
@@ -88,7 +93,9 @@ function render(cockpit) {
   const session = cockpit.session;
   byId("session-name").textContent = session.name;
   const roundCount = Number(cockpit.league.rounds);
-  byId("league-context").textContent = `${formatScoring(cockpit.league.scoring)} · ${cockpit.league.league_size} teams · ${roundCount} round${roundCount === 1 ? "" : "s"}`;
+  const boardDate = formatBoardDate(state.board?.metadata?.generated_at || cockpit.health?.board_generated_at);
+  const sourceStatus = state.board?.health?.source?.status || "snapshot";
+  byId("league-context").textContent = `${formatScoring(cockpit.league.scoring)} · ${cockpit.league.league_size} teams · ${roundCount} round${roundCount === 1 ? "" : "s"} · Board ${boardDate} · source ${sourceStatus}`;
   byId("round").textContent = session.round;
   byId("current-pick").textContent = session.current_pick;
   byId("current-team").textContent = session.current_team == null
@@ -184,14 +191,12 @@ function setStrategyState(status, message) {
 
 function syncStrategyForCockpit(cockpit) {
   const key = strategyKey(cockpit);
-  let changed = false;
   if (state.strategyKey && state.strategyKey !== key) {
-    changed = true;
     state.strategyController?.abort();
     state.strategySequence += 1;
     state.strategyKey = null;
     state.strategyResult = null;
-    setStrategyState("Stale", "The draft changed. Refreshing strategy when appropriate.");
+    setStrategyState("Stale", "The draft changed. Tap Analyze when you want a new plan.");
   }
   const session = cockpit.session;
   const eligible = session.status === "active" && session.next_user_pick != null;
@@ -199,15 +204,12 @@ function syncStrategyForCockpit(cockpit) {
     setStrategyState("Unavailable", "No upcoming user pick remains.");
     return;
   }
-  if (session.picks_until_user <= AUTO_STRATEGY_THRESHOLD && !state.strategyAutoAttempts.has(key)) {
-    state.strategyAutoAttempts.add(key);
-    queueMicrotask(() => requestStrategy(true));
-  } else if (!changed && !state.strategyResult && !state.strategyController) {
+  if (!state.strategyResult && !state.strategyController && !state.strategyKey) {
     setStrategyState("Not requested", "Analyze positional urgency for your upcoming turn.");
   }
 }
 
-async function requestStrategy(automatic = false) {
+async function requestStrategy() {
   if (!state.session || !state.cockpit?.recommendation || state.strategyController) return;
   const requestedKey = strategyKey();
   const requestedPick = state.cockpit.session.current_pick;
@@ -215,7 +217,7 @@ async function requestStrategy(automatic = false) {
   const controller = new AbortController();
   state.strategyController = controller;
   state.strategyKey = requestedKey;
-  setStrategyState("Analyzing", automatic ? "Building a plan before your turn…" : "Analyzing your upcoming turn…");
+  setStrategyState("Analyzing", "Analyzing your upcoming turn…");
   try {
     const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/assistant/strategy`, {
       method: "POST",
@@ -283,7 +285,12 @@ function setHealth(id, text, healthy = true) {
 }
 
 function renderHealth(health) {
-  setHealth("health-board", health.board === "ready_snapshot" ? "Ready" : health.board, health.board === "ready_snapshot");
+  const runtimeBoard = state.board?.health;
+  if (runtimeBoard) {
+    setHealth("health-board", boardReadinessLabel(), runtimeBoard.can_create_session === true);
+  } else {
+    setHealth("health-board", health.board === "ready_snapshot" ? "Snapshot ready" : health.board, false);
+  }
   setHealth("health-model", health.model === "configured" ? "Configured" : "Offline", true);
   setHealth("health-autosave", health.autosave === "ok" ? "Saved" : "Missing", health.autosave === "ok");
   updateConnectivityIndicator();
@@ -527,6 +534,22 @@ function boardPlayerCount() {
   return Object.values(state.board?.role_counts || {}).reduce((total, count) => total + Number(count || 0), 0);
 }
 
+function boardCanCreateSession() {
+  return state.board?.health?.can_create_session === true;
+}
+
+function boardReadinessLabel() {
+  const health = state.board?.health;
+  if (!health) return "Checking board";
+  if (health.can_create_session) return "Board ready";
+  const blocked = [
+    health.snapshot?.status !== "ready" ? "snapshot" : "",
+    health.source?.status !== "ready" ? "source" : "",
+    health.freshness?.status !== "ready" ? "freshness" : "",
+  ].filter(Boolean);
+  return `Blocked: ${blocked.join("/") || "validation"}`;
+}
+
 function updateSessionCapacity() {
   const teams = Number(byId("new-league-size").value || 0);
   const total = boardPlayerCount();
@@ -537,7 +560,7 @@ function updateSessionCapacity() {
   if (Number(byId("new-user-team").value) > teams) byId("new-user-team").value = teams;
   byId("new-session-capacity").textContent = `${total} ranked players · up to ${maxRounds} rounds for ${teams || "—"} teams`;
   byId("new-session-format").textContent = `Scoring: ${formatScoring(state.board?.league?.scoring)} · ${Number(state.board?.league?.starters?.FLEX || 0)} FLEX · ${Number(state.board?.league?.bench_size || 0)} bench`;
-  byId("create-session").disabled = state.board?.health?.status !== "ready" || maxRounds < 1;
+  byId("create-session").disabled = !boardCanCreateSession() || maxRounds < 1;
 }
 
 function renderSessionManager() {
@@ -557,8 +580,9 @@ function renderSessionManager() {
   if (!byId("new-league-size").value) byId("new-league-size").value = leagueSize;
   if (!byId("new-rounds").value) byId("new-rounds").value = Math.min(15, Math.floor(total / leagueSize));
   if (!byId("new-user-team").value) byId("new-user-team").value = 1;
-  const ready = state.board?.health?.status === "ready";
-  byId("session-board-status").textContent = ready ? "Board ready" : "Board not ready";
+  const ready = boardCanCreateSession();
+  byId("session-board-status").textContent = boardReadinessLabel();
+  byId("session-board-status").classList.toggle("unhealthy", !ready);
   updateSessionCapacity();
 }
 
@@ -854,11 +878,11 @@ byId("new-session-form").addEventListener("submit", async (event) => {
   } catch (error) {
     showSessionNotice(error.message);
   } finally {
-    create.disabled = state.board?.health?.status !== "ready";
+    create.disabled = !boardCanCreateSession();
   }
 });
 byId("assistant-cancel").addEventListener("click", () => state.askController?.abort());
-byId("analyze-strategy").addEventListener("click", () => requestStrategy(false));
+byId("analyze-strategy").addEventListener("click", () => requestStrategy());
 document.querySelectorAll(".prompt-chip").forEach((button) => {
   button.addEventListener("click", () => {
     byId("command-input").value = button.textContent.trim();

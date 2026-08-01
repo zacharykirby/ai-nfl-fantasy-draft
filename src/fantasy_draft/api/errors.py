@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 
 from fantasy_draft.api.repository import (
     BoardNotFoundError,
+    BoardNotReadyError,
     InvalidSessionNameError,
     SessionNotFoundError,
 )
@@ -63,6 +64,18 @@ def install_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(BoardNotFoundError)
     async def board_not_found(_request: Request, exc: BoardNotFoundError) -> JSONResponse:
         return JSONResponse(error_payload("board_not_found", str(exc)), status_code=404)
+
+    @app.exception_handler(BoardNotReadyError)
+    async def board_not_ready(_request: Request, exc: BoardNotReadyError) -> JSONResponse:
+        return JSONResponse(
+            error_payload(
+                "board_not_ready",
+                str(exc),
+                True,
+                {"health": exc.health},
+            ),
+            status_code=409,
+        )
 
     @app.exception_handler(InvalidSessionNameError)
     async def invalid_session(_request: Request, exc: InvalidSessionNameError) -> JSONResponse:

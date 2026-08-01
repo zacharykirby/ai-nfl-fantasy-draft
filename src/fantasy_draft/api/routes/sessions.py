@@ -7,7 +7,8 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, Query, Response
 
 from fantasy_draft.api.dependencies import assistant_client, board_path, session_repository
-from fantasy_draft.api.repository import BoardNotFoundError, SessionRepository
+from fantasy_draft.api.repository import BoardNotFoundError, BoardNotReadyError, SessionRepository
+from fantasy_draft.board import validate_board_path
 from fantasy_draft.api.schemas import (
     AssistantAnswerResponse,
     AssistantQuestionRequest,
@@ -67,6 +68,12 @@ def create_session(
 ) -> Dict[str, Any]:
     if not configured_board.is_file():
         raise BoardNotFoundError("Draft board is not available")
+    health = validate_board_path(configured_board)
+    if not health["can_create_session"]:
+        raise BoardNotReadyError(
+            "The configured draft board is not ready for a new session",
+            health,
+        )
     result = DraftSessionCreationService(
         repository.candidate_path(request.name),
         configured_board,

@@ -1,5 +1,6 @@
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -47,7 +48,7 @@ def write_rankings(tmp_path, players, projection_source=None):
         json.dumps(
             {
                 "season": 2026,
-                "retrieved_at": "2026-07-10T00:00:00+00:00",
+                "retrieved_at": datetime.now(timezone.utc).isoformat(),
                 "sources": {"projections": ["https://example.test"]},
             }
         ),

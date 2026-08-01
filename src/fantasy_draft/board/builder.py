@@ -8,7 +8,7 @@ clients. It intentionally contains facts and evidence, not round-by-round picks.
 import json
 import re
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
@@ -21,6 +21,10 @@ POSITIONS = ("QB", "RB", "WR", "TE")
 # waiver-adjacent depth are concentrated at those positions.
 DEFAULT_POSITION_LIMITS = {"QB": 40, "RB": 110, "WR": 140, "TE": 40}
 SCHEMA_VERSION = "1.0"
+FRESHNESS_ISSUE_CODES = {
+    "projection_data_stale",
+    "projection_retrieval_time_missing",
+}
 NAME_SUFFIX_PATTERN = re.compile(r"\s+(?:jr|sr|ii|iii|iv|v)$", re.IGNORECASE)
 PLAYER_NAME_ALIASES = {"ken walker": "kenneth walker"}
 
@@ -235,8 +239,25 @@ def _normalize_source_path(source: Any) -> Optional[Path]:
     return Path(str(source).replace("\\", "/"))
 
 
-def validate_board(board: Dict[str, Any], project_root: Path = Path(".")) -> Dict[str, Any]:
-    """Return a machine-readable board health report without mutating the board."""
+def _health_report(
+    issues: Iterable[ValidationIssue],
+    metrics: Optional[Dict[str, Any]] = None,
+    status: Optional[str] = None,
+) -> Dict[str, Any]:
+    issue_list = list(issues)
+    errors = sum(issue.severity == "error" for issue in issue_list)
+    warnings = sum(issue.severity == "warning" for issue in issue_list)
+    return {
+        "status": status or ("ready" if errors == 0 else "not_ready"),
+        "error_count": errors,
+        "warning_count": warnings,
+        "issues": [asdict(issue) for issue in issue_list],
+        **({"metrics": metrics or {}} if metrics is not None else {}),
+    }
+
+
+def _validate_board_snapshot(board: Dict[str, Any]) -> Dict[str, Any]:
+    """Validate only the portable board contract, not its external provenance."""
     issues: List[ValidationIssue] = []
     metadata = board.get("metadata", {})
     roles = board.get("roles", {})
@@ -245,43 +266,6 @@ def validate_board(board: Dict[str, Any], project_root: Path = Path(".")) -> Dic
         issues.append(ValidationIssue("error", "schema_version", "Unsupported board schema version"))
     if not metadata.get("season"):
         issues.append(ValidationIssue("error", "missing_season", "Board has no target season"))
-
-    source = metadata.get("projection_source")
-    if source == "historical_fantasy_points_fallback":
-        issues.append(ValidationIssue(
-            "error", "historical_projection_fallback",
-            "Historical results are being used as future projections",
-        ))
-    else:
-        source_path = _normalize_source_path(source)
-        if source_path is None:
-            issues.append(ValidationIssue("error", "missing_projection_source", "Projection source is missing"))
-        elif not source_path.is_absolute() and not (Path(project_root) / source_path).exists():
-            issues.append(ValidationIssue(
-                "error", "projection_source_not_found",
-                "Projection source does not exist locally: {}".format(source_path),
-            ))
-        else:
-            resolved_source = source_path if source_path.is_absolute() else Path(project_root) / source_path
-            season = metadata.get("season")
-            try:
-                expected_season = int(season)
-            except (TypeError, ValueError):
-                expected_season = None
-            manifest = resolved_source.with_name(
-                "projection_metadata_{}.json".format(expected_season or datetime.now().year)
-            )
-            projection_report = validate_projection_file(
-                resolved_source,
-                metadata_path=manifest,
-                expected_season=expected_season,
-            )
-            for issue in projection_report["issues"]:
-                issues.append(ValidationIssue(
-                    issue["severity"],
-                    issue["code"],
-                    issue["message"],
-                ))
 
     seen = set()
     for position in POSITIONS:
@@ -303,15 +287,108 @@ def validate_board(board: Dict[str, Any], project_root: Path = Path(".")) -> Dic
                 issues.append(ValidationIssue("error", "position_rank_gap", "{} has an invalid position rank".format(name)))
             if not player.get("projected_points"):
                 issues.append(ValidationIssue("warning", "missing_projection", "{} has no projected points".format(name)))
+    return _health_report(issues)
 
-    errors = sum(issue.severity == "error" for issue in issues)
-    warnings = sum(issue.severity == "warning" for issue in issues)
-    return {
-        "status": "ready" if errors == 0 else "not_ready",
-        "error_count": errors,
-        "warning_count": warnings,
-        "issues": [asdict(issue) for issue in issues],
+
+def _validate_board_source(
+    board: Dict[str, Any], project_root: Path
+) -> Tuple[Dict[str, Any], bool]:
+    """Validate the normalized projection source and return whether freshness is known."""
+    metadata = board.get("metadata", {})
+    source = metadata.get("projection_source")
+    issues: List[ValidationIssue] = []
+    if source == "historical_fantasy_points_fallback":
+        issues.append(ValidationIssue(
+            "error", "historical_projection_fallback",
+            "Historical results are being used as future projections",
+        ))
+        return _health_report(issues, metrics={}), False
+
+    source_path = _normalize_source_path(source)
+    if source_path is None:
+        issues.append(ValidationIssue("error", "missing_projection_source", "Projection source is missing"))
+        return _health_report(issues, metrics={}), False
+
+    resolved_source = source_path if source_path.is_absolute() else Path(project_root) / source_path
+    if not resolved_source.exists():
+        issues.append(ValidationIssue(
+            "error", "projection_source_not_found",
+            "Projection source does not exist locally: {}".format(source_path),
+        ))
+        return _health_report(issues, metrics={}), False
+
+    season = metadata.get("season")
+    try:
+        expected_season = int(season)
+    except (TypeError, ValueError):
+        expected_season = None
+    manifest = resolved_source.with_name(
+        "projection_metadata_{}.json".format(expected_season or datetime.now().year)
+    )
+    projection_report = validate_projection_file(
+        resolved_source,
+        metadata_path=manifest,
+        expected_season=expected_season,
+    )
+    for issue in projection_report["issues"]:
+        issues.append(ValidationIssue(
+            issue["severity"],
+            issue["code"],
+            issue["message"],
+        ))
+    freshness_known = bool(projection_report.get("metrics", {}).get("retrieved_at"))
+    return _health_report(issues, metrics=projection_report.get("metrics", {})), freshness_known
+
+
+def runtime_board_health(
+    board: Dict[str, Any], project_root: Path = Path(".")
+) -> Dict[str, Any]:
+    """Return authoritative snapshot, source, and freshness readiness."""
+    snapshot = _validate_board_snapshot(board)
+    projection, freshness_known = _validate_board_source(board, Path(project_root))
+    projection_issues = [ValidationIssue(**issue) for issue in projection["issues"]]
+    source_issues = [
+        issue for issue in projection_issues if issue.code not in FRESHNESS_ISSUE_CODES
+    ]
+    freshness_issues = [
+        issue for issue in projection_issues if issue.code in FRESHNESS_ISSUE_CODES
+    ]
+    source = _health_report(source_issues, metrics=projection.get("metrics", {}))
+    freshness_metrics = {
+        key: projection.get("metrics", {}).get(key)
+        for key in ("retrieved_at", "age_days")
+        if key in projection.get("metrics", {})
     }
+    freshness = _health_report(
+        freshness_issues,
+        metrics=freshness_metrics,
+        status=None if freshness_known else "unknown",
+    )
+    components_ready = all(
+        component["status"] == "ready"
+        for component in (snapshot, source, freshness)
+    )
+    all_issues = [
+        *[ValidationIssue(**issue) for issue in source["issues"]],
+        *[ValidationIssue(**issue) for issue in freshness["issues"]],
+        *[ValidationIssue(**issue) for issue in snapshot["issues"]],
+    ]
+    combined = _health_report(all_issues)
+    return {
+        **combined,
+        "status": "ready" if components_ready else "not_ready",
+        "can_create_session": components_ready,
+        "validated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": board.get("metadata", {}).get("generated_at"),
+        "snapshot": snapshot,
+        "source": source,
+        "freshness": freshness,
+    }
+
+
+def validate_board(board: Dict[str, Any], project_root: Path = Path(".")) -> Dict[str, Any]:
+    """Return authoritative board health without mutating the board."""
+    return runtime_board_health(board, project_root=project_root)
 
 
 def load_board(path: Path = Path("outputs/draft_board.json")) -> Dict[str, Any]:
@@ -320,6 +397,18 @@ def load_board(path: Path = Path("outputs/draft_board.json")) -> Dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError("Draft board must be a JSON object")
     return payload
+
+
+def board_project_root(path: Path) -> Path:
+    """Resolve relative provenance paths for canonical and standalone boards."""
+    path = Path(path)
+    return path.parent.parent if path.parent.name == "outputs" else path.parent
+
+
+def validate_board_path(path: Path) -> Dict[str, Any]:
+    """Load and authoritatively validate one configured board path."""
+    path = Path(path)
+    return runtime_board_health(load_board(path), project_root=board_project_root(path))
 
 
 def format_board(board: Dict[str, Any], top_n: int = 10, position: Optional[str] = None) -> str:

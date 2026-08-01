@@ -37,6 +37,7 @@ GET /api/v1/sessions/{name}/available?position=RB&limit=20
 GET /api/v1/sessions/{name}/recommendation?mode=balanced
 POST /api/v1/sessions/{name}/commands/interpret
 POST /api/v1/sessions/{name}/assistant/ask
+POST /api/v1/sessions/{name}/assistant/strategy
 POST /api/v1/sessions/{name}/picks
 POST /api/v1/sessions/{name}/picks/bulk/preview
 POST /api/v1/sessions/{name}/picks/bulk
@@ -52,6 +53,9 @@ The OpenAPI document is available at `/openapi.json` and interactive documentati
 - Session names are restricted to safe filename slugs inside the configured directory.
 - Browser-created sessions snapshot only the configured server-side board and require
   that board to be ready and deep enough for every planned pick.
+- Health and board-summary responses recompute one authoritative readiness result
+  with separate `snapshot`, `source`, and `freshness` statuses. A failed component
+  disables and rejects only new-session creation; saved sessions remain available.
 - Session detail responses omit the embedded full board snapshot.
 - API responses disable caching and include basic private-app security headers.
 - Filesystem paths and secrets are not returned to the browser.
@@ -63,6 +67,7 @@ The OpenAPI document is available at `/openapi.json` and interactive documentati
 - Successful mutations return the refreshed cockpit snapshot.
 - Model-backed assistant questions are read-only, bounded, validated, and fall back to
   deterministic advice without blocking draft controls.
+- Strategy analysis is opt-in: the browser calls it only after the user taps Analyze.
 
 ## Cockpit response
 
@@ -124,8 +129,8 @@ without changing state.
 
 The top strip identifies the team currently on the clock and the user's countdown.
 Tier and position-run alerts share the compact cockpit evidence area, while separate
-board, model, autosave, and server-connectivity indicators keep degraded conditions
-visible without opening diagnostics.
+board provenance/date, model, autosave, and server-connectivity indicators keep
+degraded conditions visible without opening diagnostics.
 
 Question-classified text calls the assistant endpoint. The response reports model or
 fallback source, latency, and freshness. A session revision change while the call is

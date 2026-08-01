@@ -138,9 +138,10 @@ python scripts/cli.py --validate-board
 python scripts/cli.py --show-board --top 10
 ```
 
-Do not start a real draft from a board whose health status is `not_ready`. Warnings
-remain available for inspection, but errors indicate that projections, coverage, or
-the board contract are unsafe for live advice.
+Do not start a real draft from a board whose runtime health status is `not_ready`.
+Runtime validation reports snapshot, source, and freshness separately and permits a
+new session only when all three are ready. Existing sessions keep using their saved
+snapshot if the original source later becomes unavailable.
 
 ### 2. Create a live session
 
@@ -299,8 +300,9 @@ idempotency key so the same request cannot advance the draft twice, and a confir
 is rejected if the overall pick has advanced since it opened.
 
 The cockpit shows the current team on the clock, the user's countdown, tier cliffs,
-recent position runs, and separate board, model, autosave, and server-connectivity
-health indicators.
+recent position runs, board date/source readiness, and separate model, autosave, and
+server-connectivity health indicators. Strategy analysis is manual and never starts
+from page load, refresh, or a recorded pick.
 
 Use **Undo last** to review the exact player, pick, position, and team before restoring
 that player to the pool. The confirmation is rejected if another pick arrives first.

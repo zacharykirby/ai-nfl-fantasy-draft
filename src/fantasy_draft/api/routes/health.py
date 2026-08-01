@@ -1,6 +1,5 @@
 """Application and local artifact health routes."""
 
-import json
 import os
 from pathlib import Path
 from typing import Any, Dict
@@ -10,6 +9,7 @@ from fastapi import APIRouter, Depends
 from fantasy_draft.api.dependencies import board_path, session_repository
 from fantasy_draft.api.repository import SessionRepository
 from fantasy_draft.api.schemas import HealthResponse
+from fantasy_draft.board import validate_board_path
 
 
 router = APIRouter(tags=["health"])
@@ -33,12 +33,43 @@ def health(
 
 def _board_health(path: Path) -> Dict[str, Any]:
     if not path.is_file():
-        return {"status": "missing"}
+        return _unavailable_board_health("missing", "Draft board is not available")
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        return validate_board_path(path)
     except (OSError, ValueError) as exc:
-        return {"status": "unreadable", "message": str(exc)}
+        return _unavailable_board_health("unreadable", str(exc))
+
+
+def _unavailable_board_health(component_status: str, message: str) -> Dict[str, Any]:
+    issue = {
+        "severity": "error",
+        "code": "board_{}".format(component_status),
+        "message": message,
+    }
     return {
-        "status": payload.get("health", {}).get("status", "unknown"),
-        "generated_at": payload.get("metadata", {}).get("generated_at"),
+        "status": "not_ready",
+        "can_create_session": False,
+        "error_count": 1,
+        "warning_count": 0,
+        "issues": [issue],
+        "snapshot": {
+            "status": component_status,
+            "error_count": 1,
+            "warning_count": 0,
+            "issues": [issue],
+        },
+        "source": {
+            "status": "unknown",
+            "error_count": 0,
+            "warning_count": 0,
+            "issues": [],
+            "metrics": {},
+        },
+        "freshness": {
+            "status": "unknown",
+            "error_count": 0,
+            "warning_count": 0,
+            "issues": [],
+            "metrics": {},
+        },
     }

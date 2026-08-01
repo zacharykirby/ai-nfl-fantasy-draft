@@ -43,9 +43,17 @@ reason over them.
 
 ## Health behavior
 
-`health.status` is `not_ready` when the board should not power live advice. Checks
-cover missing target season or projections, historical fallback, empty roles,
-duplicate players, position mismatches, and rank gaps.
+Runtime health is authoritative. It recomputes three components instead of trusting
+the health block saved when the board was built:
+
+- `snapshot` checks the portable board contract, roles, identities, and ranks.
+- `source` checks the referenced normalized projection data and manifest.
+- `freshness` checks the manifest retrieval time against the age policy.
+
+The combined `status` is `ready`, and `can_create_session` is true, only when all
+three components are ready. Existing sessions remain usable during a later source or
+freshness failure because each session owns its immutable board snapshot; only new
+session creation is blocked.
 
 Board generation still writes diagnostic output when health checks fail. The
 separate validation command exits with status 1 so automation can enforce readiness.
@@ -58,8 +66,8 @@ python scripts/cli.py --validate-projections --season 2026
 ```
 
 The projection manifest records source URLs, retrieval time, coverage, estimates,
-missing values, duplicates, and player/team conflicts. Projection quality issues are
-copied into board health so downstream clients have one readiness decision.
+missing values, duplicates, and player/team conflicts. Runtime clients receive the
+same split health report from `/api/v1/health` and `/api/v1/board/summary`.
 
 The primary provider parses the official ESPN Mike Clay projection guide and merges
 it with FantasyPros ADP/bye context. Its PPR totals can be converted to PPR,

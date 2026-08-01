@@ -1,9 +1,11 @@
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from fantasy_draft.api.app import create_app
+from fantasy_draft.draft.session import DraftSession
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,6 +27,10 @@ def test_health_board_and_frontend(web_draft):
     health = client.get("/api/v1/health")
     assert health.status_code == 200
     assert health.json()["board"]["status"] == "ready"
+    assert health.json()["board"]["can_create_session"] is True
+    assert health.json()["board"]["snapshot"]["status"] == "ready"
+    assert health.json()["board"]["source"]["status"] == "ready"
+    assert health.json()["board"]["freshness"]["status"] == "ready"
     assert health.json()["sessions"]["count"] == 1
     assert health.headers["cache-control"] == "no-store"
     assert "path" not in health.json()["board"]
@@ -32,6 +38,13 @@ def test_health_board_and_frontend(web_draft):
     board = client.get("/api/v1/board/summary")
     assert board.status_code == 200
     assert board.json()["role_counts"] == {"RB": 3, "WR": 3, "QB": 3, "TE": 3}
+    board_health = board.json()["health"]
+    service_health = health.json()["board"]
+    assert board_health["status"] == service_health["status"]
+    assert board_health["can_create_session"] == service_health["can_create_session"]
+    assert board_health["snapshot"]["status"] == service_health["snapshot"]["status"]
+    assert board_health["source"]["status"] == service_health["source"]["status"]
+    assert board_health["freshness"]["status"] == service_health["freshness"]["status"]
 
     frontend = client.get("/")
     assert frontend.status_code == 200
@@ -57,6 +70,11 @@ def test_health_board_and_frontend(web_draft):
     assert 'id="health-connectivity"' in frontend.text
     assert frontend.headers["x-frame-options"] == "DENY"
     assert "default-src 'self'" in frontend.headers["content-security-policy"]
+
+    script = client.get("/assets/app.js").text
+    assert "AUTO_STRATEGY_THRESHOLD" not in script
+    assert "requestStrategy(true)" not in script
+    assert "Server unreachable. The last confirmed draft state is still shown." in script
 
 
 def test_private_host_origin_and_request_size_boundaries(web_draft):
@@ -479,6 +497,70 @@ def test_invalid_mutation_payload_uses_public_error_contract(web_draft):
     assert response.json()["error"]["recoverable"] is True
 
 
+def test_runtime_invalid_board_blocks_creation_but_existing_session_remains_available(web_draft):
+    board = json.loads(web_draft["board_path"].read_text(encoding="utf-8"))
+    Path(board["metadata"]["projection_source"]).unlink()
+    client = make_client(web_draft)
+
+    health = client.get("/api/v1/health")
+    assert health.status_code == 200
+    assert health.json()["status"] == "degraded"
+    assert health.json()["board"]["status"] == "not_ready"
+    assert health.json()["board"]["snapshot"]["status"] == "ready"
+    assert health.json()["board"]["source"]["status"] == "not_ready"
+    assert health.json()["board"]["freshness"]["status"] == "unknown"
+    assert health.json()["board"]["can_create_session"] is False
+
+    existing = client.get("/api/v1/sessions/phone-test/cockpit")
+    assert existing.status_code == 200
+    assert existing.json()["session"]["current_pick"] == 2
+
+    created = client.post(
+        "/api/v1/sessions",
+        json={
+            "name": "blocked-draft",
+            "league_size": 4,
+            "rounds": 2,
+            "user_team": 1,
+            "request_id": "blocked-create-0001",
+        },
+    )
+    assert created.status_code == 409
+    assert created.json()["error"]["code"] == "board_not_ready"
+    assert created.json()["error"]["recoverable"] is True
+    assert created.json()["error"]["details"]["health"]["can_create_session"] is False
+
+
+def test_runtime_stale_source_is_reported_separately_and_blocks_creation(web_draft):
+    board = json.loads(web_draft["board_path"].read_text(encoding="utf-8"))
+    projection_path = Path(board["metadata"]["projection_source"])
+    manifest_path = projection_path.with_name("projection_metadata_2026.json")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["retrieved_at"] = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    client = make_client(web_draft)
+
+    health = client.get("/api/v1/health").json()["board"]
+    assert health["snapshot"]["status"] == "ready"
+    assert health["source"]["status"] == "ready"
+    assert health["freshness"]["status"] == "not_ready"
+    assert health["freshness"]["issues"][0]["code"] == "projection_data_stale"
+    assert health["can_create_session"] is False
+
+    created = client.post(
+        "/api/v1/sessions",
+        json={
+            "name": "stale-draft",
+            "league_size": 4,
+            "rounds": 2,
+            "user_team": 1,
+            "request_id": "stale-create-0001",
+        },
+    )
+    assert created.status_code == 409
+    assert created.json()["error"]["code"] == "board_not_ready"
+
+
 def test_api_errors_are_structured_and_mutations_are_explicit(web_draft, tmp_path):
     client = make_client(web_draft)
 
@@ -510,6 +592,7 @@ def test_api_errors_are_structured_and_mutations_are_explicit(web_draft, tmp_pat
     assert post_paths == {
         "/api/v1/sessions",
         "/api/v1/sessions/{session_name}/assistant/ask",
+        "/api/v1/sessions/{session_name}/assistant/strategy",
         "/api/v1/sessions/{session_name}/commands/interpret",
         "/api/v1/sessions/{session_name}/picks",
         "/api/v1/sessions/{session_name}/picks/bulk",

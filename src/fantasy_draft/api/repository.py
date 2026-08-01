@@ -18,6 +18,12 @@ class BoardNotFoundError(FileNotFoundError):
     pass
 
 
+class BoardNotReadyError(ValueError):
+    def __init__(self, message: str, health: dict):
+        self.health = health
+        super().__init__(message)
+
+
 class InvalidSessionNameError(ValueError):
     pass
 
