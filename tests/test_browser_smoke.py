@@ -97,7 +97,7 @@ def wait(driver, seconds=10):
 
 
 @pytest.mark.browser
-@pytest.mark.parametrize("width,height", [(320, 700), (390, 844), (700, 390)])
+@pytest.mark.parametrize("width,height", [(320, 700), (390, 844), (844, 390)])
 def test_cockpit_fits_phone_viewports_and_keeps_touch_targets(browser, width, height):
     browser.set_window_rect(width=width, height=height)
     browser.refresh()
@@ -108,12 +108,43 @@ def test_cockpit_fits_phone_viewports_and_keeps_touch_targets(browser, width, he
     )
     assert overflow <= 1
 
-    for element_id in ("refresh", "undo-last", "draft-primary", "command-send"):
+    for element_id in ("refresh", "undo-last", "oh-god", "command-send"):
         height = browser.execute_script(
             "return arguments[0].getBoundingClientRect().height",
             browser.find_element(By.ID, element_id),
         )
         assert height >= 44, f"#{element_id} is only {height}px tall"
+
+
+@pytest.mark.browser
+def test_oh_god_is_silent_until_explicit_click(browser):
+    assistant_requests = browser.execute_script(
+        "return performance.getEntriesByType('resource').map(x => x.name).filter(x => x.includes('/assistant/'))"
+    )
+    assert assistant_requests == []
+
+    browser.find_element(By.ID, "oh-god").click()
+    wait(browser).until(expected.visibility_of_element_located((By.ID, "oh-god-card")))
+    assert len(browser.find_elements(By.CSS_SELECTOR, ".copilot-option")) <= 3
+    assert browser.find_element(By.ID, "command-input").is_enabled()
+    assert not browser.find_element(By.ID, "talk-shop").get_attribute("open")
+    assistant_requests = browser.execute_script(
+        "return performance.getEntriesByType('resource').map(x => x.name).filter(x => x.includes('/assistant/oh-god'))"
+    )
+    assert assistant_requests
+
+
+@pytest.mark.browser
+def test_landscape_board_keeps_real_content_visible(browser):
+    browser.set_window_rect(width=844, height=390)
+    browser.find_element(By.CSS_SELECTOR, '[data-view="board"]').click()
+    wait(browser).until(expected.presence_of_element_located((By.CSS_SELECTOR, ".tier-section")))
+    room = browser.execute_script(
+        "const tier=document.querySelector('.tier-section').getBoundingClientRect();"
+        "const composer=document.querySelector('.composer').getBoundingClientRect();"
+        "return Math.max(0, Math.min(tier.bottom, composer.top) - Math.max(tier.top, 0));"
+    )
+    assert room >= 80
 
 
 @pytest.mark.browser

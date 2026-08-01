@@ -150,9 +150,6 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 .completion-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .completion-actions button { min-height: 44px; border: 1px solid rgba(94, 224, 176, 0.45); border-radius: 11px; background: var(--accent-soft); color: var(--accent); font-weight: 800; }
 .recommendation-card h2 { font-size: 1.45rem; }
-.strategy-card { border-color: rgba(95, 167, 255, 0.32); }
-.strategy-card.stale { border-color: rgba(255, 209, 139, 0.42); }
-.strategy-button { width: 100%; margin-top: 14px; }
 .player-meta, .small-meta, .empty-state { color: var(--muted); }
 .player-meta { margin: 7px 0 10px; }
 .small-meta { font-size: 0.78rem; }
@@ -206,6 +203,51 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 }
 .search-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .search-results { margin-top: 8px; }
+
+.copilot-launch {
+  margin-bottom: 12px;
+  padding: 13px;
+  border: 1px solid rgba(255, 200, 87, 0.38);
+  border-radius: 16px;
+  background: rgba(255, 200, 87, 0.06);
+}
+.copilot-mode-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.copilot-mode-row p { margin-bottom: 0; color: var(--muted); font-size: 0.78rem; }
+.copilot-mode-row label { color: var(--muted); font-size: 0.7rem; font-weight: 800; }
+.copilot-mode-row select { display: block; min-height: 44px; margin-top: 4px; padding: 0 9px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); color: var(--text); }
+.oh-god-button {
+  display: flex;
+  width: 100%;
+  min-height: 68px;
+  padding: 10px 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #ffc857;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #ffc857, #ff9f43);
+  color: #291600;
+  font-weight: 900;
+  text-align: left;
+}
+.oh-god-button span { font-size: 1.35rem; letter-spacing: 0.02em; }
+.oh-god-button small { font-size: 0.72rem; font-weight: 800; text-align: right; }
+.oh-god-button:disabled { opacity: 0.5; }
+.oh-god-card { border-color: rgba(255, 200, 87, 0.55); }
+.oh-god-card[data-urgency="high"] { box-shadow: inset 4px 0 0 var(--warning), 0 12px 35px rgba(0, 0, 0, 0.12); }
+.oh-god-card.stale { border-color: rgba(255, 123, 123, 0.55); }
+.copilot-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+.copilot-option { min-height: 132px; padding: 11px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); color: var(--text); text-align: left; }
+.copilot-option span, .copilot-option strong, .copilot-option small { display: block; }
+.copilot-option span { color: var(--warning); font-size: 0.65rem; font-weight: 850; text-transform: uppercase; }
+.copilot-option strong { margin-top: 7px; }
+.copilot-option small { margin-top: 3px; color: var(--muted); }
+.copilot-option p { margin: 8px 0 0; color: #c9d5e2; font-size: 0.75rem; line-height: 1.35; }
+.can-wait-row { display: grid; grid-template-columns: auto 1fr; gap: 10px; margin-top: 13px; padding: 10px; border-radius: 11px; background: rgba(145, 163, 183, 0.08); font-size: 0.8rem; }
+.can-wait-row span { color: var(--muted); }
+.follow-up-answer { margin: 12px 0 0; padding: 11px; border-left: 3px solid var(--accent); background: var(--accent-soft); line-height: 1.45; }
+.follow-up-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.follow-up-actions button { min-height: 44px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); color: var(--text); font-weight: 750; }
 
 .filters {
   display: grid;
@@ -304,7 +346,7 @@ h2 { margin-bottom: 0; font-size: 1rem; }
 .suggested-prompts::-webkit-scrollbar { display: none; }
 .prompt-chip {
   flex: 0 0 auto;
-  min-height: 38px;
+  min-height: 44px;
   padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -312,6 +354,16 @@ h2 { margin-bottom: 0; font-size: 1rem; }
   color: var(--muted);
   font-weight: 700;
 }
+
+.talk-shop { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 16px; background: rgba(14, 28, 45, 0.72); }
+.talk-shop summary { min-height: 52px; padding: 15px; cursor: pointer; color: var(--text); font-weight: 850; }
+.talk-shop summary span { float: right; color: var(--muted); font-size: 0.75rem; font-weight: 650; }
+.talk-shop-body { padding: 0 12px 12px; }
+.talk-shop-body .assistant-card { margin-top: 4px; }
+.talk-shop-form { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+.talk-shop-form input { min-width: 0; min-height: 48px; padding: 0 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); font: inherit; }
+.talk-shop-form button { min-height: 48px; padding: 0 13px; border: 0; border-radius: 12px; background: var(--accent); color: #052018; font-weight: 850; }
+.talk-shop-form .cancel-send { background: #d95763; color: white; }
 
 .composer {
   position: fixed;
@@ -462,6 +514,25 @@ h2 { margin-bottom: 0; font-size: 1rem; }
   .pick-strip strong { font-size: 1.05rem; }
   .health-grid { grid-template-columns: 1fr 1fr; }
   .composer { padding-left: 10px; padding-right: 10px; }
+  .copilot-options { grid-template-columns: 1fr; }
+  .copilot-option { min-height: 44px; }
+  .follow-up-actions { grid-template-columns: 1fr; }
+}
+
+@media (max-height: 480px) and (orientation: landscape) {
+  body { padding-bottom: 52px; }
+  .shell { padding-top: 7px; }
+  .topbar { margin-bottom: 6px; }
+  .topbar .eyebrow { display: none; }
+  .league-context { max-width: 58vw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .primary-nav { margin-bottom: 7px; padding: 2px; }
+  .view-tab { min-height: 44px; }
+  .view-heading-card { position: static; padding: 10px 12px; }
+  .view-heading-card .eyebrow { display: none; }
+  .view-heading-card .filters { margin: 8px 0 0; }
+  .position-heading { min-height: 20px; margin: 0 2px 2px; }
+  .composer { padding: 0 10px max(0px, env(safe-area-inset-bottom)); }
+  .composer input, .composer button { min-height: 44px; }
 }
 
 @media (min-width: 701px) {

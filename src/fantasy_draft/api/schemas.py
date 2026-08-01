@@ -1,6 +1,6 @@
 """Versioned HTTP response contracts."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -191,6 +191,33 @@ class StrategyResponse(BaseModel):
     source: str
     model: Optional[str] = None
     latency_ms: int
+
+
+class OhGodRequest(BaseModel):
+    generated_for_pick: int = Field(ge=1)
+    draft_revision: str = Field(min_length=1, max_length=80)
+
+
+class OhGodResponse(BaseModel):
+    result: Dict[str, Any]
+    source: str
+    model: Optional[str] = None
+    freshness: Dict[str, Any]
+    latency_ms: int
+    timeout_seconds: int
+
+
+class OhGodFollowUpRequest(BaseModel):
+    intent: Literal["can_i_wait", "why_not_safe", "more_upside"]
+    draft_revision: str = Field(min_length=1, max_length=80)
+
+
+class OhGodFollowUpResponse(BaseModel):
+    intent: str
+    answer: str
+    draft_revision: str
+    freshness: Dict[str, Any]
+    source: str
 
 
 class PickRequest(BaseModel):

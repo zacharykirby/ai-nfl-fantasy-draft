@@ -20,10 +20,23 @@ python scripts/live_draft.py ask home-league \
 
 Options include `--model`, `--timeout`, `--mode`, and `--json`.
 
-The mobile textbox exposes the same layer through
+The mobile **Talk shop** drawer exposes the same layer through
 `POST /api/v1/sessions/{name}/assistant/ask`. The web route uses a fixed 12-second
 server timeout, reports latency and response source, and compares the session revision
 again after the model returns. Advice generated across a state change is marked stale.
+
+The phone cockpit also offers an explicit `POST .../assistant/oh-god` situation check.
+It receives the current pick and exact draft revision, uses an `oh_god_context.v1`
+packet capped at 18 candidate IDs, and returns `oh_god.v1`: a headline, urgency,
+explanation, at most three distinct options, a wait assessment, caveats, and a compact
+evidence summary. Unknown or drafted IDs and mismatched revisions are rejected. The
+five-second model attempt falls back to the same deterministic evidence. Enumerated
+follow-ups (`can_i_wait`, `why_not_safe`, and `more_upside`) are local, contextual, and
+read-only.
+
+Neither assistant route is called automatically. Chill mode is the default; it hides
+the persistent recommendation. **OH GOD** and the collapsed **Talk shop** drawer each
+require an explicit user action, and their controls never call a pick mutation.
 
 ## Context boundary
 

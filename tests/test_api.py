@@ -52,7 +52,8 @@ def test_health_board_and_frontend(web_draft):
     assert "Someone got Gibbs" in frontend.text
     assert "Undo last" in frontend.text
     assert "Catch up" in frontend.text
-    assert "Who should I take here?" in frontend.text
+    assert "Talk shop" in frontend.text
+    assert "OH GOD" in frontend.text
     assert "assistant-cancel" in frontend.text
     assert "Choose or create a draft" in frontend.text
     assert "new-session-form" in frontend.text
@@ -428,6 +429,52 @@ def test_read_only_strategy_route_falls_back_without_mutation(web_draft):
     assert path.read_bytes() == before
 
 
+def test_explicit_oh_god_and_follow_up_routes_are_read_only(web_draft):
+    class OfflineClient:
+        model = "offline/test"
+
+        def chat(self, **kwargs):
+            assert kwargs["timeout"] == 5
+            return "Error: simulated offline model"
+
+    api = make_client(web_draft, assistant_client_factory=OfflineClient)
+    path = web_draft["session"].path
+    before = path.read_bytes()
+    session = DraftSession.load(path)
+    revision = session.payload["session"]["updated_at"]
+
+    response = api.post(
+        "/api/v1/sessions/phone-test/assistant/oh-god",
+        json={"generated_for_pick": 2, "draft_revision": revision},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["result"]["schema_version"] == "oh_god.v1"
+    assert payload["source"] == "deterministic_fallback"
+    assert payload["freshness"]["stale"] is False
+    available_ids = {player["player_id"] for player in session.available_players()}
+    option_ids = {
+        option["player_id"]
+        for option in (
+            payload["result"]["primary_option"],
+            payload["result"]["safe_option"],
+            payload["result"]["upside_option"],
+        )
+        if option
+    }
+    assert option_ids <= available_ids
+
+    follow_up = api.post(
+        "/api/v1/sessions/phone-test/assistant/oh-god/follow-up",
+        json={"intent": "can_i_wait", "draft_revision": revision},
+    )
+    assert follow_up.status_code == 200
+    assert follow_up.json()["freshness"]["stale"] is False
+    assert follow_up.json()["answer"]
+    assert path.read_bytes() == before
+
+
 def test_undo_route_returns_refreshed_cockpit(web_draft):
     client = make_client(web_draft)
 
@@ -592,6 +639,8 @@ def test_api_errors_are_structured_and_mutations_are_explicit(web_draft, tmp_pat
     assert post_paths == {
         "/api/v1/sessions",
         "/api/v1/sessions/{session_name}/assistant/ask",
+        "/api/v1/sessions/{session_name}/assistant/oh-god",
+        "/api/v1/sessions/{session_name}/assistant/oh-god/follow-up",
         "/api/v1/sessions/{session_name}/assistant/strategy",
         "/api/v1/sessions/{session_name}/commands/interpret",
         "/api/v1/sessions/{session_name}/picks",

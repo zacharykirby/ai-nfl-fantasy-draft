@@ -17,10 +17,12 @@ const state = {
   searchTimer: null,
   searchSequence: 0,
   serverOnline: false,
-  strategyController: null,
-  strategySequence: 0,
-  strategyKey: null,
-  strategyResult: null,
+  copilotController: null,
+  copilotSequence: 0,
+  copilotKey: null,
+  copilotResult: null,
+  copilotOptionPlayers: {},
+  assistantMode: "chill",
 };
 
 const byId = (id) => document.getElementById(id);
@@ -160,7 +162,8 @@ function render(cockpit) {
   renderHealth(cockpit.health);
   byId("undo-last").disabled = cockpit.recent_picks.length === 0;
   byId("catch-up").disabled = draftComplete;
-  syncStrategyForCockpit(cockpit);
+  applyAssistantMode();
+  syncCopilotForCockpit(cockpit);
   const teamSelect = byId("log-team");
   const selectedTeam = teamSelect.value;
   teamSelect.innerHTML = `<option value="">All teams</option>${Array.from(
@@ -173,89 +176,153 @@ function render(cockpit) {
   }
 }
 
-function strategyKey(cockpit = state.cockpit) {
+function copilotKey(cockpit = state.cockpit) {
   if (!cockpit?.session || !state.session) return null;
-  return `${state.session}:${cockpit.session.current_pick}:${cockpit.session.revision}:balanced`;
+  return `${state.session}:${cockpit.session.current_pick}:${cockpit.session.revision}`;
 }
 
-function setStrategyState(status, message) {
-  byId("strategy-status").textContent = status;
-  byId("strategy-summary").textContent = message;
-  byId("strategy-details").hidden = true;
-  byId("strategy-confidence").textContent = "—";
-  const button = byId("analyze-strategy");
-  button.disabled = status === "Analyzing" || !state.cockpit?.recommendation;
-  button.textContent = status === "Analyzing" ? "Analyzing…" : state.strategyResult ? "Refresh strategy" : "Analyze my turn";
-  byId("strategy-card").classList.toggle("stale", status === "Stale");
+function applyAssistantMode() {
+  const full = state.assistantMode === "full";
+  byId("full-assistant-panel").hidden = !full;
+  byId("assistant-mode-copy").textContent = full
+    ? "Full assistant · deterministic lean stays visible"
+    : "Chill · silent until asked";
 }
 
-function syncStrategyForCockpit(cockpit) {
-  const key = strategyKey(cockpit);
-  if (state.strategyKey && state.strategyKey !== key) {
-    state.strategyController?.abort();
-    state.strategySequence += 1;
-    state.strategyKey = null;
-    state.strategyResult = null;
-    setStrategyState("Stale", "The draft changed. Tap Analyze when you want a new plan.");
+function syncCopilotForCockpit(cockpit) {
+  const key = copilotKey(cockpit);
+  if (state.copilotKey && state.copilotKey !== key) {
+    state.copilotController?.abort();
+    state.copilotSequence += 1;
+    state.copilotKey = null;
+    state.copilotResult = null;
+    state.copilotOptionPlayers = {};
+    if (!byId("oh-god-card").hidden) {
+      byId("oh-god-card").classList.add("stale");
+      byId("oh-god-headline").textContent = "THE DRAFT MOVED.";
+      byId("oh-god-explanation").textContent = "Tap OH GOD again for the current snapshot.";
+      byId("oh-god-options").innerHTML = "";
+    }
   }
-  const session = cockpit.session;
-  const eligible = session.status === "active" && session.next_user_pick != null;
-  if (!eligible) {
-    setStrategyState("Unavailable", "No upcoming user pick remains.");
-    return;
-  }
-  if (!state.strategyResult && !state.strategyController && !state.strategyKey) {
-    setStrategyState("Not requested", "Analyze positional urgency for your upcoming turn.");
-  }
+  byId("oh-god").disabled = cockpit.session.status !== "active" || !cockpit.recommendation || Boolean(state.copilotController);
 }
 
-async function requestStrategy() {
-  if (!state.session || !state.cockpit?.recommendation || state.strategyController) return;
-  const requestedKey = strategyKey();
-  const requestedPick = state.cockpit.session.current_pick;
-  const sequence = ++state.strategySequence;
-  const controller = new AbortController();
-  state.strategyController = controller;
-  state.strategyKey = requestedKey;
-  setStrategyState("Analyzing", "Analyzing your upcoming turn…");
-  try {
-    const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/assistant/strategy`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "balanced", generated_for_pick: requestedPick }),
-      signal: controller.signal,
-    });
-    if (sequence !== state.strategySequence || requestedKey !== strategyKey()) return;
-    if (result.freshness.stale || result.freshness.current_revision !== state.cockpit.session.revision) {
-      state.strategyResult = null;
-      setStrategyState("Stale", "Draft state changed while the plan was being prepared.");
+function setCopilotLoading(loading) {
+  const button = byId("oh-god");
+  button.disabled = loading || !state.cockpit?.recommendation;
+  button.querySelector("span").textContent = loading ? "HOLD ON…" : "OH GOD";
+  button.querySelector("small").textContent = loading ? "Reading this snapshot" : "Explain this draft snapshot";
+}
+
+function cockpitPlayer(playerId) {
+  const pool = [
+    state.cockpit?.recommendation?.primary,
+    ...(state.cockpit?.recommendation?.alternatives || []),
+    ...(state.cockpit?.best_available || []),
+    ...Object.values(state.cockpit?.top_available_by_position || {}).flat(),
+  ];
+  return pool.find((player) => player?.player_id === playerId) || null;
+}
+
+async function resolveCopilotPlayers(result) {
+  const options = [result.primary_option, result.safe_option, result.upside_option].filter(Boolean);
+  const resolved = {};
+  await Promise.all(options.map(async (option) => {
+    const local = cockpitPlayer(option.player_id);
+    if (local) {
+      resolved[option.player_id] = local;
       return;
     }
-    state.strategyKey = requestedKey;
-    state.strategyResult = result;
-    renderStrategy(result);
+    try {
+      const detail = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/players/${encodeURIComponent(option.player_id)}`);
+      resolved[option.player_id] = detail.player;
+    } catch (_error) {
+      resolved[option.player_id] = { player: option.player_id, position: "" };
+    }
+  }));
+  return resolved;
+}
+
+function renderCopilot(payload) {
+  const result = payload.result;
+  const card = byId("oh-god-card");
+  card.hidden = false;
+  card.classList.toggle("stale", Boolean(payload.freshness.stale));
+  card.dataset.urgency = result.urgency;
+  byId("oh-god-headline").textContent = result.headline;
+  byId("oh-god-urgency").textContent = payload.freshness.stale ? "STALE" : result.urgency.toUpperCase();
+  byId("oh-god-explanation").textContent = payload.freshness.stale
+    ? "The draft changed while this was being prepared. Tap OH GOD again."
+    : result.explanation;
+  const optionTypes = [
+    ["primary_option", "Model/data lean"],
+    ["safe_option", "Safer build"],
+    ["upside_option", "Upside swing"],
+  ];
+  byId("oh-god-options").innerHTML = optionTypes.map(([field, heading]) => {
+    const option = result[field];
+    if (!option) return "";
+    const player = state.copilotOptionPlayers[option.player_id] || {};
+    const meta = [player.position, player.team].filter(Boolean).join(" · ");
+    return `<button class="copilot-option" type="button" data-player-id="${escapeHtml(option.player_id)}">
+      <span>${heading}</span><strong>${escapeHtml(player.player || option.player_id)}</strong>
+      ${meta ? `<small>${escapeHtml(meta)}</small>` : ""}<p>${escapeHtml(option.reason)}</p>
+    </button>`;
+  }).join("");
+  byId("oh-god-can-wait").textContent = `Can wait: ${result.can_wait}`;
+  byId("oh-god-wait-reason").textContent = result.can_wait_reason;
+  byId("oh-god-caveats").innerHTML = result.caveats.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  byId("oh-god-follow-up-answer").hidden = true;
+  byId("oh-god-follow-ups").hidden = Boolean(payload.freshness.stale);
+}
+
+async function requestOhGod() {
+  if (!state.session || !state.cockpit?.recommendation || state.copilotController) return;
+  const requestedKey = copilotKey();
+  const requestedPick = state.cockpit.session.current_pick;
+  const requestedRevision = state.cockpit.session.revision;
+  const sequence = ++state.copilotSequence;
+  const controller = new AbortController();
+  state.copilotController = controller;
+  state.copilotKey = requestedKey;
+  setCopilotLoading(true);
+  try {
+    const payload = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/assistant/oh-god`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ generated_for_pick: requestedPick, draft_revision: requestedRevision }),
+      signal: controller.signal,
+    });
+    if (sequence !== state.copilotSequence || requestedKey !== copilotKey()) return;
+    state.copilotResult = payload;
+    state.copilotOptionPlayers = await resolveCopilotPlayers(payload.result);
+    if (sequence !== state.copilotSequence) return;
+    renderCopilot(payload);
   } catch (error) {
-    if (error.name === "AbortError" || sequence !== state.strategySequence) return;
-    setStrategyState("Unavailable", "Strategy analysis is unavailable. The recommendation above remains current.");
+    if (error.name === "AbortError" || sequence !== state.copilotSequence) return;
+    showNotice(`OH GOD is unavailable: ${error.message}`);
   } finally {
-    if (state.strategyController === controller) state.strategyController = null;
+    if (state.copilotController === controller) state.copilotController = null;
+    setCopilotLoading(false);
   }
 }
 
-function renderStrategy(result) {
-  const assessment = result.assessment;
-  const fallback = result.source !== "model";
-  byId("strategy-status").textContent = fallback ? "Local fallback" : "Ready";
-  byId("strategy-confidence").textContent = `${Math.round(assessment.confidence * 100)}%`;
-  byId("strategy-summary").textContent = assessment.summary;
-  byId("strategy-primary").textContent = assessment.primary_player ? `Priority: ${assessment.primary_player}` : "Priority: Best positional value";
-  byId("strategy-fallbacks").textContent = assessment.fallback_players.length ? `Fallback: ${assessment.fallback_players.join(", ")}` : "";
-  byId("strategy-wait").textContent = assessment.wait_positions.length ? `Can wait: ${assessment.wait_positions.join(", ")}` : "";
-  byId("strategy-cautions").innerHTML = assessment.cautions.slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-  byId("strategy-details").hidden = false;
-  byId("analyze-strategy").disabled = false;
-  byId("analyze-strategy").textContent = "Refresh strategy";
-  byId("strategy-card").classList.remove("stale");
+async function requestCopilotFollowUp(intent) {
+  if (!state.copilotResult || state.copilotResult.freshness.stale) return;
+  const answer = byId("oh-god-follow-up-answer");
+  answer.hidden = false;
+  answer.textContent = "Checking this snapshot…";
+  try {
+    const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/assistant/oh-god/follow-up`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ intent, draft_revision: state.copilotResult.result.draft_revision }),
+    });
+    answer.textContent = result.answer;
+    if (result.freshness.stale) syncCopilotForCockpit({ ...state.cockpit, session: { ...state.cockpit.session, revision: result.freshness.current_revision } });
+  } catch (error) {
+    answer.textContent = error.message;
+  }
 }
 
 function renderAvailable() {
@@ -360,6 +427,7 @@ async function refreshActiveView() {
 }
 
 async function loadBoardView() {
+  byId("full-board").classList.add("view-loading");
   byId("full-board").innerHTML = `<div class="view-loading">Loading board…</div>`;
   const position = state.boardPosition === "ALL" ? "" : `&position=${state.boardPosition}`;
   const available = byId("board-available-only").checked;
@@ -373,6 +441,7 @@ async function loadBoardView() {
     </section>`).join("");
     return `<div class="position-heading"><h2>${role}</h2><span class="small-meta">${group.count} shown</span></div>${tiers || `<div class="card empty-state">No ${role} players match.</div>`}`;
   }).join("");
+  byId("full-board").classList.remove("view-loading");
   byId("full-board").innerHTML = html || `<div class="card empty-state">No players match this board filter.</div>`;
 }
 
@@ -511,6 +580,13 @@ async function loadSession(name) {
   setList(byId("player-search-results"), "", "Type at least 2 characters");
   const cockpit = await api(`/api/v1/sessions/${encodeURIComponent(name)}/cockpit`);
   state.session = name;
+  state.copilotController?.abort();
+  state.copilotSequence += 1;
+  state.copilotController = null;
+  state.copilotKey = null;
+  state.copilotResult = null;
+  state.copilotOptionPlayers = {};
+  byId("oh-god-card").hidden = true;
   byId("command-input").disabled = false;
   byId("command-send").disabled = false;
   rememberSession(name);
@@ -614,9 +690,11 @@ async function interpretCommand(text) {
 }
 
 async function askAssistant(question) {
+  if (state.askController) return;
   const controller = new AbortController();
   state.askController = controller;
   byId("assistant-cancel").hidden = false;
+  byId("talk-shop-send").disabled = true;
   showNotice("Asking the draft assistant…");
   try {
     const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/assistant/ask`, {
@@ -626,7 +704,7 @@ async function askAssistant(question) {
       signal: controller.signal,
     });
     renderAssistant(question, result);
-    byId("command-input").value = "";
+    byId("talk-shop-input").value = "";
     if (result.freshness.stale) {
       showNotice("The draft changed while that answer was in flight. State refreshed; ask again for current advice.");
       const cockpit = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/cockpit`);
@@ -637,6 +715,7 @@ async function askAssistant(question) {
   } finally {
     if (state.askController === controller) state.askController = null;
     byId("assistant-cancel").hidden = true;
+    byId("talk-shop-send").disabled = false;
   }
 }
 
@@ -882,12 +961,30 @@ byId("new-session-form").addEventListener("submit", async (event) => {
   }
 });
 byId("assistant-cancel").addEventListener("click", () => state.askController?.abort());
-byId("analyze-strategy").addEventListener("click", () => requestStrategy());
+byId("oh-god").addEventListener("click", () => requestOhGod());
+byId("assistant-mode").addEventListener("change", (event) => {
+  state.assistantMode = event.target.value === "full" ? "full" : "chill";
+  applyAssistantMode();
+});
+document.querySelectorAll("[data-copilot-follow-up]").forEach((button) => {
+  button.addEventListener("click", () => requestCopilotFollowUp(button.dataset.copilotFollowUp));
+});
 document.querySelectorAll(".prompt-chip").forEach((button) => {
   button.addEventListener("click", () => {
-    byId("command-input").value = button.textContent.trim();
-    byId("command-form").requestSubmit();
+    byId("talk-shop").open = true;
+    byId("talk-shop-input").value = button.textContent.trim();
+    byId("talk-shop-form").requestSubmit();
   });
+});
+byId("talk-shop-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const question = byId("talk-shop-input").value.trim();
+  if (!question) return;
+  try {
+    await askAssistant(question);
+  } catch (error) {
+    showNotice(error.name === "AbortError" ? "Question cancelled." : error.message);
+  }
 });
 byId("undo-last").addEventListener("click", () => {
   const picks = state.cockpit?.recent_picks || [];
@@ -938,7 +1035,11 @@ byId("command-form").addEventListener("submit", async (event) => {
   try {
     const interpretation = await interpretCommand(text);
     if (interpretation.intent !== "record_pick") {
-      await askAssistant(text);
+      byId("talk-shop").open = true;
+      byId("talk-shop-input").value = text;
+      input.value = "";
+      showNotice("That sounds like a question. It is ready in Talk shop—tap Ask when you want an answer.", true);
+      byId("talk-shop-input").focus();
       return;
     }
     state.pendingPick = { ...interpretation, requestId: requestId() };

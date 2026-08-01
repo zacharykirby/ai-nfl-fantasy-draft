@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, Query, Response
 
 from fantasy_draft.api.dependencies import assistant_client, board_path, session_repository
 from fantasy_draft.api.repository import BoardNotFoundError, BoardNotReadyError, SessionRepository
-from fantasy_draft.board import validate_board_path
+from fantasy_draft.board import load_board, validate_board_path
 from fantasy_draft.api.schemas import (
     AssistantAnswerResponse,
     AssistantQuestionRequest,
@@ -20,6 +20,10 @@ from fantasy_draft.api.schemas import (
     InterpretCommandRequest,
     InterpretCommandResponse,
     MutationResponse,
+    OhGodFollowUpRequest,
+    OhGodFollowUpResponse,
+    OhGodRequest,
+    OhGodResponse,
     PickRequest,
     PlayerListResponse,
     PlayerDetailResponse,
@@ -37,7 +41,7 @@ from fantasy_draft.api.schemas import (
     StrategyResponse,
     UndoRequest,
 )
-from fantasy_draft.assistant import DraftAssistantQueryService, DraftStrategyService
+from fantasy_draft.assistant import DraftAssistantQueryService, DraftStrategyService, OhGodService
 from fantasy_draft.draft.cockpit import DraftCockpitService, player_view
 from fantasy_draft.draft.commands import bulk_pick_queries, pick_query
 from fantasy_draft.draft.mutations import (
@@ -254,6 +258,66 @@ def ask_assistant(
         client=client,
         timeout=12,
     ).ask(request.question, mode=request.mode)
+
+
+def _copilot_board_context(path: Path) -> Dict[str, Any]:
+    try:
+        board = load_board(path)
+        return {
+            "health": validate_board_path(path),
+            "metadata": board.get("metadata", {}),
+        }
+    except (OSError, ValueError) as exc:
+        return {
+            "health": {
+                "status": "not_ready",
+                "snapshot": {"status": "unknown"},
+                "source": {"status": "unknown"},
+                "freshness": {"status": "unknown", "metrics": {}},
+                "issues": [{
+                    "severity": "warning",
+                    "code": "runtime_board_unavailable",
+                    "message": str(exc),
+                }],
+            },
+            "metadata": {},
+        }
+
+
+@router.post("/{session_name}/assistant/oh-god", response_model=OhGodResponse)
+def ask_oh_god(
+    session_name: str,
+    request: OhGodRequest,
+    repository: SessionRepository = Depends(session_repository),
+    configured_board: Path = Depends(board_path),
+    client: Any = Depends(assistant_client),
+) -> Dict[str, Any]:
+    board_context = _copilot_board_context(configured_board)
+    return OhGodService(
+        repository.path(session_name),
+        client=client,
+        timeout=5,
+        board_health=board_context["health"],
+        board_metadata=board_context["metadata"],
+    ).assess(request.generated_for_pick, request.draft_revision)
+
+
+@router.post(
+    "/{session_name}/assistant/oh-god/follow-up",
+    response_model=OhGodFollowUpResponse,
+)
+def follow_up_oh_god(
+    session_name: str,
+    request: OhGodFollowUpRequest,
+    repository: SessionRepository = Depends(session_repository),
+    configured_board: Path = Depends(board_path),
+) -> Dict[str, Any]:
+    board_context = _copilot_board_context(configured_board)
+    return OhGodService(
+        repository.path(session_name),
+        board_health=board_context["health"],
+        board_metadata=board_context["metadata"],
+    ).follow_up(request.intent, request.draft_revision)
 
 
 @router.post("/{session_name}/assistant/strategy", response_model=StrategyResponse)

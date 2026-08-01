@@ -291,7 +291,9 @@ automatically resumes the next saved draft or opens the new-draft form.
 
 The main navigation provides four mobile views:
 
-- **Cockpit** keeps the current recommendation and quick draft controls above the fold.
+- **Cockpit** defaults to a quiet draft board with quick pick controls and an explicit
+  **OH GOD** situation check. Full assistant mode reveals the persistent deterministic
+  recommendation and alternatives.
 - **Board** groups the full session board by position and tier, hiding drafted players
   by default. Tap any player for projection, VORP, ADP, historical evidence, risk, and
   flags; available players can enter the normal confirmation flow from that sheet.
@@ -313,8 +315,8 @@ is rejected if the overall pick has advanced since it opened.
 
 The cockpit shows the current team on the clock, the user's countdown, tier cliffs,
 recent position runs, board date/source readiness, and separate model, autosave, and
-server-connectivity health indicators. Strategy analysis is manual and never starts
-from page load, refresh, or a recorded pick.
+server-connectivity health indicators. Copilot analysis is manual and never starts
+from page load, refresh, a visibility change, or a recorded pick.
 
 Use **Undo last** to review the exact player, pick, position, and team before restoring
 that player to the pool. The confirmation is rejected if another pick arrives first.
@@ -322,11 +324,12 @@ Use **Catch up** to enter 2–20 missed selections separated by commas, semicolo
 new lines. The app resolves and previews the full ordered batch, then saves every pick
 atomically. If any player is ambiguous, unavailable, or invalid, no picks are saved.
 
-Ordinary questions use the same bounded assistant as `live-draft ask`. The result card
-shows whether advice came from the configured model or deterministic local fallback,
-plus request latency. Calls have a 12-second server timeout and can be ignored with
-the UI's Cancel button. If a pick lands while an answer is in flight, the answer is
-marked stale, draft state refreshes, and the user is prompted to ask again.
+**OH GOD** returns no more than three evidence-bound options, a wait assessment, and
+caveats for the exact pick and session revision. It times out within five seconds and
+falls back locally. Ordinary questions live in the collapsed **Talk shop** drawer and
+use the same bounded assistant as `live-draft ask`; typing a question into the pick
+recorder merely transfers it there until **Ask** is tapped. Stale answers never become
+draft actions, and player options open read-only detail rather than recording a pick.
 
 The implemented API includes:
 
@@ -347,6 +350,8 @@ GET /api/v1/sessions/{name}/available
 GET /api/v1/sessions/{name}/recommendation
 POST /api/v1/sessions/{name}/commands/interpret
 POST /api/v1/sessions/{name}/assistant/ask
+POST /api/v1/sessions/{name}/assistant/oh-god
+POST /api/v1/sessions/{name}/assistant/oh-god/follow-up
 POST /api/v1/sessions/{name}/picks
 POST /api/v1/sessions/{name}/picks/bulk/preview
 POST /api/v1/sessions/{name}/picks/bulk

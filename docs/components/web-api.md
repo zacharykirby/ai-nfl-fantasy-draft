@@ -38,6 +38,8 @@ GET /api/v1/sessions/{name}/recommendation?mode=balanced
 POST /api/v1/sessions/{name}/commands/interpret
 POST /api/v1/sessions/{name}/assistant/ask
 POST /api/v1/sessions/{name}/assistant/strategy
+POST /api/v1/sessions/{name}/assistant/oh-god
+POST /api/v1/sessions/{name}/assistant/oh-god/follow-up
 POST /api/v1/sessions/{name}/picks
 POST /api/v1/sessions/{name}/picks/bulk/preview
 POST /api/v1/sessions/{name}/picks/bulk
@@ -70,7 +72,8 @@ The OpenAPI document is available at `/openapi.json` and interactive documentati
 - Successful mutations return the refreshed cockpit snapshot.
 - Model-backed assistant questions are read-only, bounded, validated, and fall back to
   deterministic advice without blocking draft controls.
-- Strategy analysis is opt-in: the browser calls it only after the user taps Analyze.
+- Copilot analysis is opt-in: the browser calls it only after the user taps **OH GOD**.
+  Its contextual follow-ups accept only three enumerated intents.
 
 ## Cockpit response
 
@@ -135,10 +138,17 @@ Tier and position-run alerts share the compact cockpit evidence area, while sepa
 board provenance/date, model, autosave, and server-connectivity indicators keep
 degraded conditions visible without opening diagnostics.
 
-Question-classified text calls the assistant endpoint. The response reports model or
+Question-classified text is transferred to the collapsed **Talk shop** drawer; it does
+not call the assistant until the user taps **Ask**. The response reports model or
 fallback source, latency, and freshness. A session revision change while the call is
 in flight marks the result stale and triggers a cockpit refresh. The browser can
 cancel waiting for a result without granting the model any mutation capability.
+
+Chill mode is the default and keeps deterministic recommendations hidden. Full
+assistant mode reveals them without making a model request. **OH GOD** sends the exact
+current pick and revision, renders at most three read-only player-detail options, and
+marks an in-flight response stale if either changes. The five-second server budget and
+deterministic fallback keep pick entry usable throughout.
 
 ## Undo and catch-up
 

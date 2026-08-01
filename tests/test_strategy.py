@@ -105,15 +105,18 @@ def test_strategy_marks_changed_session_and_drafted_primary_stale(web_draft):
     assert result["freshness"]["primary_available"] is False
 
 
-def test_strategy_frontend_contract():
+def test_copilot_frontend_contract_replaces_persistent_strategy_card():
     from pathlib import Path
     root = Path(__file__).resolve().parents[1]
     html = (root / "frontend" / "index.html").read_text(encoding="utf-8")
     script = (root / "frontend" / "assets" / "app.js").read_text(encoding="utf-8")
-    assert 'id="strategy-card"' in html
-    assert 'id="analyze-strategy"' in html
-    assert "AUTO_STRATEGY_THRESHOLD" not in script
-    assert "requestStrategy(true)" not in script
-    assert 'addEventListener("click", () => requestStrategy())' in script
-    assert "result.freshness.stale" in script
+    assert 'id="strategy-card"' not in html
+    assert 'id="analyze-strategy"' not in html
+    assert 'id="oh-god"' in html
+    assert 'id="assistant-mode"' in html
+    assert '<option value="chill" selected>Chill</option>' in html
+    assert 'id="talk-shop"' in html
+    assert "requestStrategy" not in script
+    assert 'addEventListener("click", () => requestOhGod())' in script
+    assert "/assistant/oh-god" in script
     assert "render(cockpit)" in script
