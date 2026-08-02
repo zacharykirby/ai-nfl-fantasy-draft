@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#07111f">
     <title>Draft Cockpit</title>
-    <link rel="stylesheet" href="/assets/app.css">
-    <script type="module" src="/assets/app.js"></script>
+    <link rel="stylesheet" href="/assets/app.css?v=phone-companion-2">
+    <script type="module" src="/assets/app.js?v=phone-companion-2"></script>
   </head>
   <body>
     <main class="shell">
       <header class="topbar">
         <div>
-          <p class="eyebrow">LIVE DRAFT COCKPIT</p>
+          <p class="eyebrow">LIVE DRAFT</p>
           <h1 id="session-name">Loading session…</h1>
-          <p id="league-context" class="league-context">Loading league settings…</p>
         </div>
         <div class="topbar-actions">
-          <button id="session-switcher" class="text-button" type="button">Drafts</button>
+          <span id="health-connectivity" class="status-badge">Connecting</span>
+          <button id="session-switcher" class="text-button" type="button" aria-label="Open drafts and settings">Drafts</button>
           <button id="refresh" class="icon-button" type="button" aria-label="Refresh draft state">↻</button>
         </div>
       </header>
@@ -33,24 +33,23 @@
 
       <section id="view-cockpit" class="view-panel">
 
-      <section class="pick-strip" aria-label="Current draft position">
-        <div>
-          <span class="label">Round</span>
-          <strong id="round">—</strong>
-        </div>
-        <div>
-          <span class="label">Pick</span>
-          <strong id="current-pick">—</strong>
-        </div>
-        <div>
-          <span class="label">On clock</span>
-          <strong id="current-team">—</strong>
-        </div>
-        <div class="accent-stat">
-          <span class="label">You in</span>
-          <strong id="your-turn">—</strong>
-        </div>
-      </section>
+      <div class="cockpit-primary">
+        <section class="pick-strip" aria-label="Current draft position">
+          <div class="pick-numbers">
+            <span><span class="label">Round</span><strong id="round">—</strong></span>
+            <span><span class="label">Pick</span><strong id="current-pick">—</strong></span>
+          </div>
+          <div class="clock-state">
+            <span class="label">On clock</span>
+            <strong id="current-team">—</strong>
+            <span id="your-turn" class="turn-detail">—</span>
+          </div>
+        </section>
+
+        <section id="latest-pick" class="latest-pick" hidden aria-live="polite">
+          <span id="latest-pick-copy">Latest pick recorded.</span>
+          <button id="undo-last" class="undo-link" type="button" disabled>Undo</button>
+        </section>
 
       <section id="completion-card" class="card completion-card" hidden aria-live="polite">
         <p class="eyebrow">DRAFT RESULTS</p>
@@ -62,36 +61,13 @@
         </div>
       </section>
 
-      <nav class="draft-actions" aria-label="Draft corrections and catch-up">
-        <button id="undo-last" class="action-button danger" type="button" disabled>Undo last</button>
-        <button id="catch-up" class="action-button" type="button">Catch up</button>
-      </nav>
-
-      <section class="card search-card">
-        <div class="card-heading">
-          <div><p class="eyebrow">QUICK PICK</p><h2>Find an available player</h2></div>
-          <span class="small-meta">Tap · confirm</span>
-        </div>
-        <label class="sr-only" for="player-search">Search available players</label>
-        <input id="player-search" type="search" maxlength="80" placeholder="Search name, e.g. Puka" autocomplete="off">
-        <div id="player-search-results" class="search-results empty-state" aria-live="polite">Type at least 2 characters</div>
-      </section>
-
-      <section class="copilot-launch" aria-label="On-demand draft help">
-        <div class="copilot-mode-row">
-          <div><p class="eyebrow">ASSISTANT MODE</p><p id="assistant-mode-copy">Chill · silent until asked</p></div>
-          <label>Mode
-            <select id="assistant-mode">
-              <option value="chill" selected>Chill</option>
-              <option value="full">Full assistant</option>
-            </select>
-          </label>
-        </div>
+        <section class="copilot-launch" aria-label="On-demand draft help">
         <button id="oh-god" class="oh-god-button" type="button">
           <span>OH GOD</span>
-          <small>Explain this draft snapshot</small>
+          <small>Explain what’s happening</small>
         </button>
-      </section>
+        </section>
+      </div>
 
       <section id="oh-god-card" class="card oh-god-card" hidden aria-live="polite">
         <div class="card-heading">
@@ -129,19 +105,22 @@
         </section>
       </section>
 
-      <section class="card">
+      <section class="card best-available-card">
         <div class="card-heading">
           <h2 id="best-available-title">Best available</h2>
           <span id="available-count" class="small-meta">—</span>
         </div>
-        <nav class="filters" aria-label="Position filter">
-          <button class="filter active" data-position="ALL" type="button" aria-pressed="true">All</button>
-          <button class="filter" data-position="RB" type="button" aria-pressed="false">RB</button>
-          <button class="filter" data-position="WR" type="button" aria-pressed="false">WR</button>
-          <button class="filter" data-position="QB" type="button" aria-pressed="false">QB</button>
-          <button class="filter" data-position="TE" type="button" aria-pressed="false">TE</button>
-        </nav>
         <div id="best-available" class="player-list empty-state">No players available</div>
+        <details class="available-tools">
+          <summary>Browse by position</summary>
+          <nav class="filters" aria-label="Position filter">
+            <button class="filter active" data-position="ALL" type="button" aria-pressed="true">All</button>
+            <button class="filter" data-position="RB" type="button" aria-pressed="false">RB</button>
+            <button class="filter" data-position="WR" type="button" aria-pressed="false">WR</button>
+            <button class="filter" data-position="QB" type="button" aria-pressed="false">QB</button>
+            <button class="filter" data-position="TE" type="button" aria-pressed="false">TE</button>
+          </nav>
+        </details>
       </section>
 
       <section class="grid-two">
@@ -189,13 +168,6 @@
           </form>
         </div>
       </details>
-
-      <section class="health-grid" aria-label="Draft cockpit health">
-        <div class="health-item"><span>Board</span><strong id="health-board">Checking</strong></div>
-        <div class="health-item"><span>Model</span><strong id="health-model">Checking</strong></div>
-        <div class="health-item"><span>Autosave</span><strong id="health-autosave">Checking</strong></div>
-        <div class="health-item"><span>Connection</span><strong id="health-connectivity">Checking</strong></div>
-      </section>
 
       <p class="read-only-note">Draft facts stay local · every pick requires confirmation</p>
       </section>
@@ -246,13 +218,14 @@
     </main>
 
     <form id="command-form" class="composer" autocomplete="off">
-      <label class="sr-only" for="command-input">Record a picked player</label>
+      <div id="player-search-results" class="composer-results empty-state" aria-live="polite" hidden></div>
+      <label class="sr-only" for="command-input">Search available players to record a pick</label>
       <input
         id="command-input"
         name="command"
         type="text"
         maxlength="160"
-        placeholder="e.g. Someone got Gibbs"
+        placeholder="Search available players…"
         enterkeyhint="send"
       >
       <button id="command-send" type="submit">Record</button>
@@ -267,6 +240,22 @@
         <button id="session-dialog-close" class="icon-button" type="button" aria-label="Close session picker">×</button>
       </div>
       <div id="session-list" class="session-list empty-state">No saved drafts yet</div>
+      <section class="session-utilities" aria-label="Draft settings and utilities">
+        <div class="session-context">
+          <div><span>League</span><strong id="league-context">Loading league settings…</strong></div>
+          <div><span>Board</span><strong id="health-board">Checking</strong></div>
+          <div><span>Model</span><strong id="health-model">Checking</strong></div>
+          <div><span>Autosave</span><strong id="health-autosave">Checking</strong></div>
+        </div>
+        <label class="assistant-setting" for="assistant-mode">
+          <span>Assistant mode</span>
+          <select id="assistant-mode">
+            <option value="chill" selected>Chill</option>
+            <option value="full">Full assistant</option>
+          </select>
+        </label>
+        <button id="catch-up" class="action-button" type="button">Catch up missed picks</button>
+      </section>
       <p id="session-form-notice" class="notice" hidden></p>
       <form id="new-session-form" class="new-session-form" autocomplete="off">
         <div class="card-heading">

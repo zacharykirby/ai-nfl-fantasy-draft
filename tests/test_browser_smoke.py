@@ -109,11 +109,46 @@ def test_cockpit_fits_phone_viewports_and_keeps_touch_targets(browser, width, he
     assert overflow <= 1
 
     for element_id in ("refresh", "undo-last", "oh-god", "command-send"):
-        height = browser.execute_script(
+        target_height = browser.execute_script(
             "return arguments[0].getBoundingClientRect().height",
             browser.find_element(By.ID, element_id),
         )
-        assert height >= 44, f"#{element_id} is only {height}px tall"
+        assert target_height >= 44, f"#{element_id} is only {target_height}px tall"
+
+    if width == 390 and height == 844:
+        first_player = browser.find_element(By.CSS_SELECTOR, "#best-available .player-action")
+        composer_top = browser.execute_script(
+            "return document.querySelector('.composer').getBoundingClientRect().top"
+        )
+        assert first_player.rect["y"] < composer_top
+
+
+@pytest.mark.browser
+def test_record_composer_stays_visible_when_focused_and_viewport_shrinks(browser):
+    composer_input = browser.find_element(By.ID, "command-input")
+    composer_input.click()
+    browser.set_window_rect(width=390, height=500)
+
+    geometry = browser.execute_script(
+        "const composer=document.querySelector('.composer').getBoundingClientRect();"
+        "const record=document.getElementById('command-send').getBoundingClientRect();"
+        "return {composerBottom:composer.bottom,recordBottom:record.bottom,height:window.innerHeight};"
+    )
+    assert geometry["composerBottom"] <= geometry["height"] + 1
+    assert geometry["recordBottom"] <= geometry["height"] + 1
+    assert browser.switch_to.active_element.get_attribute("id") == "command-input"
+
+
+@pytest.mark.browser
+def test_secondary_controls_live_in_drafts_menu(browser):
+    assert browser.find_elements(By.CSS_SELECTOR, ".search-card") == []
+    assert not browser.find_element(By.ID, "assistant-mode").is_displayed()
+    assert not browser.find_element(By.ID, "catch-up").is_displayed()
+
+    browser.find_element(By.ID, "session-switcher").click()
+    wait(browser).until(expected.visibility_of_element_located((By.ID, "session-dialog")))
+    assert browser.find_element(By.ID, "assistant-mode").is_displayed()
+    assert browser.find_element(By.ID, "catch-up").is_displayed()
 
 
 @pytest.mark.browser
@@ -149,10 +184,10 @@ def test_landscape_board_keeps_real_content_visible(browser):
 
 @pytest.mark.browser
 def test_search_confirm_double_submit_and_refresh_records_one_pick(browser):
-    search = browser.find_element(By.ID, "player-search")
+    search = browser.find_element(By.ID, "command-input")
     search.send_keys("Bijan")
     draft_button = wait(browser).until(
-        expected.element_to_be_clickable((By.CSS_SELECTOR, '[data-draft-player="Bijan Robinson"]'))
+        expected.element_to_be_clickable((By.CSS_SELECTOR, '.composer-results [data-draft-player="Bijan Robinson"]'))
     )
     draft_button.click()
     dialog = wait(browser).until(expected.visibility_of_element_located((By.ID, "confirmation-dialog")))
@@ -198,6 +233,7 @@ def test_board_navigation_and_position_filter_remain_interactive(browser):
     assert "Josh Allen" not in board_text
 
     browser.find_element(By.CSS_SELECTOR, '[data-view="cockpit"]').click()
+    browser.find_element(By.CSS_SELECTOR, ".available-tools summary").click()
     te_filter = browser.find_element(By.CSS_SELECTOR, '[data-position="TE"]')
     browser.execute_script("arguments[0].scrollIntoView({block: 'center'});", te_filter)
     wait(browser).until(expected.element_to_be_clickable((By.CSS_SELECTOR, '[data-position="TE"]')))

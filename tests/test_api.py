@@ -49,8 +49,8 @@ def test_health_board_and_frontend(web_draft):
     frontend = client.get("/")
     assert frontend.status_code == 200
     assert "Draft Cockpit" in frontend.text
-    assert "Someone got Gibbs" in frontend.text
-    assert "Undo last" in frontend.text
+    assert "Search available players" in frontend.text
+    assert ">Undo<" in frontend.text
     assert "Catch up" in frontend.text
     assert "Talk shop" in frontend.text
     assert "OH GOD" in frontend.text
@@ -65,7 +65,8 @@ def test_health_board_and_frontend(web_draft):
     assert "player-detail-dialog" in frontend.text
     assert 'id="current-team"' in frontend.text
     assert 'id="draft-primary"' in frontend.text
-    assert 'id="player-search"' in frontend.text
+    assert 'id="player-search"' not in frontend.text
+    assert 'id="player-search-results"' in frontend.text
     assert 'id="position-run"' in frontend.text
     assert 'id="health-autosave"' in frontend.text
     assert 'id="health-connectivity"' in frontend.text

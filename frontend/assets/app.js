@@ -103,7 +103,11 @@ function render(cockpit) {
   byId("current-team").textContent = session.current_team == null
     ? "Done"
     : session.current_team === session.user_team ? "You" : `T${session.current_team}`;
-  byId("your-turn").textContent = session.picks_until_user === 0 ? "Now" : session.picks_until_user ?? "Done";
+  byId("your-turn").textContent = session.current_team == null
+    ? "Draft complete"
+    : session.picks_until_user === 0
+      ? "You’re up"
+      : `${session.picks_until_user} pick${session.picks_until_user === 1 ? "" : "s"} until you`;
   byId("available-count").textContent = `${session.available} total`;
   const draftComplete = session.status === "complete";
   byId("completion-card").hidden = !draftComplete;
@@ -130,12 +134,6 @@ function render(cockpit) {
   document.querySelectorAll("[data-draft-player]").forEach((button) => {
     button.disabled = draftComplete;
   });
-  byId("player-search").disabled = draftComplete;
-  if (draftComplete) {
-    state.searchSequence += 1;
-    byId("player-search").value = "";
-    setList(byId("player-search-results"), "", "Draft complete · player selection is closed");
-  }
   setList(
     byId("roster"),
     cockpit.user_roster.map((player) => compactRow(player.player, player.position)).join(""),
@@ -159,6 +157,11 @@ function render(cockpit) {
     cockpit.recent_picks.slice().reverse().map((pick) => compactRow(`${pick.overall_pick}. ${pick.player}`, `${pick.position} · Team ${pick.team}`)).join(""),
     "No selections yet",
   );
+  const latestPick = cockpit.recent_picks[cockpit.recent_picks.length - 1];
+  byId("latest-pick").hidden = !latestPick;
+  byId("latest-pick-copy").textContent = latestPick
+    ? `Recorded ${latestPick.player} at pick ${latestPick.overall_pick}.`
+    : "";
   renderHealth(cockpit.health);
   byId("undo-last").disabled = cockpit.recent_picks.length === 0;
   byId("catch-up").disabled = draftComplete;
@@ -184,9 +187,6 @@ function copilotKey(cockpit = state.cockpit) {
 function applyAssistantMode() {
   const full = state.assistantMode === "full";
   byId("full-assistant-panel").hidden = !full;
-  byId("assistant-mode-copy").textContent = full
-    ? "Full assistant · deterministic lean stays visible"
-    : "Chill · silent until asked";
 }
 
 function syncCopilotForCockpit(cockpit) {
@@ -211,7 +211,7 @@ function setCopilotLoading(loading) {
   const button = byId("oh-god");
   button.disabled = loading || !state.cockpit?.recommendation;
   button.querySelector("span").textContent = loading ? "HOLD ON…" : "OH GOD";
-  button.querySelector("small").textContent = loading ? "Reading this snapshot" : "Explain this draft snapshot";
+  button.querySelector("small").textContent = loading ? "Reading this snapshot" : "Explain what’s happening";
 }
 
 function cockpitPlayer(playerId) {
@@ -332,7 +332,7 @@ function renderAvailable() {
     : state.cockpit.top_available_by_position[state.position] || [];
   setList(
     byId("best-available"),
-    players.map((player) => actionablePlayerRow(player)).join(""),
+    players.slice(0, 3).map((player) => actionablePlayerRow(player)).join(""),
     "No players available",
   );
   byId("best-available-title").textContent = state.position === "ALL"
@@ -394,9 +394,11 @@ async function beginPickConfirmation(playerName) {
 async function searchPlayers(query, sequence = ++state.searchSequence) {
   const results = byId("player-search-results");
   if (query.length < 2) {
-    setList(results, "", "Type at least 2 characters");
+    results.hidden = true;
+    setList(results, "", "");
     return;
   }
+  results.hidden = false;
   results.textContent = "Searching…";
   results.classList.add("empty-state");
   const payload = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/players/search?q=${encodeURIComponent(query)}&limit=8`);
@@ -576,8 +578,9 @@ async function load(preferredSession = null) {
 
 async function loadSession(name) {
   state.searchSequence += 1;
-  byId("player-search").value = "";
-  setList(byId("player-search-results"), "", "Type at least 2 characters");
+  byId("command-input").value = "";
+  byId("player-search-results").hidden = true;
+  setList(byId("player-search-results"), "", "");
   const cockpit = await api(`/api/v1/sessions/${encodeURIComponent(name)}/cockpit`);
   state.session = name;
   state.copilotController?.abort();
@@ -766,11 +769,11 @@ async function recordPendingPick() {
   });
   render(result.cockpit);
   byId("command-input").value = "";
-  byId("player-search").value = "";
   state.searchSequence += 1;
-  setList(byId("player-search-results"), "", "Type at least 2 characters");
+  byId("player-search-results").hidden = true;
+  setList(byId("player-search-results"), "", "");
   state.pendingPick = null;
-  showNotice(`Recorded ${result.event.player} at pick ${result.event.overall_pick}.`, true);
+  showNotice("");
 }
 
 async function previewBulk(text) {
@@ -846,6 +849,8 @@ byId("log-position").addEventListener("change", () => loadDraftLogView().catch((
 document.addEventListener("click", (event) => {
   const draftButton = event.target.closest("[data-draft-player]");
   if (draftButton) {
+    byId("player-search-results").hidden = true;
+    byId("command-input").value = "";
     beginPickConfirmation(draftButton.dataset.draftPlayer)
       .catch((error) => showNotice(error.message));
     return;
@@ -997,6 +1002,7 @@ byId("undo-last").addEventListener("click", () => {
   byId("undo-dialog").showModal();
 });
 byId("catch-up").addEventListener("click", () => {
+  if (byId("session-dialog").open) byId("session-dialog").close();
   byId("catch-up-dialog").returnValue = "";
   byId("catch-up-dialog").showModal();
   byId("catch-up-input").focus();
@@ -1007,13 +1013,21 @@ document.querySelectorAll(".filter").forEach((button) => {
     renderAvailable();
   });
 });
-byId("player-search").addEventListener("input", (event) => {
+byId("command-input").addEventListener("input", (event) => {
   clearTimeout(state.searchTimer);
   const query = event.target.value.trim();
   const sequence = ++state.searchSequence;
   state.searchTimer = setTimeout(() => {
     searchPlayers(query, sequence).catch((error) => showNotice(error.message));
   }, 150);
+});
+byId("command-input").addEventListener("focus", (event) => {
+  if (event.target.value.trim().length >= 2 && byId("player-search-results").textContent.trim()) {
+    byId("player-search-results").hidden = false;
+  }
+});
+document.addEventListener("click", (event) => {
+  if (!event.target.closest("#command-form")) byId("player-search-results").hidden = true;
 });
 window.addEventListener("online", () => {
   updateConnectivityIndicator();
@@ -1030,6 +1044,7 @@ byId("command-form").addEventListener("submit", async (event) => {
   const send = byId("command-send");
   const text = input.value.trim();
   if (!text) return;
+  byId("player-search-results").hidden = true;
   send.disabled = true;
   showNotice("");
   try {
