@@ -64,7 +64,8 @@ def test_health_board_and_frontend(web_draft):
     assert "Complete pick log" in frontend.text
     assert "player-detail-dialog" in frontend.text
     assert 'id="current-team"' in frontend.text
-    assert 'id="draft-primary"' in frontend.text
+    assert 'id="draft-primary"' not in frontend.text
+    assert 'id="player-detail-draft"' not in frontend.text
     assert 'id="player-search"' not in frontend.text
     assert 'id="player-search-results"' in frontend.text
     assert 'id="position-run"' in frontend.text
@@ -252,6 +253,13 @@ def test_available_search_and_recommendation_routes(web_draft):
     search = client.get("/api/v1/sessions/phone-test/players/search?q=puka")
     assert search.status_code == 200
     assert search.json()["players"][0]["player"] == "Puka Nacua"
+
+    bounded = client.get("/api/v1/sessions/phone-test/players/search?q=a&limit=8")
+    assert bounded.status_code == 200
+    assert len(bounded.json()["players"]) <= 8
+
+    excessive = client.get("/api/v1/sessions/phone-test/players/search?q=a&limit=9")
+    assert excessive.status_code == 422
 
     recommendation = client.get(
         "/api/v1/sessions/phone-test/recommendation?mode=upside&alternatives=2"

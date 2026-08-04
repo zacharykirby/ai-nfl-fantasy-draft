@@ -12,6 +12,7 @@ import pytest
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.support import expected_conditions as expected
@@ -96,6 +97,18 @@ def wait(driver, seconds=10):
     return WebDriverWait(driver, seconds)
 
 
+def select_from_search(browser, query, player_id):
+    search = browser.find_element(By.ID, "command-input")
+    search.send_keys(query)
+    result = wait(browser).until(
+        expected.element_to_be_clickable(
+            (By.CSS_SELECTOR, f'.composer-results [data-select-player-id="{player_id}"]')
+        )
+    )
+    result.click()
+    wait(browser).until(expected.visibility_of_element_located((By.ID, "composer-selection")))
+
+
 @pytest.mark.browser
 @pytest.mark.parametrize("width,height", [(320, 700), (390, 844), (844, 390)])
 def test_cockpit_fits_phone_viewports_and_keeps_touch_targets(browser, width, height):
@@ -116,7 +129,7 @@ def test_cockpit_fits_phone_viewports_and_keeps_touch_targets(browser, width, he
         assert target_height >= 44, f"#{element_id} is only {target_height}px tall"
 
     if width == 390 and height == 844:
-        first_player = browser.find_element(By.CSS_SELECTOR, "#best-available .player-action")
+        first_player = browser.find_element(By.CSS_SELECTOR, "#best-available .player-select-row")
         composer_top = browser.execute_script(
             "return document.querySelector('.composer').getBoundingClientRect().top"
         )
@@ -183,13 +196,14 @@ def test_landscape_board_keeps_real_content_visible(browser):
 
 
 @pytest.mark.browser
-def test_search_confirm_double_submit_and_refresh_records_one_pick(browser):
-    search = browser.find_element(By.ID, "command-input")
-    search.send_keys("Bijan")
-    draft_button = wait(browser).until(
-        expected.element_to_be_clickable((By.CSS_SELECTOR, '.composer-results [data-draft-player="Bijan Robinson"]'))
-    )
-    draft_button.click()
+def test_search_selects_without_recording_then_confirm_records_once(browser):
+    select_from_search(browser, "Bijan", "RB:bijan robinson")
+    assert browser.find_element(By.ID, "current-pick").text == "2"
+    assert not browser.find_element(By.ID, "confirmation-dialog").get_attribute("open")
+    assert browser.find_element(By.ID, "selected-player-copy").text == "Bijan Robinson · RB · TST"
+    assert browser.find_element(By.ID, "command-send").is_enabled()
+
+    browser.find_element(By.ID, "command-send").click()
     dialog = wait(browser).until(expected.visibility_of_element_located((By.ID, "confirmation-dialog")))
     assert dialog.get_attribute("open") is not None
     assert browser.find_element(By.ID, "confirmation-player").text == "Bijan Robinson"
@@ -198,10 +212,91 @@ def test_search_confirm_double_submit_and_refresh_records_one_pick(browser):
     browser.execute_script("arguments[0].click(); arguments[0].click();", confirm)
     wait(browser).until(expected.text_to_be_present_in_element((By.ID, "current-pick"), "3"))
     assert browser.find_element(By.ID, "recent-picks").text.count("Bijan Robinson") == 1
+    assert not browser.find_element(By.ID, "composer-selection").is_displayed()
+    assert browser.find_element(By.ID, "command-input").get_attribute("value") == ""
+    assert not browser.find_element(By.ID, "command-send").is_enabled()
 
     browser.refresh()
     wait(browser).until(expected.text_to_be_present_in_element((By.ID, "current-pick"), "3"))
     assert browser.find_element(By.ID, "recent-picks").text.count("Bijan Robinson") == 1
+
+
+@pytest.mark.browser
+def test_best_available_selects_without_recording_and_survives_view_switch(browser):
+    player = browser.find_element(By.CSS_SELECTOR, "#best-available .player-select-row")
+    name = player.find_element(By.CSS_SELECTOR, ".player-name").text
+    player.click()
+
+    assert browser.find_element(By.ID, "current-pick").text == "2"
+    assert name in browser.find_element(By.ID, "selected-player-copy").text
+    assert not browser.find_element(By.ID, "confirmation-dialog").get_attribute("open")
+    browser.find_element(By.CSS_SELECTOR, '[data-view="board"]').click()
+    browser.find_element(By.CSS_SELECTOR, '[data-view="cockpit"]').click()
+    assert name in browser.find_element(By.ID, "selected-player-copy").text
+
+
+@pytest.mark.browser
+def test_cancel_confirmation_preserves_selection(browser):
+    select_from_search(browser, "Puka", "WR:puka nacua")
+    browser.find_element(By.ID, "command-send").click()
+    dialog = wait(browser).until(expected.visibility_of_element_located((By.ID, "confirmation-dialog")))
+    dialog.find_element(By.CSS_SELECTOR, 'button[value="cancel"]').click()
+
+    wait(browser).until(expected.invisibility_of_element_located((By.ID, "confirmation-dialog")))
+    assert "Puka Nacua" in browser.find_element(By.ID, "selected-player-copy").text
+    assert browser.find_element(By.ID, "command-send").is_enabled()
+
+
+@pytest.mark.browser
+def test_stale_selected_player_cannot_be_confirmed(browser):
+    select_from_search(browser, "Puka", "WR:puka nacua")
+    browser.find_element(By.ID, "command-send").click()
+    wait(browser).until(expected.visibility_of_element_located((By.ID, "confirmation-dialog")))
+
+    external = browser.execute_async_script(
+        "const done=arguments[0]; fetch('/api/v1/sessions/phone-test/picks', {"
+        "method:'POST', headers:{'Content-Type':'application/json'},"
+        "body:JSON.stringify({player:'Puka Nacua',request_id:'other-client-pick-0001'})"
+        "}).then(r=>done(r.status));"
+    )
+    assert external == 200
+    browser.find_element(By.ID, "confirm-pick").click()
+
+    wait(browser).until(expected.text_to_be_present_in_element((By.ID, "notice"), "draft changed"))
+    assert browser.find_element(By.ID, "current-pick").text == "3"
+    assert not browser.find_element(By.ID, "composer-selection").is_displayed()
+    assert not browser.find_element(By.ID, "command-send").is_enabled()
+
+
+@pytest.mark.browser
+def test_rapid_search_ignores_stale_response(browser):
+    browser.execute_script(
+        "window.__realFetch=window.fetch; window.fetch=(url, options) => {"
+        "if(String(url).includes('players/search') && String(url).includes('q=ja')) {"
+        "return new Promise(resolve => setTimeout(() => resolve(window.__realFetch(url, options)), 450));}"
+        "return window.__realFetch(url, options);};"
+    )
+    search = browser.find_element(By.ID, "command-input")
+    search.send_keys("ja")
+    time.sleep(0.22)
+    search.send_keys(Keys.CONTROL, "a")
+    search.send_keys("bij")
+    wait(browser).until(expected.text_to_be_present_in_element((By.ID, "player-search-results"), "Bijan Robinson"))
+    time.sleep(0.55)
+    results = browser.find_element(By.ID, "player-search-results").text
+    assert "Bijan Robinson" in results
+    assert "Ja'Marr Chase" not in results
+
+
+@pytest.mark.browser
+def test_live_player_lists_have_no_direct_draft_buttons(browser):
+    assert browser.find_elements(By.CSS_SELECTOR, "[data-draft-player]") == []
+    assert browser.find_elements(By.ID, "draft-primary") == []
+    assert browser.find_elements(By.ID, "player-detail-draft") == []
+    assert all(
+        "draft" not in button.text.lower()
+        for button in browser.find_elements(By.CSS_SELECTOR, "#best-available button, #alternatives button, #player-search-results button")
+    )
 
 
 @pytest.mark.browser

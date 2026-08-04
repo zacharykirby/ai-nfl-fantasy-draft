@@ -2,6 +2,9 @@ const state = {
   cockpit: null,
   position: "ALL",
   session: null,
+  selectedPlayer: null,
+  selectedRequestId: null,
+  playerOptions: {},
   pendingPick: null,
   preparingPick: false,
   pendingUndo: null,
@@ -60,7 +63,12 @@ async function api(path, options = {}) {
   state.serverOnline = true;
   updateConnectivityIndicator();
   const payload = await response.json();
-  if (!response.ok) throw new Error(payload?.error?.message || `Request failed (${response.status})`);
+  if (!response.ok) {
+    const error = new Error(payload?.error?.message || `Request failed (${response.status})`);
+    error.apiCode = payload?.error?.code;
+    error.status = response.status;
+    throw error;
+  }
   return payload;
 }
 
@@ -78,11 +86,16 @@ function compactRow(left, right = "") {
   return `<div class="compact-row"><span>${escapeHtml(left)}</span><span class="player-detail">${escapeHtml(right)}</span></div>`;
 }
 
-function actionablePlayerRow(player, label = "Draft") {
-  return `<div class="player-action">
+function rememberPlayerOption(player) {
+  if (player?.player_id) state.playerOptions[player.player_id] = player;
+  return player;
+}
+
+function selectablePlayerRow(player) {
+  rememberPlayerOption(player);
+  return `<button class="player-select-row" type="button" data-select-player-id="${escapeHtml(player.player_id)}" aria-label="Select ${escapeHtml(player.player)}">
     ${playerRow(player)}
-    <button class="quick-draft" type="button" data-draft-player="${escapeHtml(player.player)}" aria-label="Draft ${escapeHtml(player.player)}">${label}</button>
-  </div>`;
+  </button>`;
 }
 
 function setList(element, html, emptyText) {
@@ -122,18 +135,17 @@ function render(cockpit) {
   byId("mode").textContent = recommendation?.mode || "complete";
   byId("primary-reasons").innerHTML = (primary?.reasons || []).slice(0, 3)
     .map((reason) => `<li>${escapeHtml(reason)}</li>`).join("");
-  byId("draft-primary").disabled = !primary;
-  byId("draft-primary").dataset.draftPlayer = primary?.player || "";
+  rememberPlayerOption(primary);
+  byId("primary-selection").disabled = !primary || draftComplete;
+  byId("primary-selection").dataset.selectPlayerId = primary?.player_id || "";
 
   setList(
     byId("alternatives"),
-    (recommendation?.alternatives || []).slice(0, 3).map((player) => actionablePlayerRow(player)).join(""),
+    (recommendation?.alternatives || []).slice(0, 3).map((player) => selectablePlayerRow(player)).join(""),
     "No alternatives available",
   );
   renderAvailable();
-  document.querySelectorAll("[data-draft-player]").forEach((button) => {
-    button.disabled = draftComplete;
-  });
+  renderComposerSelection();
   setList(
     byId("roster"),
     cockpit.user_roster.map((player) => compactRow(player.player, player.position)).join(""),
@@ -263,8 +275,9 @@ function renderCopilot(payload) {
     const option = result[field];
     if (!option) return "";
     const player = state.copilotOptionPlayers[option.player_id] || {};
+    rememberPlayerOption(player);
     const meta = [player.position, player.team].filter(Boolean).join(" · ");
-    return `<button class="copilot-option" type="button" data-player-id="${escapeHtml(option.player_id)}">
+    return `<button class="copilot-option" type="button" data-select-player-id="${escapeHtml(option.player_id)}" ${payload.freshness.stale ? "disabled" : ""}>
       <span>${heading}</span><strong>${escapeHtml(player.player || option.player_id)}</strong>
       ${meta ? `<small>${escapeHtml(meta)}</small>` : ""}<p>${escapeHtml(option.reason)}</p>
     </button>`;
@@ -332,7 +345,7 @@ function renderAvailable() {
     : state.cockpit.top_available_by_position[state.position] || [];
   setList(
     byId("best-available"),
-    players.slice(0, 3).map((player) => actionablePlayerRow(player)).join(""),
+    players.slice(0, 3).map((player) => selectablePlayerRow(player)).join(""),
     "No players available",
   );
   byId("best-available-title").textContent = state.position === "ALL"
@@ -371,23 +384,91 @@ function updateConnectivityIndicator() {
   setHealth("health-connectivity", connected ? "Connected" : browserOnline ? "Server lost" : "Offline", connected);
 }
 
-async function beginPickConfirmation(playerName) {
-  if (!playerName || !state.session || state.preparingPick || state.pendingPick) return;
+function renderComposerSelection() {
+  const player = state.selectedPlayer;
+  const input = byId("command-input");
+  const selection = byId("composer-selection");
+  selection.hidden = !player;
+  input.hidden = Boolean(player);
+  byId("selected-player-copy").textContent = player
+    ? `${player.player} · ${player.position} · ${player.team || "FA"}`
+    : "";
+  byId("command-send").disabled = !player
+    || state.cockpit?.session?.status !== "active"
+    || state.preparingPick
+    || Boolean(state.pendingPick);
+}
+
+function clearSelectedPlayer({ focus = false } = {}) {
+  state.selectedPlayer = null;
+  state.selectedRequestId = null;
+  state.searchSequence += 1;
+  clearTimeout(state.searchTimer);
+  byId("command-input").value = "";
+  byId("player-search-results").hidden = true;
+  setList(byId("player-search-results"), "", "");
+  renderComposerSelection();
+  if (focus && !byId("command-input").disabled) byId("command-input").focus();
+}
+
+function selectPlayer(player) {
+  if (!player || player.available === false || state.cockpit?.session?.status !== "active") return;
+  state.selectedPlayer = rememberPlayerOption(player);
+  state.selectedRequestId = requestId();
+  state.searchSequence += 1;
+  clearTimeout(state.searchTimer);
+  byId("command-input").value = "";
+  byId("player-search-results").hidden = true;
+  setList(byId("player-search-results"), "", "");
+  renderComposerSelection();
+  showNotice("");
+}
+
+async function selectPlayerById(playerId) {
+  let player = state.playerOptions[playerId];
+  if (!player) {
+    const detail = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/players/${encodeURIComponent(playerId)}`);
+    player = detail.player;
+  }
+  if (player.available === false) {
+    throw new Error("That player is no longer available. Refresh and choose another player.");
+  }
+  selectPlayer(player);
+}
+
+async function refreshCockpit() {
+  const cockpit = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/cockpit`);
+  render(cockpit);
+}
+
+async function beginPickConfirmation() {
+  const selected = state.selectedPlayer;
+  if (!selected || !state.session || state.preparingPick || state.pendingPick) return;
   state.preparingPick = true;
+  renderComposerSelection();
   try {
     showNotice("Checking current draft state…");
-    const interpretation = await interpretCommand(`draft ${playerName}`);
+    const interpretation = await interpretCommand(`draft ${selected.player}`);
     if (interpretation.intent !== "record_pick") {
       throw new Error("That player could not be prepared for drafting.");
     }
-    state.pendingPick = { ...interpretation, requestId: requestId() };
+    state.pendingPick = { ...interpretation, requestId: state.selectedRequestId };
     byId("confirmation-player").textContent = interpretation.player.player;
     byId("confirmation-text").textContent = interpretation.confirmation.text;
     byId("confirmation-dialog").returnValue = "";
     byId("confirmation-dialog").showModal();
     showNotice("");
+  } catch (error) {
+    if (error.apiCode === "player_not_found") {
+      clearSelectedPlayer();
+      await refreshCockpit();
+      showNotice("That player is no longer available. The draft was refreshed; choose another player.");
+      return;
+    }
+    throw error;
   } finally {
     state.preparingPick = false;
+    renderComposerSelection();
   }
 }
 
@@ -405,7 +486,7 @@ async function searchPlayers(query, sequence = ++state.searchSequence) {
   if (sequence !== state.searchSequence) return;
   setList(
     results,
-    payload.players.map((player) => actionablePlayerRow(player)).join(""),
+    payload.players.map((player) => selectablePlayerRow(player)).join(""),
     "No available players match",
   );
 }
@@ -437,9 +518,13 @@ async function loadBoardView() {
   const html = Object.entries(result.positions).map(([role, group]) => {
     const tiers = group.tiers.map((tier) => `<section class="tier-section">
       <div class="tier-heading"><span>Tier ${tier.tier === 99 ? "—" : tier.tier}</span><span>${tier.count} player${tier.count === 1 ? "" : "s"}</span></div>
-      ${tier.players.map((player) => `<button class="board-player ${player.available ? "" : "drafted"}" type="button" data-player-id="${escapeHtml(player.player_id)}">
-        ${playerRow(player)}
-      </button>`).join("")}
+      ${tier.players.map((player) => {
+        rememberPlayerOption(player);
+        const action = player.available
+          ? `data-select-player-id="${escapeHtml(player.player_id)}" aria-label="Select ${escapeHtml(player.player)}"`
+          : `data-player-id="${escapeHtml(player.player_id)}"`;
+        return `<button class="board-player ${player.available ? "" : "drafted"}" type="button" ${action}>${playerRow(player)}</button>`;
+      }).join("")}
     </section>`).join("");
     return `<div class="position-heading"><h2>${role}</h2><span class="small-meta">${group.count} shown</span></div>${tiers || `<div class="card empty-state">No ${role} players match.</div>`}`;
   }).join("");
@@ -532,7 +617,6 @@ async function openPlayerDetail(playerId) {
     ["Flags", (player.flags || []).join(", ") || "None"],
   ];
   byId("player-detail-evidence").innerHTML = evidenceRows.map(([label, value]) => `<div class="evidence-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("");
-  byId("player-detail-draft").hidden = !player.available || state.cockpit?.session?.status === "complete";
   if (!byId("player-detail-dialog").open) byId("player-detail-dialog").showModal();
 }
 
@@ -577,12 +661,26 @@ async function load(preferredSession = null) {
 }
 
 async function loadSession(name) {
+  const changingSession = Boolean(state.session && state.session !== name);
+  if (changingSession) clearSelectedPlayer();
   state.searchSequence += 1;
   byId("command-input").value = "";
   byId("player-search-results").hidden = true;
   setList(byId("player-search-results"), "", "");
-  const cockpit = await api(`/api/v1/sessions/${encodeURIComponent(name)}/cockpit`);
+  const selectedId = !changingSession ? state.selectedPlayer?.player_id : null;
+  const [cockpit, selectedDetail] = await Promise.all([
+    api(`/api/v1/sessions/${encodeURIComponent(name)}/cockpit`),
+    selectedId
+      ? api(`/api/v1/sessions/${encodeURIComponent(name)}/players/${encodeURIComponent(selectedId)}`).catch(() => null)
+      : Promise.resolve(null),
+  ]);
   state.session = name;
+  if (selectedId && selectedDetail?.player?.available) {
+    state.selectedPlayer = rememberPlayerOption(selectedDetail.player);
+  } else if (selectedId) {
+    clearSelectedPlayer();
+    showNotice("The selected player is no longer available. Choose another player.");
+  }
   state.copilotController?.abort();
   state.copilotSequence += 1;
   state.copilotController = null;
@@ -591,7 +689,6 @@ async function loadSession(name) {
   state.copilotOptionPlayers = {};
   byId("oh-god-card").hidden = true;
   byId("command-input").disabled = false;
-  byId("command-send").disabled = false;
   rememberSession(name);
   const url = new URL(window.location.href);
   url.searchParams.set("session", name);
@@ -767,12 +864,9 @@ async function recordPendingPick() {
       mode: "balanced",
     }),
   });
-  render(result.cockpit);
-  byId("command-input").value = "";
-  state.searchSequence += 1;
-  byId("player-search-results").hidden = true;
-  setList(byId("player-search-results"), "", "");
   state.pendingPick = null;
+  clearSelectedPlayer();
+  render(result.cockpit);
   showNotice("");
 }
 
@@ -847,11 +941,9 @@ byId("board-available-only").addEventListener("change", () => loadBoardView().ca
 byId("log-team").addEventListener("change", () => loadDraftLogView().catch((error) => showNotice(error.message)));
 byId("log-position").addEventListener("change", () => loadDraftLogView().catch((error) => showNotice(error.message)));
 document.addEventListener("click", (event) => {
-  const draftButton = event.target.closest("[data-draft-player]");
-  if (draftButton) {
-    byId("player-search-results").hidden = true;
-    byId("command-input").value = "";
-    beginPickConfirmation(draftButton.dataset.draftPlayer)
+  const selectButton = event.target.closest("[data-select-player-id]");
+  if (selectButton) {
+    selectPlayerById(selectButton.dataset.selectPlayerId)
       .catch((error) => showNotice(error.message));
     return;
   }
@@ -859,12 +951,6 @@ document.addEventListener("click", (event) => {
   if (player) openPlayerDetail(player.dataset.playerId).catch((error) => showNotice(error.message));
 });
 byId("player-detail-close").addEventListener("click", () => byId("player-detail-dialog").close());
-byId("player-detail-draft").addEventListener("click", () => {
-  const player = state.detailPlayer;
-  if (!player?.available) return;
-  byId("player-detail-dialog").close();
-  beginPickConfirmation(player.player).catch((error) => showNotice(error.message));
-});
 byId("session-switcher").addEventListener("click", () => {
   showSessionNotice("");
   openSessionManager(false);
@@ -1018,7 +1104,9 @@ byId("command-input").addEventListener("input", (event) => {
   const query = event.target.value.trim();
   const sequence = ++state.searchSequence;
   state.searchTimer = setTimeout(() => {
-    searchPlayers(query, sequence).catch((error) => showNotice(error.message));
+    searchPlayers(query, sequence).catch((error) => {
+      if (sequence === state.searchSequence) showNotice(error.message);
+    });
   }, 150);
 });
 byId("command-input").addEventListener("focus", (event) => {
@@ -1029,6 +1117,7 @@ byId("command-input").addEventListener("focus", (event) => {
 document.addEventListener("click", (event) => {
   if (!event.target.closest("#command-form")) byId("player-search-results").hidden = true;
 });
+byId("clear-selection").addEventListener("click", () => clearSelectedPlayer({ focus: true }));
 window.addEventListener("online", () => {
   updateConnectivityIndicator();
   load(state.session).catch((error) => showNotice(error.message));
@@ -1040,43 +1129,34 @@ document.addEventListener("visibilitychange", () => {
 
 byId("command-form").addEventListener("submit", async (event) => {
   event.preventDefault();
-  const input = byId("command-input");
-  const send = byId("command-send");
-  const text = input.value.trim();
-  if (!text) return;
+  if (!state.selectedPlayer) return;
   byId("player-search-results").hidden = true;
-  send.disabled = true;
   showNotice("");
   try {
-    const interpretation = await interpretCommand(text);
-    if (interpretation.intent !== "record_pick") {
-      byId("talk-shop").open = true;
-      byId("talk-shop-input").value = text;
-      input.value = "";
-      showNotice("That sounds like a question. It is ready in Talk shop—tap Ask when you want an answer.", true);
-      byId("talk-shop-input").focus();
-      return;
-    }
-    state.pendingPick = { ...interpretation, requestId: requestId() };
-    byId("confirmation-player").textContent = interpretation.player.player;
-    byId("confirmation-text").textContent = interpretation.confirmation.text;
-    byId("confirmation-dialog").returnValue = "";
-    byId("confirmation-dialog").showModal();
+    await beginPickConfirmation();
   } catch (error) {
-    showNotice(error.name === "AbortError" ? "Question cancelled." : error.message);
-  } finally {
-    send.disabled = false;
+    showNotice(error.message);
   }
 });
 
 byId("confirmation-dialog").addEventListener("close", async () => {
   if (byId("confirmation-dialog").returnValue !== "confirm") {
     state.pendingPick = null;
+    renderComposerSelection();
     return;
   }
   try {
     await recordPendingPick();
   } catch (error) {
+    if (error.apiCode === "stale_mutation" || error.apiCode === "player_not_found") {
+      state.pendingPick = null;
+      clearSelectedPlayer();
+      try { await refreshCockpit(); } catch (_refreshError) { /* original stale error is clearer */ }
+      showNotice("The draft changed and that selection can no longer be confirmed. The draft was refreshed; choose another player.");
+      return;
+    }
+    state.pendingPick = null;
+    renderComposerSelection();
     showNotice(error.message);
   }
 });

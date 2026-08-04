@@ -21,8 +21,19 @@ def test_search_prioritizes_prefixes_and_only_returns_available_players(web_draf
     service = DraftCockpitService(web_draft["session"])
 
     assert [player["player"] for player in service.search("bi")] == ["Bijan Robinson"]
+    assert [player["player"] for player in service.search("NaCu")] == ["Puka Nacua"]
+    assert [player["player"] for player in service.search("lam")][:2] == [
+        "Lamar Jackson",
+        "CeeDee Lamb",
+    ]
     assert service.search("jahmyr") == []
     assert all(player["position"] == "WR" for player in service.search("a", position="WR"))
+
+
+def test_search_result_count_is_bounded_by_requested_limit(web_draft):
+    results = DraftCockpitService(web_draft["session"]).search("a", limit=3)
+
+    assert len(results) <= 3
 
 
 def test_available_rejects_unknown_position(web_draft):

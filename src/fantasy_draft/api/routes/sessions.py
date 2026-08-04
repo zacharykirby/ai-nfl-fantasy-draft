@@ -136,7 +136,7 @@ def search_players(
     session_name: str,
     q: str = Query(..., min_length=1, max_length=80),
     position: Optional[str] = Query(None),
-    limit: int = Query(12, ge=1, le=50),
+    limit: int = Query(8, ge=1, le=8),
     repository: SessionRepository = Depends(session_repository),
 ) -> Dict[str, Any]:
     players = DraftCockpitService(repository.load(session_name)).search(

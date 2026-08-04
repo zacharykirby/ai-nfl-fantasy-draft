@@ -91,13 +91,12 @@
 
       <section id="full-assistant-panel" hidden>
         <section class="card recommendation-card">
-          <div class="card-heading">
-            <div><p class="eyebrow">DETERMINISTIC LEAN</p><h2 id="primary-player">No recommendation</h2></div>
+          <p class="eyebrow">DETERMINISTIC LEAN</p>
+          <button id="primary-selection" class="primary-selection" type="button" disabled>
+            <div><h2 id="primary-player">No recommendation</h2><p id="primary-meta" class="player-meta">Waiting for draft state</p></div>
             <span id="confidence" class="pill">—</span>
-          </div>
-          <p id="primary-meta" class="player-meta">Waiting for draft state</p>
+          </button>
           <ul id="primary-reasons" class="reason-list"></ul>
-          <button id="draft-primary" class="quick-draft primary-quick-draft" type="button" disabled>Draft recommendation</button>
         </section>
         <section class="card">
           <div class="card-heading"><h2>Close alternatives</h2><span id="mode" class="pill muted">balanced</span></div>
@@ -219,6 +218,10 @@
 
     <form id="command-form" class="composer" autocomplete="off">
       <div id="player-search-results" class="composer-results empty-state" aria-live="polite" hidden></div>
+      <div id="composer-selection" class="composer-selection" hidden>
+        <span id="selected-player-copy"></span>
+        <button id="clear-selection" type="button" aria-label="Change selected player">Change</button>
+      </div>
       <label class="sr-only" for="command-input">Search available players to record a pick</label>
       <input
         id="command-input"
@@ -228,7 +231,7 @@
         placeholder="Search available players…"
         enterkeyhint="send"
       >
-      <button id="command-send" type="submit">Record</button>
+      <button id="command-send" type="submit" disabled>Record</button>
     </form>
 
     <dialog id="session-dialog" class="confirmation-dialog session-dialog">
@@ -319,7 +322,6 @@
       <p id="player-detail-meta" class="player-meta"></p>
       <div id="player-detail-stats" class="detail-stats"></div>
       <div id="player-detail-evidence" class="evidence-list"></div>
-      <button id="player-detail-draft" class="dialog-button primary full-width" type="button">Draft this player</button>
     </dialog>
 
     <dialog id="undo-dialog" class="confirmation-dialog">

@@ -45,7 +45,13 @@ class DraftCockpitService:
         if not normalized:
             return []
         position = position.upper() if position else None
-        candidates = self.session.available_players(position)
+        candidates = sorted(
+            self.session.available_players(position),
+            key=lambda player: (
+                int(player.get("overall_rank") or 10**9),
+                str(player.get("player_id") or player.get("player") or ""),
+            ),
+        )
         prefix = []
         contains = []
         for player in candidates:
