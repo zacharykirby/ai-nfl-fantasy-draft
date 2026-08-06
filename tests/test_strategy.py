@@ -28,7 +28,10 @@ def test_strategy_context_is_bounded_and_includes_team_needs(web_draft):
     context = DraftStrategyContextBuilder(web_draft["session"]).build()
 
     assert len(context["team_roster_construction"]) == 4
-    assert all(set(team["counts"]) == {"QB", "RB", "WR", "TE"} for team in context["team_roster_construction"])
+    assert all(
+        set(team["counts"]) == {"QB", "RB", "WR", "TE", "DST", "K"}
+        for team in context["team_roster_construction"]
+    )
     assert context["intervening_before_following_pick"]["teams"]
     assert all("needs" in team for team in context["intervening_before_following_pick"]["teams"])
     assert context["top_available_by_position"]["QB"]
@@ -44,7 +47,7 @@ def test_strategy_validation_accepts_valid_and_rejects_bad_values():
     mutations = [
         ("primary_player", "Unavailable Player"),
         ("strategy", "invented"),
-        ("position_priority", ["DST"]),
+        ("position_priority", ["P"]),
         ("fallback_players", ["Ja'Marr Chase", "Ja'Marr Chase"]),
         ("confidence", 1.1),
     ]

@@ -13,7 +13,7 @@ from fantasy_draft.draft.session import DraftSession
 
 
 def _player(name, position, position_rank, overall_rank, tier=1):
-    return {
+    player = {
         "player": name,
         "position": position,
         "team": "TST",
@@ -27,6 +27,14 @@ def _player(name, position, position_rank, overall_rank, tier=1):
         "risk": {"level": "Low", "injury_flag": False},
         "flags": ["High Upside"] if position in {"RB", "WR"} else [],
     }
+    if position in {"DST", "K"}:
+        player.update({
+            "overall_rank": None,
+            "vorp": None,
+            "late_round_only": True,
+            "ranking_basis": "week_1_matchup_projection" if position == "DST" else "season_projection",
+        })
+    return player
 
 
 @pytest.fixture
@@ -36,6 +44,8 @@ def web_draft(tmp_path):
         "WR": ["Ja'Marr Chase", "Puka Nacua", "CeeDee Lamb"],
         "QB": ["Josh Allen", "Lamar Jackson", "Joe Burrow"],
         "TE": ["Trey McBride", "Brock Bowers", "George Kittle"],
+        "DST": [f"Fixture Defense {number} D/ST" for number in range(1, 11)],
+        "K": [f"Fixture Kicker {number}" for number in range(1, 11)],
     }
     overall = 1
     roles = {}
@@ -49,7 +59,7 @@ def web_draft(tmp_path):
 
     projection_path = tmp_path / "players_2026_positions_bye.csv"
     projection_rows = []
-    for position, count in {"QB": 20, "RB": 40, "WR": 50, "TE": 15}.items():
+    for position, count in {"QB": 20, "RB": 40, "WR": 50, "TE": 15, "K": 10, "DST": 10}.items():
         for number in range(count):
             projection_rows.append(
                 "{rank},Fixture {position} {number},{position},TST,7,100,1,{rank},published,False,Fixture".format(
@@ -86,7 +96,7 @@ def web_draft(tmp_path):
         "league": {
             "scoring": "half_ppr",
             "league_size": 4,
-            "starters": {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1},
+            "starters": {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1, "DST": 1, "K": 1},
             "bench_size": 1,
         },
         "roles": roles,

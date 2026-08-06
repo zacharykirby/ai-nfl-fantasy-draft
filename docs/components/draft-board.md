@@ -3,6 +3,24 @@
 `outputs/draft_board.json` is the boundary between data preparation and live draft
 reasoning. It prioritizes players independently within QB, RB, WR, and TE and does
 not prescribe a snake-draft sequence.
+K and D/ST use separate late-round pools: kicker is season-projection based, while
+D/ST is ranked by its Week 1 matchup projection. Neither enters skill-position VORP.
+
+Each skill-position list is ordered by the same final VORP value used for its tiers.
+Starting from the highest-VORP player, a new tier begins when the drop from the
+previous player is greater than the position threshold. A maximum tier size also
+splits unusually flat groups:
+
+| Position | VORP gap | Maximum tier size |
+| --- | ---: | ---: |
+| QB | 8.0 | 6 |
+| RB | 10.0 | 10 |
+| WR | 10.0 | 10 |
+| TE | 8.0 | 6 |
+
+The board records every player's adjacent gap, boundary reason, threshold, and
+maximum size in `evidence`. The complete configuration is also captured in
+`metadata.tiering_method`, making every boundary reproducible and auditable.
 
 Implementation: `src/fantasy_draft/board/builder.py`. The legacy
 `scripts/draft_board.py` module is a compatibility wrapper.
@@ -15,9 +33,10 @@ python scripts/cli.py --show-board --position WR --top 15
 python scripts/cli.py --validate-board
 ```
 
-The canonical default is 330 players: QB 40, RB 110, WR 140, and TE 40. The
+The canonical default is 350 entries: QB 40, RB 110, WR 140, TE 40, D/ST 10,
+and K 10. The
 RB/WR weighting preserves late-round skill-position depth. Use `--board-top N`
-to apply one explicit limit to every role.
+to apply one explicit limit to each skill role; special teams remain fixed at ten.
 
 Board metadata reports the source ranking count, eligible counts after the
 positive-projection/position/identity filters, final role counts, and exclusions
@@ -31,7 +50,7 @@ deliberately capped board.
   "schema_version": "1.0",
   "metadata": {},
   "league": {},
-  "roles": {"QB": [], "RB": [], "WR": [], "TE": []},
+  "roles": {"QB": [], "RB": [], "WR": [], "TE": [], "DST": [], "K": []},
   "health": {"status": "ready", "issues": []}
 }
 ```

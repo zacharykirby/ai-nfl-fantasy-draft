@@ -118,6 +118,8 @@
             <button class="filter" data-position="WR" type="button" aria-pressed="false">WR</button>
             <button class="filter" data-position="QB" type="button" aria-pressed="false">QB</button>
             <button class="filter" data-position="TE" type="button" aria-pressed="false">TE</button>
+            <button class="filter" data-position="DST" type="button" aria-pressed="false">D/ST</button>
+            <button class="filter" data-position="K" type="button" aria-pressed="false">K</button>
           </nav>
         </details>
       </section>
@@ -183,6 +185,8 @@
             <button class="board-filter" data-board-position="WR" type="button" aria-pressed="false">WR</button>
             <button class="board-filter" data-board-position="QB" type="button" aria-pressed="false">QB</button>
             <button class="board-filter" data-board-position="TE" type="button" aria-pressed="false">TE</button>
+            <button class="board-filter" data-board-position="DST" type="button" aria-pressed="false">D/ST</button>
+            <button class="board-filter" data-board-position="K" type="button" aria-pressed="false">K</button>
           </nav>
         </section>
         <div id="full-board" class="view-loading">Open the board to load players.</div>
@@ -209,7 +213,7 @@
           <div class="card-heading"><div><p class="eyebrow">DRAFT HISTORY</p><h2>Complete pick log</h2></div><span id="log-count" class="pill muted">0</span></div>
           <div class="log-filters">
             <label>Team<select id="log-team"><option value="">All teams</option></select></label>
-            <label>Position<select id="log-position"><option value="">All positions</option><option>QB</option><option>RB</option><option>WR</option><option>TE</option></select></label>
+            <label>Position<select id="log-position"><option value="">All positions</option><option>QB</option><option>RB</option><option>WR</option><option>TE</option><option value="DST">D/ST</option><option>K</option></select></label>
           </div>
         </section>
         <section class="card"><div id="draft-log-list" class="compact-list empty-state">No picks recorded</div></section>

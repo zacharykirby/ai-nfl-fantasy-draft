@@ -29,6 +29,7 @@ from ranker import PlayerRanker
 from draft_recommender import DraftRecommender
 from llm_client import OpenRouterClient
 from draft_board import DraftBoardBuilder, LeagueConfig, format_board, load_board, validate_board
+from fantasy_draft.board import write_cheatsheet
 from fetch_2026_projections import build_projection_file, write_projection_artifacts
 from projection_validator import validate_projection_file
 from projection_importer import import_projection_csv
@@ -101,12 +102,24 @@ class FantasyCLI:
             limits = None
             if top_n is not None:
                 limits = {position: top_n for position in ("QB", "RB", "WR", "TE")}
+                limits.update({"DST": 10, "K": 10})
             builder = DraftBoardBuilder()
             board = builder.build(
                 league=LeagueConfig(scoring=scoring, league_size=league_size),
                 limits=limits,
             )
             output = builder.write(board)
+            runtime_health = validate_board(board)
+            cheatsheet = write_cheatsheet(
+                board,
+                Path("outputs/draft_cheatsheet.md"),
+                runtime_health,
+            )
+            fallback = write_cheatsheet(
+                board,
+                Path("outputs/emergency_draft_cheatsheet.md"),
+                runtime_health,
+            )
             counts = board["metadata"]["role_counts"]
             self.print_success(
                 "Exported {}".format(
@@ -125,6 +138,8 @@ class FantasyCLI:
                 for issue in health["issues"]:
                     print("- [{}] {}".format(issue["code"], issue["message"]))
             self.print_success("Saved board to {}".format(output))
+            self.print_success("Saved position cheat sheet to {}".format(cheatsheet))
+            self.print_success("Synced emergency fallback to {}".format(fallback))
             return True
         except Exception as exc:
             self.print_error("Board build failed: {}".format(exc))
@@ -171,6 +186,63 @@ class FantasyCLI:
         except Exception as exc:
             self.print_error("Projection fetch failed: {}".format(exc))
             return False
+
+    def refresh_draft_sheet(
+        self,
+        season: int,
+        scoring: str,
+        provider: str,
+        league_size: int,
+        years: Optional[List[int]] = None,
+        force_historical: bool = False,
+        news_age_hours: int = 168,
+        news_limit: int = 30,
+        skip_news: bool = False,
+    ) -> bool:
+        """Refresh every input and artifact needed by the static draft sheet."""
+        self.print_section_header("REFRESHING DRAFT DATA AND CHEAT SHEET")
+
+        if not self.fetch_projections(season, scoring=scoring, provider=provider):
+            return False
+
+        historical_path = Path("data/nfl_player_data.csv")
+        if force_historical or not historical_path.exists():
+            self.print_info("Refreshing historical player data...")
+            try:
+                historical = self.data_ingester.get_fantasy_data(years=years)
+            except Exception as exc:
+                self.print_error("Historical data refresh failed: {}".format(exc))
+                return False
+            if historical.empty:
+                self.print_error("Historical data refresh returned no players")
+                return False
+            self.print_success("Refreshed {} historical player-seasons".format(len(historical)))
+        else:
+            self.print_info(
+                "Using existing historical data (pass --force-refresh to recollect it)"
+            )
+
+        if skip_news:
+            self.print_warning("Skipping news and hype refresh (--skip-news)")
+        elif not self.run_news_pipeline(
+            max_age_hours=news_age_hours,
+            max_headlines=news_limit,
+        ):
+            return False
+
+        self.ranker = PlayerRanker(target_season=season, league_size=league_size)
+        if not self.run_ranking(rank_all=True):
+            return False
+        if not self.build_draft_board(
+            league_size=league_size,
+            scoring=scoring,
+        ):
+            return False
+        if not self.validate_draft_board():
+            return False
+
+        self.print_success("Draft cheat sheet refresh completed")
+        return True
 
     def validate_projections(self, season: int):
         """Show projection provenance, coverage, and identity health."""
@@ -248,7 +320,8 @@ class FantasyCLI:
         return df
 
     def run_full_pipeline(self, years: Optional[List[int]] = None, 
-                         max_news_age: int = 24, force_refresh: bool = False, skip_news: bool = False):
+                         max_news_age: int = 24, force_refresh: bool = False,
+                         skip_news: bool = False, news_limit: int = 30):
         """Run the complete fantasy football analysis pipeline"""
         self.print_banner()
         self.print_section_header("RUNNING COMPLETE FANTASY FOOTBALL PIPELINE")
@@ -296,8 +369,15 @@ class FantasyCLI:
             else:
                 self.print_section_header("STEP 3: NEWS ANALYSIS")
                 self.print_info("Analyzing news sentiment and extracting player features...")
-                analyze_headlines()  # This will read from news/raw_headlines.json and write to news/player_features.json
-                self.print_success("News analysis completed")
+                analysis = analyze_headlines(max_headlines=news_limit)
+                if not analysis or not analysis.get("player_features"):
+                    self.print_warning("News analysis produced no matched fantasy players")
+                else:
+                    self.print_success(
+                        "News analysis completed for {} players".format(
+                            len(analysis["player_features"])
+                        )
+                    )
             
             # Step 4: Player Ranking
             self.print_section_header("STEP 4: PLAYER RANKING")
@@ -612,7 +692,7 @@ class FantasyCLI:
             self.print_error(f"Data ingestion failed: {e}")
             return False
     
-    def run_news_pipeline(self, max_age_hours: int = 24):
+    def run_news_pipeline(self, max_age_hours: int = 24, max_headlines: int = 30):
         """Run only the news fetching and analysis pipeline"""
         self.print_section_header("NEWS PIPELINE")
         
@@ -626,8 +706,15 @@ class FantasyCLI:
                 
                 # Analyze news
                 self.print_info("Analyzing news sentiment...")
-                analyze_headlines()  # This will read from news/raw_headlines.json and write to news/player_features.json
-                self.print_success("News analysis completed")
+                analysis = analyze_headlines(max_headlines=max_headlines)
+                if not analysis or not analysis.get("player_features"):
+                    self.print_error("News analysis produced no matched fantasy players")
+                    return False
+                self.print_success(
+                    "News analysis completed for {} players".format(
+                        len(analysis["player_features"])
+                    )
+                )
                 return True
             else:
                 self.print_warning("No recent headlines found")
@@ -827,6 +914,7 @@ Examples:
   python scripts/cli.py --news-only                   # Only fetch and analyze news
   python scripts/cli.py --draft-recommendations       # Generate fast position-aware draft recommendations
   python scripts/cli.py --smoke-test                  # Validate local rankings and draft logic
+  python scripts/cli.py --refresh-draft-sheet         # Refresh data, rankings, board, and Markdown sheet
   python scripts/cli.py --draft-recommendations --top 30 --save-recommendations  # Custom recommendations
         """
     )
@@ -863,6 +951,8 @@ Examples:
                              help='Validate projection provenance, coverage, and identity')
     action_group.add_argument('--import-projections', type=Path, metavar='CSV',
                              help='Import a licensed or user-authored projection CSV')
+    action_group.add_argument('--refresh-draft-sheet', action='store_true',
+                             help='Refresh projections, rankings, board, and Markdown cheat sheet')
     
     # Filtering options
     parser.add_argument('--position', type=str, choices=['QB', 'RB', 'WR', 'TE', 'K', 'DST'],
@@ -887,6 +977,8 @@ Examples:
                        help='Years of data to analyze (default: most recent 3 completed seasons)')
     parser.add_argument('--news-age', type=int, default=24, metavar='HOURS',
                        help='Maximum age of news headlines in hours (default: 24)')
+    parser.add_argument('--news-limit', type=int, default=30, metavar='N',
+                       help='Maximum headlines sent to OpenRouter (default: 30)')
     parser.add_argument('--force-refresh', action='store_true',
                        help='Force refresh of existing data')
     parser.add_argument('--skip-news', action='store_true',
@@ -917,7 +1009,8 @@ Examples:
                 years=args.years,
                 max_news_age=args.news_age,
                 force_refresh=args.force_refresh,
-                skip_news=args.skip_news
+                skip_news=args.skip_news,
+                news_limit=args.news_limit,
             )
             sys.exit(0 if success else 1)
             
@@ -937,7 +1030,10 @@ Examples:
             sys.exit(0 if success else 1)
             
         elif args.news_only:
-            success = cli.run_news_pipeline(max_age_hours=args.news_age)
+            success = cli.run_news_pipeline(
+                max_age_hours=args.news_age,
+                max_headlines=args.news_limit,
+            )
             sys.exit(0 if success else 1)
             
         elif args.rank_only:
@@ -1000,6 +1096,20 @@ Examples:
                 input_path=args.import_projections,
                 season=args.season,
                 scoring=args.scoring,
+            )
+            sys.exit(0 if success else 1)
+
+        elif args.refresh_draft_sheet:
+            success = cli.refresh_draft_sheet(
+                season=args.season,
+                scoring=args.scoring,
+                provider=args.projection_provider,
+                league_size=args.league_size,
+                years=args.years,
+                force_historical=args.force_refresh,
+                news_age_hours=args.news_age,
+                news_limit=args.news_limit,
+                skip_news=args.skip_news,
             )
             sys.exit(0 if success else 1)
             

@@ -125,6 +125,8 @@ cp .env.example .env
 OPENROUTER_API_KEY=your-openrouter-api-key
 OPENROUTER_MODEL=your-preferred-fast-model
 OPENROUTER_APP_TITLE=NFL Fantasy Draft Assistant
+# Optional and off by default; see the news scoring note below.
+NEWS_RANKING_ADJUSTMENTS=false
 ```
 
 `.env` is ignored by Git. Never place its values in frontend code, committed session
@@ -206,6 +208,26 @@ To regenerate only the static emergency board during development:
 ```bash
 venv/bin/python scripts/generate_emergency_cheatsheet.py
 ```
+
+To refresh current projections, historical inputs, rankings, the live board, and
+the role-by-role Markdown cheat sheet in one checked workflow:
+
+```bash
+python scripts/cli.py --refresh-draft-sheet --season 2026 --league-size 8 --scoring half_ppr --news-age 168 --news-limit 25 --force-refresh
+```
+
+The primary human-readable output is `outputs/draft_cheatsheet.md`. It contains a
+deeper next-best queue for RB, WR, QB, and TE with checkboxes for drafted players.
+Queue depth scales with league size: three QB/TE and five RB/WR slots per team,
+subject to the available canonical board depth. It also includes ten Week 1
+matchup-ranked D/ST fallbacks and ten season-projected kickers. D/ST and K stay
+outside skill-position VORP and are reserved for the final two rounds.
+By default the refresh also fetches recent, dated news and sends at most 30
+roster-matched headlines to OpenRouter. News is shown as an annotation; sentiment,
+hype, contracts, and opinion pieces do not change player rankings. Set
+`NEWS_RANKING_ADJUSTMENTS=true` only if you want small, capped adjustments for
+high-confidence injury/recovery, suspension, release, or directional role events.
+Use `--news-age HOURS`, `--news-limit N`, or `--skip-news` to control collection.
 
 The printable fallback is written to `outputs/emergency_draft_cheatsheet.md` and
 includes the exact live-board fingerprint. It does not track selections; cross off
@@ -437,8 +459,8 @@ score, VORP, tiers, risk flags, provenance, and the component-level scoring evid
 ### `outputs/draft_board.json`
 
 The stable consumption contract for live draft clients. It contains league metadata,
-health status, and independent QB, RB, WR, and TE priority lists with compact player
-evidence.
+health status, independent QB, RB, WR, and TE priority lists, and separate late-round
+D/ST and K fallback lists with compact evidence.
 
 ### `sessions/<name>.json`
 

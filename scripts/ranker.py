@@ -17,10 +17,12 @@ import pandas as pd
 import numpy as np
 import json
 import logging
+import os
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Tuple, Optional
 from pathlib import Path
 from fetch_2026_projections import normalize_player_name
+from fantasy_draft.board.tiers import rank_and_tier_by_vorp
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -31,7 +33,8 @@ class PlayerRanker:
     
     def __init__(self, data_dir: str = "data", outputs_dir: str = "outputs", news_dir: str = "news",
                  max_players: int = 500, target_season: int = None,
-                 league_size: int = 10, starters: Optional[Dict[str, int]] = None):
+                 league_size: int = 10, starters: Optional[Dict[str, int]] = None,
+                 enable_news_adjustments: Optional[bool] = None):
         self.data_dir = Path(data_dir)
         self.outputs_dir = Path(outputs_dir)
         self.news_dir = Path(news_dir)
@@ -39,6 +42,12 @@ class PlayerRanker:
         self.target_season = target_season or datetime.now().year
         self.projection_source = "unknown"
         self.news_source = "none"
+        self.news_metadata: Dict[str, Any] = {}
+        if enable_news_adjustments is None:
+            enable_news_adjustments = os.getenv("NEWS_RANKING_ADJUSTMENTS", "").casefold() in {
+                "1", "true", "yes", "on"
+            }
+        self.enable_news_adjustments = bool(enable_news_adjustments)
         self.league_size = int(league_size)
         self.starters = {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1}
         self.starters.update(starters or {})
@@ -63,15 +72,6 @@ class PlayerRanker:
             'TE': {'start_age': 32, 'gradual_rate': 0.03, 'steep_rate': 0.06, 'steep_age': 35}
         }
         
-        # Tier assignment percentiles (fixed order)
-        self.tier_percentiles = {
-            'Tier 1': 0.90,  # Top 10%
-            'Tier 2': 0.75,  # Top 25%
-            'Tier 3': 0.50,  # Top 50%
-            'Tier 4': 0.25,  # Top 75%
-            'Tier 5': 0.00   # All others
-        }
-
         # Explicit feature columns used to build raw_score. Keeping these in the
         # ranked dataframe makes score changes auditable and easy to test.
         self.score_feature_columns = [
@@ -148,24 +148,25 @@ class PlayerRanker:
                     bye_week_df = None
             
             # Load original target-season projections if available (as backup)
-            if bye_week_df is None and stats_file_projection.exists():
-                logger.info(f"Loading {self.target_season} projections...")
-                try:
-                    projections_df = pd.read_csv(stats_file_projection)
-                    self.projection_source = str(stats_file_projection)
-                    logger.info(f"Loaded {len(projections_df)} projection records from {stats_file_projection.name}")
-                    logger.info(f"Projection columns: {projections_df.columns.tolist()}")
-                    
-                    # Clean and standardize the projections data
-                    projections_df = self._process_projection_file(projections_df)
-                    
-                except Exception as e:
-                    logger.error(f"Error loading target-season projections: {e}")
-                    import traceback
-                    logger.error(f"Traceback: {traceback.format_exc()}")
-                    projections_df = None
-            else:
-                logger.info(f"{self.target_season} projections file not found")
+            if bye_week_df is None:
+                if stats_file_projection.exists():
+                    logger.info(f"Loading {self.target_season} projections...")
+                    try:
+                        projections_df = pd.read_csv(stats_file_projection)
+                        self.projection_source = str(stats_file_projection)
+                        logger.info(f"Loaded {len(projections_df)} projection records from {stats_file_projection.name}")
+                        logger.info(f"Projection columns: {projections_df.columns.tolist()}")
+
+                        # Clean and standardize the projections data
+                        projections_df = self._process_projection_file(projections_df)
+
+                    except Exception as e:
+                        logger.error(f"Error loading target-season projections: {e}")
+                        import traceback
+                        logger.error(f"Traceback: {traceback.format_exc()}")
+                        projections_df = None
+                else:
+                    logger.info(f"{self.target_season} projections file not found")
             
             # Get the most recent season data for each player
             df = df.sort_values(['player_match_name', 'season'], ascending=[True, False])
@@ -508,7 +509,11 @@ class PlayerRanker:
         try:
             with open(news_file, "r", encoding="utf-8") as f:
                 payload = json.load(f)
+            self.news_source = str(news_file)
+            self.news_metadata = payload.get("metadata", {}) if isinstance(payload, dict) else {}
         except Exception as e:
+            self.news_source = "none"
+            self.news_metadata = {}
             logger.warning("Could not load news features from %s: %s", news_file, e)
             return pd.DataFrame()
 
@@ -526,6 +531,8 @@ class PlayerRanker:
                     "news_injury_flag": bool(features.get("has_injury", features.get("injury_flag", False))),
                     "news_role_change_flag": bool(features.get("has_role_change", features.get("role_change", False))),
                     "news_topics": features.get("all_topics", features.get("topics", [])) or [],
+                    "news_actionable_events": features.get("actionable_events", []) or [],
+                    "news_latest_event": features.get("latest_actionable_event"),
                 }
             )
 
@@ -549,6 +556,8 @@ class PlayerRanker:
             "news_injury_flag": False,
             "news_role_change_flag": False,
             "news_topics": [],
+            "news_actionable_events": [],
+            "news_latest_event": None,
         }
 
         if news_df.empty:
@@ -569,6 +578,10 @@ class PlayerRanker:
                 merged[col] = [default.copy() if isinstance(default, list) else default for _ in range(len(merged))]
             elif isinstance(default, list):
                 merged[col] = merged[col].apply(lambda value: value if isinstance(value, list) else [])
+            elif default is None:
+                merged[col] = merged[col].apply(
+                    lambda value: value if isinstance(value, dict) else None
+                )
             elif isinstance(default, bool):
                 merged[col] = merged[col].fillna(default).astype(bool)
             else:
@@ -892,27 +905,47 @@ class PlayerRanker:
         return 0.0
 
     def calculate_news_adjustment(self, row: pd.Series) -> float:
-        """Calculate a small, explainable news adjustment."""
-        sentiment = max(-1.0, min(1.0, float(row.get('news_sentiment_score', 0) or 0)))
-        buzz = max(0.0, min(1.0, float(row.get('news_buzz_score', 0) or 0)))
-        headline_count = max(0, int(row.get('news_headline_count', 0) or 0))
-        injury_flag = bool(row.get('news_injury_flag', False))
-        role_change_flag = bool(row.get('news_role_change_flag', False))
+        """Score only explicit football events when the opt-in is enabled.
 
-        if headline_count == 0:
+        Sentiment, buzz, contracts, opinion pieces, and generic hype remain
+        annotations. The analyzer has already reduced duplicate coverage to the
+        newest event in each category.
+        """
+        if not self.enable_news_adjustments:
             return 0.0
 
-        adjustment = sentiment * 4.0
-        if sentiment >= 0:
-            adjustment += buzz * 2.0
-        else:
-            adjustment += sentiment * buzz * 2.0
-        if role_change_flag:
-            adjustment += 3.0 if sentiment >= 0 else -3.0
-        if injury_flag:
-            adjustment -= 12.0
+        events = row.get("news_actionable_events", [])
+        if not isinstance(events, list):
+            return 0.0
+        adjustment = 0.0
+        for event in events:
+            if not isinstance(event, dict) or not event.get("actionable"):
+                continue
+            confidence = max(0.0, min(1.0, float(event.get("confidence") or 0)))
+            source = max(0.0, min(1.0, float(event.get("source_quality") or 0.7)))
+            if confidence < 0.65:
+                continue
+            event_type = str(event.get("event_type") or "none")
+            event_score = 0.0
+            if event_type == "injury" and event.get("injury_status") in {"new", "worsening"}:
+                games = event.get("expected_games_missed")
+                event_score = -min(6.0, 3.0 if games is None else 1.5 + float(games))
+            elif event_type == "recovery" and event.get("injury_status") == "recovering":
+                event_score = 1.5
+            elif event_type == "recovery" and event.get("injury_status") == "cleared":
+                event_score = 2.5
+            elif event_type == "role_change" and event.get("role_direction") == "gained":
+                event_score = 3.0
+            elif event_type == "role_change" and event.get("role_direction") == "lost":
+                event_score = -3.0
+            elif event_type == "suspension" and event.get("event_direction") == "negative":
+                games = event.get("expected_games_missed")
+                event_score = -min(6.0, 3.0 if games is None else 1.5 + float(games))
+            elif event_type == "release" and event.get("event_direction") == "negative":
+                event_score = -4.0
+            adjustment += event_score * confidence * source
 
-        return max(-15.0, min(6.0, adjustment))
+        return max(-6.0, min(4.0, adjustment))
     
     def calculate_age_decline_penalty(self, row: pd.Series) -> float:
         """Calculate age-based decline penalty"""
@@ -987,7 +1020,10 @@ class PlayerRanker:
     
     def apply_penalty_adjustments(self, row: pd.Series, raw_score: float) -> float:
         """Apply penalty adjustments to raw score"""
-        adjusted_score = raw_score
+        # News is an additive event adjustment. Remove it while applying player
+        # age/depth uncertainty so unrelated multipliers do not distort it.
+        news_adjustment = float(row.get("news_component", 0) or 0)
+        adjusted_score = raw_score - news_adjustment
         
         # Age penalty for all players
         age_penalty = self.calculate_age_decline_penalty(row)
@@ -1013,7 +1049,7 @@ class PlayerRanker:
         if position in starter_thresholds and projected_pts < starter_thresholds[position]:
             adjusted_score *= 0.7  # 30% penalty for non-starters
         
-        return adjusted_score
+        return adjusted_score + news_adjustment
     
     def calculate_tier_score(self, tier: float) -> float:
         """Calculate tier-based score (lower tier = better score)"""
@@ -1146,57 +1182,32 @@ class PlayerRanker:
         return df
     
     def assign_tiers(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Assign tiers based on target-season projections and VORP percentiles"""
+        """Assign explainable tiers from adjacent final-VORP gaps by position."""
         df = df.copy()
-        
-        # First, use projection tier information if available
-        if 'projection_tier' in df.columns:
-            logger.info("Using projection tier information for initial tier assignment...")
-            # Convert numeric tier to tier name
-            df['tier'] = df['projection_tier'].apply(self._convert_tier_number_to_name)
-        
-        # Calculate tiers for each position based on VORP for players without projection tiers
+        df['tier'] = 'Tier 5'
+        df['vorp_tier'] = 5
+        df['tier_gap_from_previous'] = None
+        df['tier_boundary_reason'] = None
+        df['tier_gap_threshold'] = None
+        df['tier_max_size'] = None
+
         for position in ['QB', 'RB', 'WR', 'TE']:
-            pos_df = df[df['position'] == position].copy()
-            if len(pos_df) == 0:
+            indices = list(df.index[df['position'] == position])
+            if not indices:
                 continue
-            
-            # For players without projection tier info, calculate based on VORP
-            pos_df_no_tier = pos_df[pos_df['tier'] == 'Tier 5'].copy()
-            if len(pos_df_no_tier) > 0:
-                # Sort by VORP
-                pos_df_no_tier = pos_df_no_tier.sort_values('VORP', ascending=False)
-                
-                # Assign tiers based on percentiles
-                tier_names = ['Tier 1', 'Tier 2', 'Tier 3', 'Tier 4']
-                for tier_name in tier_names:
-                    percentile = self.tier_percentiles[tier_name]
-                    if percentile > 0:
-                        cutoff_idx = int(len(pos_df_no_tier) * percentile)
-                        if cutoff_idx > 0:
-                            pos_df_no_tier.iloc[:cutoff_idx, pos_df_no_tier.columns.get_loc('tier')] = tier_name
-                
-                # Update main dataframe using original row indices.
-                df.loc[pos_df_no_tier.index, 'tier'] = pos_df_no_tier['tier']
-        
+            records = []
+            for row_index in indices:
+                record = df.loc[row_index].to_dict()
+                record['_row_index'] = row_index
+                records.append(record)
+            for assigned in rank_and_tier_by_vorp(records, position):
+                row_index = assigned['_row_index']
+                for column in (
+                    'tier', 'vorp_tier', 'tier_gap_from_previous',
+                    'tier_boundary_reason', 'tier_gap_threshold', 'tier_max_size',
+                ):
+                    df.at[row_index, column] = assigned[column]
         return df
-    
-    def _convert_tier_number_to_name(self, tier_num: float) -> str:
-        """Convert numeric tier to tier name"""
-        try:
-            tier_num = float(tier_num)
-            if tier_num <= 1:
-                return 'Tier 1'
-            elif tier_num <= 2:
-                return 'Tier 2'
-            elif tier_num <= 3:
-                return 'Tier 3'
-            elif tier_num <= 4:
-                return 'Tier 4'
-            else:
-                return 'Tier 5'
-        except:
-            return 'Tier 5'
     
     def generate_player_flags(self, row: pd.Series) -> List[str]:
         """Generate flags for player based on target-season projections and historical data"""
@@ -1222,11 +1233,11 @@ class PlayerRanker:
             flags.append("Age Risk")
         
         # target-season projection flags
-        projection_tier = float(row.get('projection_tier', 99))
+        final_tier = float(row.get('vorp_tier', 99))
         projection_rank = float(row.get('projection_rank', 999))
         
         # Elite tier flag
-        if projection_tier <= 1:
+        if final_tier <= 1:
             flags.append("Elite Tier")
         
         # Top 10 rank flag
@@ -1326,6 +1337,17 @@ class PlayerRanker:
                     "score": round(row.get('adjusted_score', 0), 2),
                     "VORP": round(row.get('VORP', 0), 2),
                     "tier": row.get('tier', 'Tier 5'),
+                    "vorp_tier": int(row.get('vorp_tier', 5) or 5),
+                    "tier_gap_from_previous": (
+                        None if pd.isna(row.get('tier_gap_from_previous'))
+                        else round(float(row.get('tier_gap_from_previous')), 3)
+                    ),
+                    "tier_boundary_reason": row.get('tier_boundary_reason'),
+                    "tier_gap_threshold": (
+                        None if pd.isna(row.get('tier_gap_threshold'))
+                        else float(row.get('tier_gap_threshold'))
+                    ),
+                    "tier_max_size": int(row.get('tier_max_size', 0) or 0),
                     "age": age,
                     "injury_risk": "Low",  # Simplified for now
                     "flags": row.get('flags', []),
@@ -1351,6 +1373,8 @@ class PlayerRanker:
                     "news_injury_flag": bool(row.get('news_injury_flag', False)),
                     "news_role_change_flag": bool(row.get('news_role_change_flag', False)),
                     "news_topics": row.get('news_topics', []),
+                    "news_actionable_events": row.get('news_actionable_events', []),
+                    "news_latest_event": row.get('news_latest_event'),
                     "raw_score": round(row.get('raw_score', 0), 2),
                     "score_breakdown": {
                         col: round(row.get(col, 0), 2)
@@ -1366,6 +1390,10 @@ class PlayerRanker:
                     "target_season": self.target_season,
                     "projection_source": self.projection_source,
                     "news_source": self.news_source,
+                    "news_analyzed_at": self.news_metadata.get("analyzed_at"),
+                    "news_players_found": self.news_metadata.get("players_found", 0),
+                    "news_headlines_analyzed": self.news_metadata.get("total_headlines_analyzed", 0),
+                    "news_ranking_adjustments_enabled": self.enable_news_adjustments,
                     "ranking_count": len(output_data),
                     "replacement_model": {
                         "league_size": self.league_size,

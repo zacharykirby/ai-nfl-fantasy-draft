@@ -20,6 +20,10 @@ FANTASYPROS_PROJECTION_URLS: Dict[str, str] = {
     "WR": "https://www.fantasypros.com/nfl/projections/wr.php?week=draft",
     "TE": "https://www.fantasypros.com/nfl/projections/te.php?week=draft",
 }
+SPECIAL_TEAMS_PROJECTION_URLS: Dict[str, str] = {
+    "K": "https://www.fantasypros.com/nfl/projections/k.php?week=draft",
+    "DST": "https://www.fantasypros.com/nfl/projections/dst.php?week=1",
+}
 FANTASYPROS_ADP_URL = "https://draftwizard.fantasypros.com/football/adp/mock-drafts/"
 
 DEFAULT_SEASON = datetime.now().year
@@ -29,6 +33,19 @@ PLAYER_NAME_ALIASES = {
     "kenny gainwell": "kenneth gainwell",
     "chig okonkwo": "chigoziem okonkwo",
     "ken walker": "kenneth walker",
+}
+DEFENSE_TEAM_CODES = {
+    "Arizona Cardinals": "ARI", "Atlanta Falcons": "ATL", "Baltimore Ravens": "BAL",
+    "Buffalo Bills": "BUF", "Carolina Panthers": "CAR", "Chicago Bears": "CHI",
+    "Cincinnati Bengals": "CIN", "Cleveland Browns": "CLE", "Dallas Cowboys": "DAL",
+    "Denver Broncos": "DEN", "Detroit Lions": "DET", "Green Bay Packers": "GB",
+    "Houston Texans": "HOU", "Indianapolis Colts": "IND", "Jacksonville Jaguars": "JAX",
+    "Kansas City Chiefs": "KC", "Las Vegas Raiders": "LV", "Los Angeles Chargers": "LAC",
+    "Los Angeles Rams": "LAR", "Miami Dolphins": "MIA", "Minnesota Vikings": "MIN",
+    "New England Patriots": "NE", "New Orleans Saints": "NO", "New York Giants": "NYG",
+    "New York Jets": "NYJ", "Philadelphia Eagles": "PHI", "Pittsburgh Steelers": "PIT",
+    "San Francisco 49ers": "SF", "Seattle Seahawks": "SEA", "Tampa Bay Buccaneers": "TB",
+    "Tennessee Titans": "TEN", "Washington Commanders": "WAS",
 }
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -110,6 +127,8 @@ def estimate_overall_rank(row: pd.Series) -> float:
         "WR": (0, 2.6),
         "TE": (12, 6.0),
         "QB": (18, 6.5),
+        "DST": (165, 3.0),
+        "K": (180, 3.0),
     }
     offset, multiplier = curves.get(position, (100, 4.0))
     return offset + (float(pos_rank) * multiplier)
@@ -140,6 +159,37 @@ def fetch_projection_rows() -> pd.DataFrame:
         projections["projected_fantasy_points"], errors="coerce"
     ).fillna(0)
     return projections
+
+
+def fetch_special_teams_rows() -> pd.DataFrame:
+    """Fetch season K and matchup-aware Week 1 D/ST fallback rankings."""
+    rows = []
+    for position, url in SPECIAL_TEAMS_PROJECTION_URLS.items():
+        logger.info("Fetching %s projections from %s", position, url)
+        table = flatten_columns(pd.read_html(url)[0])
+        for idx, row in table.iterrows():
+            raw_name = str(row.get("PLAYER", "")).strip()
+            if position == "K":
+                name, team = split_player_team(raw_name)
+                ranking_basis = "season_projection"
+            else:
+                team = DEFENSE_TEAM_CODES.get(raw_name, "")
+                name = "{} D/ST".format(raw_name)
+                ranking_basis = "week_1_matchup_projection"
+            points = pd.to_numeric(row.get("FPTS", row.get("MISC_FPTS", 0)), errors="coerce")
+            if not name or not team or pd.isna(points) or float(points) <= 0:
+                continue
+            rows.append({
+                "name": name,
+                "position": position,
+                "team": team,
+                "projected_fantasy_points": float(points),
+                "projection_rank": idx + 1,
+                "projection_method": "published",
+                "projection_source": url,
+                "ranking_basis": ranking_basis,
+            })
+    return pd.DataFrame(rows)
 
 
 def fetch_adp_rows() -> pd.DataFrame:
@@ -211,6 +261,9 @@ def build_projection_file(
         projection_sources = list(FANTASYPROS_PROJECTION_URLS.values())
     else:
         raise ValueError("provider must be espn or fantasypros")
+    special_teams = fetch_special_teams_rows()
+    projections = pd.concat([projections, special_teams], ignore_index=True, sort=False)
+    projection_sources.extend(SPECIAL_TEAMS_PROJECTION_URLS.values())
     adp = fetch_adp_rows()
 
     projections = projections.copy()
@@ -264,9 +317,11 @@ def build_projection_file(
             "projection_method",
             "team_conflict",
             "source",
+            "ranking_basis",
         ]
     ].copy()
-    output = output[output["position"].isin(["QB", "RB", "WR", "TE"])]
+    output["ranking_basis"] = output["ranking_basis"].fillna("season_projection")
+    output = output[output["position"].isin(["QB", "RB", "WR", "TE", "K", "DST"])]
     output = output[pd.to_numeric(output["projected_fantasy_points"], errors="coerce").fillna(0) > 0]
     output = output.sort_values(["rank", "projected_fantasy_points"], ascending=[True, False])
     output["rank"] = output["rank"].round(0).astype(int)

@@ -37,7 +37,9 @@ def test_health_board_and_frontend(web_draft):
 
     board = client.get("/api/v1/board/summary")
     assert board.status_code == 200
-    assert board.json()["role_counts"] == {"RB": 3, "WR": 3, "QB": 3, "TE": 3}
+    assert board.json()["role_counts"] == {
+        "RB": 3, "WR": 3, "QB": 3, "TE": 3, "DST": 10, "K": 10
+    }
     board_health = board.json()["health"]
     service_health = health.json()["board"]
     assert board_health["status"] == service_health["status"]
@@ -181,7 +183,7 @@ def test_session_creation_rejects_invalid_name_depth_and_unready_board(web_draft
 
     too_deep = client.post(
         "/api/v1/sessions",
-        json={**base, "name": "too-deep", "rounds": 4},
+            json={**base, "name": "too-deep", "rounds": 8},
     )
     assert too_deep.status_code == 409
     assert not (web_draft["sessions_dir"] / "too-deep.json").exists()
@@ -314,7 +316,7 @@ def test_board_summary_reports_canonical_session_capacity(web_draft, tmp_path):
     summary = client.get("/api/v1/board/summary")
     assert summary.status_code == 200
     assert summary.json()["role_counts"]["RB"] == 3
-    assert sum(summary.json()["role_counts"].values()) == 12
+    assert sum(summary.json()["role_counts"].values()) == 32
 
 
 def test_text_command_requires_confirmation_then_records_pick(web_draft):

@@ -6,6 +6,7 @@ clients. It intentionally contains facts and evidence, not round-by-round picks.
 """
 
 import json
+import csv
 import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
@@ -13,20 +14,27 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from fantasy_draft.validation.projections import validate_projection_file
+from fantasy_draft.board.tiers import VORP_TIER_CONFIG, rank_and_tier_by_vorp
 
 
-POSITIONS = ("QB", "RB", "WR", "TE")
+SKILL_POSITIONS = ("QB", "RB", "WR", "TE")
+SPECIAL_TEAMS_POSITIONS = ("DST", "K")
+POSITIONS = (*SKILL_POSITIONS, *SPECIAL_TEAMS_POSITIONS)
 # The canonical live-draft universe is deliberately deeper than a normal league.
 # RB and WR receive most of the reserve because late-round picks, handcuffs, and
 # waiver-adjacent depth are concentrated at those positions.
-DEFAULT_POSITION_LIMITS = {"QB": 40, "RB": 110, "WR": 140, "TE": 40}
+DEFAULT_POSITION_LIMITS = {"QB": 40, "RB": 110, "WR": 140, "TE": 40, "DST": 10, "K": 10}
+MINIMUM_SPECIAL_TEAMS_ENTRIES = 10
 SCHEMA_VERSION = "1.0"
 FRESHNESS_ISSUE_CODES = {
     "projection_data_stale",
     "projection_retrieval_time_missing",
 }
 NAME_SUFFIX_PATTERN = re.compile(r"\s+(?:jr|sr|ii|iii|iv|v)$", re.IGNORECASE)
-PLAYER_NAME_ALIASES = {"ken walker": "kenneth walker"}
+PLAYER_NAME_ALIASES = {
+    "cam ward": "cameron ward",
+    "ken walker": "kenneth walker",
+}
 
 
 def normalize_player_identity(value: Any) -> str:
@@ -44,7 +52,9 @@ class LeagueConfig:
     scoring: str = "half_ppr"
     league_size: int = 10
     starters: Dict[str, int] = field(
-        default_factory=lambda: {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1}
+        default_factory=lambda: {
+            "QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1, "DST": 1, "K": 1
+        }
     )
     bench_size: int = 6
 
@@ -86,6 +96,38 @@ class DraftBoardBuilder:
         metadata = payload.get("metadata", {})
         return metadata if isinstance(metadata, dict) else {}, payload["rankings"]
 
+    def load_special_teams(self, metadata: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Load K/DST directly from projections so they never enter skill VORP."""
+        source = _normalize_source_path(metadata.get("projection_source"))
+        if source is None:
+            return []
+        if not source.is_absolute():
+            source = self.rankings_path.parent.parent / source
+        if not source.exists():
+            return []
+        with source.open("r", encoding="utf-8-sig", newline="") as handle:
+            rows = []
+            for row in csv.DictReader(handle):
+                position = str(row.get("position") or "").upper()
+                if position not in SPECIAL_TEAMS_POSITIONS:
+                    continue
+                rows.append({
+                    "name": row.get("name"),
+                    "pos": position,
+                    "team": row.get("team"),
+                    "bye_week": row.get("bye_week"),
+                    "projection_rank": row.get("rank"),
+                    "projection_tier": row.get("tier"),
+                    "projected_fantasy_points": row.get("projected_fantasy_points"),
+                    "adp": row.get("adp"),
+                    "projection_method": row.get("projection_method"),
+                    "projection_data_source": row.get("source"),
+                    "ranking_basis": row.get("ranking_basis") or (
+                        "week_1_matchup_projection" if position == "DST" else "season_projection"
+                    ),
+                })
+        return rows
+
     @staticmethod
     def _number(value: Any, default: float = 0.0) -> float:
         try:
@@ -118,7 +160,10 @@ class DraftBoardBuilder:
             "position": position,
             "position_rank": position_rank,
             "overall_rank": projection_rank,
-            "tier": self._tier(raw.get("projection_tier", raw.get("tier"))),
+            "tier": self._integer(
+                raw.get("vorp_tier"),
+                self._tier(raw.get("tier", raw.get("projection_tier"))),
+            ),
             "projected_points": round(self._number(raw.get("projected_fantasy_points")), 2),
             "vorp": round(self._number(raw.get("VORP", raw.get("vorp_score"))), 2),
             "score": round(self._number(raw.get("score", raw.get("total_score"))), 2),
@@ -137,6 +182,10 @@ class DraftBoardBuilder:
                 "sentiment": round(self._number(raw.get("news_sentiment_score")), 3),
                 "buzz": round(self._number(raw.get("news_buzz_score")), 3),
                 "headline_count": self._integer(raw.get("news_headline_count")),
+                "latest_event": raw.get("news_latest_event")
+                if isinstance(raw.get("news_latest_event"), dict) else None,
+                "actionable_events": raw.get("news_actionable_events")
+                if isinstance(raw.get("news_actionable_events"), list) else [],
             },
             "flags": [str(flag) for flag in flags],
             "evidence": {
@@ -151,8 +200,29 @@ class DraftBoardBuilder:
                 ),
                 "historical_seasons": self._integer(raw.get("historical_seasons_count")),
                 "score_breakdown": raw.get("score_breakdown", {}),
+                "tier_gap_from_previous": raw.get("tier_gap_from_previous"),
+                "tier_boundary_reason": raw.get("tier_boundary_reason"),
+                "tier_gap_threshold": raw.get("tier_gap_threshold"),
+                "tier_max_size": raw.get("tier_max_size"),
             },
+            "ranking_basis": raw.get("ranking_basis", "blended_skill_projection"),
         }
+
+    def _special_player(self, raw: Dict[str, Any], position_rank: int) -> Dict[str, Any]:
+        player = self._player(raw, position_rank)
+        player["overall_rank"] = None
+        player["vorp"] = None
+        player["score"] = None
+        player["tier"] = position_rank
+        player["late_round_only"] = True
+        player["news"] = {"sentiment": 0.0, "buzz": 0.0, "headline_count": 0,
+                          "latest_event": None, "actionable_events": []}
+        player["risk"] = {"level": "Not applicable", "injury_flag": False}
+        player["evidence"] = {
+            "ranking_basis": player["ranking_basis"],
+            "projection_source": player["projection_source"],
+        }
+        return player
 
     @staticmethod
     def _sort_key(player: Dict[str, Any]) -> Tuple[float, float, int]:
@@ -170,18 +240,28 @@ class DraftBoardBuilder:
         league_errors = league.validate()
         if league_errors:
             raise ValueError("Invalid league config: {}".format("; ".join(league_errors)))
-        limits = dict(DEFAULT_POSITION_LIMITS if limits is None else limits)
+        requested_limits = limits or {}
+        limits = dict(DEFAULT_POSITION_LIMITS)
+        limits.update(requested_limits)
         metadata, rankings = self.load_rankings()
+        special_teams = self.load_special_teams(metadata)
 
         roles: Dict[str, List[Dict[str, Any]]] = {}
         eligible_role_counts: Dict[str, int] = {}
         for position in POSITIONS:
+            source_rows = rankings if position in SKILL_POSITIONS else special_teams
             candidates = [
-                player for player in rankings
+                player for player in source_rows
                 if str(player.get("pos", player.get("position", ""))).upper() == position
                 and self._number(player.get("projected_fantasy_points")) > 0
             ]
-            candidates.sort(key=self._sort_key)
+            if position in SPECIAL_TEAMS_POSITIONS:
+                candidates.sort(key=lambda player: (
+                    -self._number(player.get("projected_fantasy_points")),
+                    self._integer(player.get("projection_rank"), 999),
+                ))
+            else:
+                candidates = rank_and_tier_by_vorp(candidates, position)
             unique_candidates = []
             seen_names = set()
             for player in candidates:
@@ -195,7 +275,7 @@ class DraftBoardBuilder:
             eligible_role_counts[position] = len(unique_candidates)
             limit = max(0, int(limits.get(position, 0)))
             roles[position] = [
-                self._player(player, index)
+                (self._special_player if position in SPECIAL_TEAMS_POSITIONS else self._player)(player, index)
                 for index, player in enumerate(unique_candidates[:limit], 1)
             ]
 
@@ -208,8 +288,24 @@ class DraftBoardBuilder:
                 "source_generated_at": metadata.get("generated_at"),
                 "projection_source": metadata.get("projection_source"),
                 "news_source": metadata.get("news_source", "none"),
+                "news_analyzed_at": metadata.get("news_analyzed_at"),
+                "news_players_found": metadata.get("news_players_found", 0),
+                "news_headlines_analyzed": metadata.get("news_headlines_analyzed", 0),
+                "news_ranking_adjustments_enabled": bool(
+                    metadata.get("news_ranking_adjustments_enabled", False)
+                ),
                 "ranking_replacement_model": metadata.get("replacement_model"),
-                "ranking_method": "blended_score_then_vorp_then_source_rank",
+                "ranking_method": "position_vorp_then_score_then_source_rank",
+                "tiering_method": {
+                    "method": "adjacent_vorp_gap_with_max_size",
+                    "metric": "VORP",
+                    "position_config": VORP_TIER_CONFIG,
+                },
+                "special_teams_ranking_method": {
+                    "DST": "week_1_matchup_projection",
+                    "K": "season_projection",
+                    "excluded_from_skill_vorp": True,
+                },
                 "ranking_count": len(rankings),
                 "role_counts": {position: len(players) for position, players in roles.items()},
                 "eligible_role_counts": eligible_role_counts,
@@ -267,6 +363,7 @@ def _validate_board_snapshot(board: Dict[str, Any]) -> Dict[str, Any]:
     issues: List[ValidationIssue] = []
     metadata = board.get("metadata", {})
     roles = board.get("roles", {})
+    starters = (board.get("league") or {}).get("starters") or {}
 
     if board.get("schema_version") != SCHEMA_VERSION:
         issues.append(ValidationIssue("error", "schema_version", "Unsupported board schema version"))
@@ -282,9 +379,20 @@ def _validate_board_snapshot(board: Dict[str, Any]) -> Dict[str, Any]:
     seen = set()
     for position in POSITIONS:
         players = roles.get(position)
+        required = position in SKILL_POSITIONS or int(starters.get(position, 0) or 0) > 0
+        if not required and (not isinstance(players, list) or not players):
+            continue
         if not isinstance(players, list) or not players:
             issues.append(ValidationIssue("error", "empty_role", "{} rankings are empty".format(position)))
             continue
+        if position in SPECIAL_TEAMS_POSITIONS and len(players) < MINIMUM_SPECIAL_TEAMS_ENTRIES:
+            issues.append(ValidationIssue(
+                "error",
+                "special_teams_coverage_low",
+                "{} has {} entries; minimum is {}".format(
+                    position, len(players), MINIMUM_SPECIAL_TEAMS_ENTRIES
+                ),
+            ))
         for expected_rank, player in enumerate(players, 1):
             name = str(player.get("player", "")).strip()
             if not name or name == "Unknown":
@@ -299,6 +407,11 @@ def _validate_board_snapshot(board: Dict[str, Any]) -> Dict[str, Any]:
                 issues.append(ValidationIssue("error", "position_rank_gap", "{} has an invalid position rank".format(name)))
             if not player.get("projected_points"):
                 issues.append(ValidationIssue("warning", "missing_projection", "{} has no projected points".format(name)))
+            if position in SPECIAL_TEAMS_POSITIONS and player.get("vorp") not in (None, 0, 0.0):
+                issues.append(ValidationIssue(
+                    "error", "special_teams_vorp_present",
+                    "{} must not be included in skill-position VORP".format(name),
+                ))
     return _health_report(issues)
 
 
@@ -429,11 +542,19 @@ def format_board(board: Dict[str, Any], top_n: int = 10, position: Optional[str]
     for role in selected:
         lines.append("{} PRIORITIES".format(role))
         for player in board.get("roles", {}).get(role, [])[:top_n]:
-            lines.append(
-                "{rank:>2}. {name:<24} {team:<4} Tier {tier:<2} Proj {points:>6.1f} VORP {vorp:>6.1f}".format(
-                    rank=player["position_rank"], name=player["player"], team=player["team"],
-                    tier=player["tier"], points=player["projected_points"], vorp=player["vorp"],
+            if role in SPECIAL_TEAMS_POSITIONS:
+                lines.append(
+                    "{rank:>2}. {name:<30} {team:<4} Proj {points:>5.1f} ({basis})".format(
+                        rank=player["position_rank"], name=player["player"], team=player["team"],
+                        points=player["projected_points"], basis=player.get("ranking_basis", "projection"),
+                    )
                 )
-            )
+            else:
+                lines.append(
+                    "{rank:>2}. {name:<24} {team:<4} Tier {tier:<2} Proj {points:>6.1f} VORP {vorp:>6.1f}".format(
+                        rank=player["position_rank"], name=player["player"], team=player["team"],
+                        tier=player["tier"], points=player["projected_points"], vorp=player["vorp"],
+                    )
+                )
         lines.append("")
     return "\n".join(lines).rstrip()

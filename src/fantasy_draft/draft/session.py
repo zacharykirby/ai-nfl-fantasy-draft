@@ -14,7 +14,7 @@ from uuid import uuid4
 
 
 SESSION_SCHEMA_VERSION = "1.0"
-BOARD_POSITIONS = ("QB", "RB", "WR", "TE")
+BOARD_POSITIONS = ("QB", "RB", "WR", "TE", "DST", "K")
 MINIMUM_CAPACITY_RESERVE_FRACTION = 0.10
 
 

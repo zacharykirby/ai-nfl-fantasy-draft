@@ -14,7 +14,7 @@ from projection_validator import validate_projection_file
 
 def valid_frame():
     rows = []
-    for position, count in {"QB": 20, "RB": 40, "WR": 50, "TE": 15}.items():
+    for position, count in {"QB": 20, "RB": 40, "WR": 50, "TE": 15, "K": 10, "DST": 10}.items():
         for number in range(count):
             rows.append(
                 {
@@ -62,7 +62,9 @@ def test_valid_projection_artifacts_are_ready(tmp_path):
     )
 
     assert report["status"] == "ready"
-    assert report["metrics"]["position_counts"] == {"WR": 50, "RB": 40, "QB": 20, "TE": 15}
+    assert report["metrics"]["position_counts"] == {
+        "WR": 50, "RB": 40, "QB": 20, "TE": 15, "K": 10, "DST": 10
+    }
 
 
 def test_estimated_projection_rate_can_block_readiness(tmp_path):
@@ -103,5 +105,5 @@ def test_metadata_reports_coverage_and_provenance(tmp_path):
     metadata = build_metadata(frame, 2026, output)
 
     assert metadata["season"] == 2026
-    assert metadata["projection_method_counts"] == {"published": 124, "adp_estimate": 1}
+    assert metadata["projection_method_counts"] == {"published": 144, "adp_estimate": 1}
     assert metadata["sources"]["adp"].startswith("https://")

@@ -17,8 +17,10 @@ import time
 import os
 import re
 import requests
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, urlsplit, urlunsplit
 import random
+import csv
+from pathlib import Path
 from bs4 import BeautifulSoup
 
 # Configure logging
@@ -61,6 +63,68 @@ ARCHIVE_SOURCES = {
     'profootballtalk_analysis_archive': 'https://profootballtalk.nbcsports.com/category/analysis/',
     'yahoo_fantasy_rankings_archive': 'https://sports.yahoo.com/fantasy/football/rankings/',
 }
+
+HIGH_TRUST_SOURCE_MARKERS = {"nfl_com", "espn", "the_athletic"}
+
+
+def source_quality(source_name: str) -> float:
+    """Return a conservative, transparent source-quality prior."""
+    source = source_name.casefold()
+    if any(marker in source for marker in HIGH_TRUST_SOURCE_MARKERS):
+        return 1.0
+    if any(marker in source for marker in ("cbs", "yahoo", "profootballtalk", "fantasypros")):
+        return 0.85
+    return 0.7
+
+
+def canonical_link(value: str) -> str:
+    """Normalize article URLs for deterministic cross-feed deduplication."""
+    if not value:
+        return ""
+    parts = urlsplit(value)
+    path = re.sub(r"/+$", "", parts.path)
+    return urlunsplit((parts.scheme.casefold(), parts.netloc.casefold(), path, "", ""))
+
+
+def normalized_title_tokens(value: str) -> set:
+    stop_words = {"a", "an", "and", "at", "for", "from", "in", "of", "on", "the", "to", "with"}
+    return {
+        token for token in re.findall(r"[a-z0-9]+", value.casefold())
+        if token not in stop_words
+    }
+
+
+def headlines_are_duplicate(left: Dict[str, Any], right: Dict[str, Any]) -> bool:
+    """Deduplicate canonical URLs and strongly overlapping same-player stories."""
+    left_link = canonical_link(str(left.get("link") or ""))
+    right_link = canonical_link(str(right.get("link") or ""))
+    if left_link and left_link == right_link:
+        return True
+    if set(left.get("player_names") or []) != set(right.get("player_names") or []):
+        return False
+    left_tokens = normalized_title_tokens(str(left.get("title") or ""))
+    right_tokens = normalized_title_tokens(str(right.get("title") or ""))
+    if not left_tokens or not right_tokens:
+        return False
+    return len(left_tokens & right_tokens) / len(left_tokens | right_tokens) >= 0.7
+
+
+def element_publication_date(element: Any) -> Optional[str]:
+    """Read a real machine-readable publication date near an archive headline."""
+    containers = [element]
+    containers.extend(list(element.parents)[:4])
+    for container in containers:
+        time_element = container if getattr(container, "name", None) == "time" else container.find("time")
+        if time_element is None:
+            continue
+        raw = time_element.get("datetime") or time_element.get("content")
+        if not raw:
+            continue
+        try:
+            return datetime.fromisoformat(str(raw).replace("Z", "+00:00")).isoformat()
+        except ValueError:
+            continue
+    return None
 
 # Enhanced football-specific keywords
 FOOTBALL_KEYWORDS = [
@@ -166,6 +230,30 @@ def is_football_related(title: str, summary: str) -> bool:
     
     return False
 
+def load_current_player_names(data_dir: Path = Path("data")) -> List[str]:
+    """Load the newest normalized projection pool for headline matching."""
+    projection_files = sorted(data_dir.glob("players_*_positions_bye.csv"), reverse=True)
+    if not projection_files:
+        return []
+    try:
+        with projection_files[0].open("r", encoding="utf-8-sig", newline="") as handle:
+            return sorted(
+                {
+                    str(row.get("name") or "").strip()
+                    for row in csv.DictReader(handle)
+                    if str(row.get("name") or "").strip()
+                }
+            )
+    except (OSError, csv.Error) as exc:
+        logger.warning("Could not load current player names: %s", exc)
+        return []
+
+
+def _match_text(value: str) -> str:
+    normalized = re.sub(r"[^a-z0-9]+", " ", value.casefold()).strip()
+    return re.sub(r"\s+(?:jr|sr|ii|iii|iv|v)$", "", normalized)
+
+
 def has_player_name(title: str) -> bool:
     """
     Check if headline contains a player name (last name).
@@ -176,35 +264,7 @@ def has_player_name(title: str) -> bool:
     Returns:
         True if contains player name, False otherwise
     """
-    # Common NFL player last names (top players and common names)
-    player_names = [
-        'mccaffrey', 'barkley', 'jefferson', 'chase', 'hill', 'ekeler', 'henry',
-        'allen', 'mahomes', 'hurts', 'jackson', 'burrow', 'murray', 'prescott',
-        'tagovailoa', 'herbert', 'lawrence', 'love', 'robinson', 'taylor', 'chubb',
-        'kamara', 'diggs', 'brown', 'lamb', 'cooper', 'evans', 'kelce', 'andrews',
-        'kittle', 'laporta', 'adams', 'hopkins', 'thomas', 'jones', 'williams',
-        'johnson', 'smith', 'davis', 'wilson', 'miller', 'moore', 'white', 'cook',
-        'gordon', 'bell', 'gurley', 'elliot', 'zeke', 'saquon', 'cmc', 'tyreek',
-        'aj', 'cee dee', 'stefon', 'travis', 'mark', 'george', 'sam', 'bijan',
-        'justin', 'patrick', 'jalen', 'lamar', 'joe', 'kyler', 'dak', 'tua',
-        'trevor', 'jordan', 'nick', 'alvin', 'mike', 'derrick', 'austin',
-        'darrisaw', 'maye', 'emerson', 'schottenheimer', 'guyton', 'wright',
-        'mendoza', 'skule', 'stefanski', 'watson', 'rodgers', 'brady', 'manning',
-        'brees', 'rivers', 'roethlisberger', 'wilson', 'stafford', 'cousins',
-        'carr', 'winston', 'mariota', 'trubisky', 'darnold', 'rosen', 'mayfield',
-        'darnold', 'rosen', 'mayfield', 'darnold', 'rosen', 'mayfield'
-    ]
-    
-    title_lower = title.lower()
-    for name in player_names:
-        if name in title_lower:
-            return True
-    
-    # Check for patterns like "Player Name" or "Name, Player"
-    if re.search(r'\b[A-Z][a-z]+ [A-Z][a-z]+\b', title):
-        return True
-    
-    return False
+    return bool(extract_player_names(title))
 
 def extract_player_names(title: str) -> List[str]:
     """
@@ -216,7 +276,7 @@ def extract_player_names(title: str) -> List[str]:
     Returns:
         List of player names found
     """
-    known_players = [
+    known_players = load_current_player_names() or [
         'christian mccaffrey', 'saquon barkley', 'justin jefferson', 'jamarr chase',
         'tyreek hill', 'austin ekeler', 'derrick henry', 'josh allen', 'patrick mahomes',
         'jalen hurts', 'lamar jackson', 'joe burrow', 'kyler murray', 'dak prescott',
@@ -231,17 +291,12 @@ def extract_player_names(title: str) -> List[str]:
     ]
     
     found_players = []
-    title_lower = title.lower()
+    normalized_title = " {} ".format(_match_text(title))
     
     for player in known_players:
-        if player in title_lower:
+        normalized_player = _match_text(player)
+        if normalized_player and " {} ".format(normalized_player) in normalized_title:
             found_players.append(player)
-    
-    # Also look for "FirstName LastName" patterns
-    name_patterns = re.findall(r'\b[A-Z][a-z]+ [A-Z][a-z]+\b', title)
-    for name in name_patterns:
-        if name.lower() not in found_players:
-            found_players.append(name)
     
     return found_players
 
@@ -263,12 +318,11 @@ def assess_headline_quality(title: str, summary: str) -> Dict[str, Any]:
     if is_football_related(title, summary):
         score += 2
     
-    # Check if has player name (+3 points)
-    if has_player_name(title):
-        score += 3
-    
-    # Extract player names
     player_names = extract_player_names(title)
+
+    # Check if has a current fantasy player name (+3 points)
+    if player_names:
+        score += 3
     
     # Bonus for multiple players (+1 point per additional player, max +2)
     if len(player_names) > 1:
@@ -296,10 +350,10 @@ def assess_headline_quality(title: str, summary: str) -> Dict[str, Any]:
     
     return {
         "is_high_quality": is_high_quality,
-        "has_player_name": has_player_name(title),
+        "has_player_name": bool(player_names),
         "player_names": player_names,
         "relevance_score": score,
-        "reason": f"Rule-based assessment: football={is_football_related(title, summary)}, player={has_player_name(title)}, score={score}"
+        "reason": f"Rule-based assessment: football={is_football_related(title, summary)}, player={bool(player_names)}, score={score}"
     }
 
 def clean_text(text: str) -> str:
@@ -435,12 +489,19 @@ def scrape_archive_page(url: str, source_name: str) -> List[Dict[str, Any]]:
                     link = urljoin(url, link)
                 
                 if title and len(title) > 10 and is_football_related(title, ''):
+                    published = element_publication_date(element)
+                    # An undated archive item may be months or years old. Do not
+                    # fabricate freshness and let it displace dated reporting.
+                    if not published:
+                        continue
                     headline = {
                         'title': title,
                         'summary': '',
                         'link': link,
                         'source': f"{source_name}_archive",
-                        'published': datetime.now().isoformat(),
+                        'published': published,
+                        'date_verified': True,
+                        'source_quality': source_quality(source_name),
                         'raw_content': ''
                     }
                     headlines.append(headline)
@@ -493,8 +554,9 @@ def fetch_headlines(max_age_hours: int = 720) -> List[Dict[str, Any]]:
                 elif entry.get('updated_parsed'):
                     pub_time = time.mktime(entry.updated_parsed)
                 else:
-                    # If no date, assume it's recent
-                    pub_time = time.time()
+                    # Undated entries cannot safely participate in a current-news
+                    # ranking pipeline.
+                    continue
                 
                 # Skip old headlines
                 if pub_time < cutoff_time:
@@ -519,6 +581,8 @@ def fetch_headlines(max_age_hours: int = 720) -> List[Dict[str, Any]]:
                         'link': entry.get('link', ''),
                         'source': source_name,
                         'published': datetime.fromtimestamp(pub_time).isoformat(),
+                        'date_verified': True,
+                        'source_quality': source_quality(source_name),
                         'raw_content': clean_text(entry.get('content', [{}])[0].get('value', '')) if entry.get('content') else '',
                         'quality_score': quality_assessment.get('relevance_score', 5),
                         'player_names': quality_assessment.get('player_names', []),
@@ -558,25 +622,29 @@ def fetch_headlines(max_age_hours: int = 720) -> List[Dict[str, Any]]:
             logger.error(f"Error fetching from {source_name} archive: {e}")
             continue
     
-    # Remove duplicates based on title similarity
+    # Remove canonical duplicates and near-identical same-player coverage.
     unique_headlines = []
-    seen_titles = set()
-    
-    for headline in all_headlines:
-        title_lower = headline['title'].lower()
-        # Check for similar titles (allowing for minor variations)
-        is_duplicate = False
-        for seen_title in seen_titles:
-            if title_lower in seen_title or seen_title in title_lower:
-                is_duplicate = True
-                break
-        
-        if not is_duplicate:
+    for headline in sorted(
+        all_headlines,
+        key=lambda item: (
+            float(item.get('source_quality', 0)),
+            int(item.get('quality_score', 0)),
+            str(item.get('published') or ''),
+        ),
+        reverse=True,
+    ):
+        if not any(headlines_are_duplicate(headline, seen) for seen in unique_headlines):
             unique_headlines.append(headline)
-            seen_titles.add(title_lower)
     
     # Sort by quality score and publication date (highest quality first)
-    unique_headlines.sort(key=lambda x: (x.get('quality_score', 5), x['published']), reverse=True)
+    unique_headlines.sort(
+        key=lambda x: (
+            x.get('quality_score', 5),
+            x.get('source_quality', 0),
+            x['published'],
+        ),
+        reverse=True,
+    )
     
     logger.info(f"Total quality football headlines fetched: {len(unique_headlines)}")
     return unique_headlines
@@ -654,4 +722,4 @@ def main():
         logger.warning("No quality football headlines were fetched. Check RSS feed URLs and connectivity.")
 
 if __name__ == "__main__":
-    main() 
+    main()

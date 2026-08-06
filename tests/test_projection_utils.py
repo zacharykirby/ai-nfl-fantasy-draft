@@ -12,6 +12,7 @@ from fetch_2026_projections import (
     estimate_overall_rank,
     estimate_points_from_adp,
     fill_bye_weeks_from_team,
+    fetch_special_teams_rows,
     flatten_columns,
     parse_position_rank,
     parse_position_rank_number,
@@ -87,3 +88,20 @@ def test_flatten_columns_handles_multiindex_and_duplicates():
     flattened = flatten_columns(df)
 
     assert flattened.columns.tolist() == ["PASSING_YDS", "RECEIVING_YDS"]
+
+
+def test_special_teams_rows_use_week_one_dst_and_season_kicker_sources(monkeypatch):
+    def fake_read_html(url):
+        if "dst.php" in url:
+            return [pd.DataFrame({"Player": ["Denver Broncos"], "FPTS": [8.3]})]
+        return [pd.DataFrame({"Player": ["Brandon Aubrey DAL"], "FPTS": [153.0]})]
+
+    monkeypatch.setattr(pd, "read_html", fake_read_html)
+
+    rows = fetch_special_teams_rows().set_index("position")
+
+    assert rows.loc["DST", "name"] == "Denver Broncos D/ST"
+    assert rows.loc["DST", "team"] == "DEN"
+    assert rows.loc["DST", "ranking_basis"] == "week_1_matchup_projection"
+    assert rows.loc["K", "name"] == "Brandon Aubrey"
+    assert rows.loc["K", "ranking_basis"] == "season_projection"

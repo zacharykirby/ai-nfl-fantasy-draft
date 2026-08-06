@@ -32,7 +32,7 @@ def write_rankings(tmp_path, players, projection_source=None):
     projection_source = projection_source or tmp_path / "projections.csv"
     projection_source = Path(projection_source)
     rows = []
-    minimums = {"QB": 20, "RB": 40, "WR": 50, "TE": 15}
+    minimums = {"QB": 20, "RB": 40, "WR": 50, "TE": 15, "K": 10, "DST": 10}
     for position, count in minimums.items():
         for number in range(count):
             rows.append(
@@ -98,21 +98,23 @@ def test_build_groups_and_ranks_players_by_position(tmp_path):
 
     assert [player["player"] for player in board["roles"]["RB"]] == ["RB Two", "Running Back"]
     assert [player["position_rank"] for player in board["roles"]["RB"]] == [1, 2]
-    assert board["metadata"]["role_counts"] == {"QB": 1, "RB": 2, "WR": 1, "TE": 1}
+    assert board["metadata"]["role_counts"] == {
+        "QB": 1, "RB": 2, "WR": 1, "TE": 1, "DST": 10, "K": 10
+    }
     assert board["metadata"]["ranking_replacement_model"]["league_size"] == 10
     assert board["health"]["status"] == "ready"
 
 
-def test_blended_score_controls_priority_before_source_rank(tmp_path):
+def test_final_vorp_controls_position_priority(tmp_path):
     players = complete_players() + [
-        ranking("Better Source Rank", "WR", 3, 50, 180, score=60),
-        ranking("Better Blended Score", "WR", 80, 5, 180, score=90),
+        ranking("Higher VORP", "WR", 80, 50, 180, score=60),
+        ranking("Higher Score", "WR", 3, 5, 180, score=90),
     ]
     board = DraftBoardBuilder(write_rankings(tmp_path, players)).build()
     names = [player["player"] for player in board["roles"]["WR"]]
 
-    assert names.index("Better Blended Score") < names.index("Better Source Rank")
-    assert board["metadata"]["ranking_method"] == "blended_score_then_vorp_then_source_rank"
+    assert names.index("Higher VORP") < names.index("Higher Score")
+    assert board["metadata"]["ranking_method"] == "position_vorp_then_score_then_source_rank"
 
 
 def test_vorp_then_source_rank_break_blended_score_ties(tmp_path):
@@ -128,6 +130,41 @@ def test_vorp_then_source_rank_break_blended_score_ties(tmp_path):
     assert names.index("Same VORP Worse Rank") < names.index("Lower VORP")
 
 
+def test_vorp_gaps_define_rb_tier_boundaries(tmp_path):
+    players = complete_players() + [
+        ranking("RB One", "RB", 1, 129.8, 250),
+        ranking("RB Two Gap", "RB", 2, 125.3, 245),
+        ranking("RB Three", "RB", 3, 108.2, 240),
+        ranking("RB Four", "RB", 4, 96.2, 235),
+        ranking("RB Five", "RB", 5, 93.2, 230),
+    ]
+
+    board = DraftBoardBuilder(write_rankings(tmp_path, players)).build()
+    backs = board["roles"]["RB"][:5]
+
+    assert [player["player"] for player in backs] == [
+        "RB One", "RB Two Gap", "RB Three", "RB Four", "RB Five"
+    ]
+    assert [player["tier"] for player in backs] == [1, 1, 2, 3, 3]
+    assert backs[2]["evidence"]["tier_gap_from_previous"] == pytest.approx(17.1)
+    assert backs[2]["evidence"]["tier_boundary_reason"] == "vorp_gap"
+    assert backs[3]["evidence"]["tier_gap_from_previous"] == pytest.approx(12.0)
+
+
+def test_max_tier_size_splits_a_large_flat_group(tmp_path):
+    flat = [
+        ranking("Flat WR {}".format(number), "WR", number, 200 - number, 200)
+        for number in range(1, 12)
+    ]
+
+    board = DraftBoardBuilder(write_rankings(tmp_path, complete_players() + flat)).build()
+    receivers = board["roles"]["WR"][:11]
+
+    assert [player["tier"] for player in receivers[:10]] == [1] * 10
+    assert receivers[10]["tier"] == 2
+    assert receivers[10]["evidence"]["tier_boundary_reason"] == "max_tier_size"
+
+
 def test_build_deduplicates_name_aliases_and_backfills_role_limit(tmp_path):
     players = complete_players() + [
         ranking("D.J. Moore", "WR", 3, 30, 210, score=80),
@@ -141,11 +178,30 @@ def test_build_deduplicates_name_aliases_and_backfills_role_limit(tmp_path):
 
     receivers = board["roles"]["WR"]
     assert [player["player"] for player in receivers] == [
+        "Receiver",
         "D.J. Moore",
         "Backfill Receiver",
-        "Receiver",
     ]
     assert [player["position_rank"] for player in receivers] == [1, 2, 3]
+
+
+def test_build_deduplicates_cam_and_cameron_ward(tmp_path):
+    players = complete_players() + [
+        ranking("Cameron Ward", "QB", 2, 30, 219, score=80),
+        ranking("Cam Ward", "QB", 3, 29, 174, score=79),
+        ranking("Backfill Quarterback", "QB", 4, 20, 170, score=70),
+    ]
+    board = DraftBoardBuilder(write_rankings(tmp_path, players)).build(
+        limits={"QB": 3, "RB": 1, "WR": 1, "TE": 1}
+    )
+
+    quarterbacks = board["roles"]["QB"]
+    names = [player["player"] for player in quarterbacks]
+    assert "Cameron Ward" in names
+    assert "Cam Ward" not in names
+    assert "Backfill Quarterback" in names
+    assert len(quarterbacks) == 3
+    assert [player["position_rank"] for player in quarterbacks] == [1, 2, 3]
 
 
 def test_historical_fallback_marks_board_not_ready(tmp_path):
@@ -231,6 +287,38 @@ def test_league_config_and_text_format(tmp_path):
     assert "QB PRIORITIES" not in output
 
 
+def test_special_teams_are_required_and_excluded_from_skill_vorp(tmp_path):
+    board = DraftBoardBuilder(write_rankings(tmp_path, complete_players())).build()
+
+    assert len(board["roles"]["DST"]) == 10
+    assert len(board["roles"]["K"]) == 10
+    assert all(player["vorp"] is None for player in board["roles"]["DST"])
+    assert all(player["vorp"] is None for player in board["roles"]["K"])
+    assert board["metadata"]["special_teams_ranking_method"] == {
+        "DST": "week_1_matchup_projection",
+        "K": "season_projection",
+        "excluded_from_skill_vorp": True,
+    }
+
+    board["roles"]["K"] = []
+    report = validate_board(board)
+
+    assert report["status"] == "not_ready"
+    assert "empty_role" in {issue["code"] for issue in report["issues"]}
+
+
+def test_special_teams_pool_below_ten_is_not_ready(tmp_path):
+    board = DraftBoardBuilder(write_rankings(tmp_path, complete_players())).build()
+    board["roles"]["DST"] = board["roles"]["DST"][:9]
+
+    report = validate_board(board)
+
+    assert report["status"] == "not_ready"
+    assert "special_teams_coverage_low" in {
+        issue["code"] for issue in report["issues"]
+    }
+
+
 def test_board_writer_stamps_exact_artifact_fingerprint(tmp_path):
     builder = DraftBoardBuilder(write_rankings(tmp_path, complete_players()))
     board = builder.build()
@@ -240,7 +328,7 @@ def test_board_writer_stamps_exact_artifact_fingerprint(tmp_path):
     assert verify_board_fingerprint(saved)["matches"] is True
 
 
-def test_default_board_universe_is_330_and_weighted_to_rb_wr(tmp_path):
+def test_default_board_universe_is_350_and_weighted_to_rb_wr(tmp_path):
     players = []
     available = {"QB": 42, "RB": 138, "WR": 194, "TE": 80}
     overall = 1
@@ -261,10 +349,10 @@ def test_default_board_universe_is_330_and_weighted_to_rb_wr(tmp_path):
     board = DraftBoardBuilder(path).build()
 
     assert board["metadata"]["role_counts"] == {
-        "QB": 40, "RB": 110, "WR": 140, "TE": 40,
+        "QB": 40, "RB": 110, "WR": 140, "TE": 40, "DST": 10, "K": 10,
     }
-    assert sum(board["metadata"]["role_counts"].values()) == 330
-    assert board["metadata"]["eligible_role_counts"] == available
+    assert sum(board["metadata"]["role_counts"].values()) == 350
+    assert board["metadata"]["eligible_role_counts"] == {**available, "DST": 10, "K": 10}
     assert board["metadata"]["role_limit_exclusions"] == {
-        "QB": 2, "RB": 28, "WR": 54, "TE": 40,
+        "QB": 2, "RB": 28, "WR": 54, "TE": 40, "DST": 0, "K": 0,
     }

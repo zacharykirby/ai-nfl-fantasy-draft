@@ -176,24 +176,63 @@ def test_score_prefers_real_historical_features_over_legacy_points():
     assert ranker.calculate_weighted_historical_average(row) == 160
 
 
-def test_news_adjustment_is_small_and_capped():
+def test_news_adjustments_are_off_by_default_and_ignore_hype():
     ranker = PlayerRanker()
-
-    positive = sample_player_row(
-        news_sentiment_score=0.8,
-        news_buzz_score=0.9,
-        news_headline_count=3,
-        news_role_change_flag=True,
+    hype = sample_player_row(
+        news_sentiment_score=1.0,
+        news_buzz_score=1.0,
+        news_headline_count=5,
+        news_actionable_events=[],
     )
-    injured = sample_player_row(
-        news_sentiment_score=-0.6,
-        news_buzz_score=0.7,
-        news_headline_count=2,
-        news_injury_flag=True,
+    confirmed = sample_player_row(
+        news_actionable_events=[{
+            "event_type": "role_change",
+            "role_direction": "gained",
+            "actionable": True,
+            "confidence": 1.0,
+            "source_quality": 1.0,
+        }]
     )
 
-    assert ranker.calculate_news_adjustment(positive) == pytest.approx(6.0)
-    assert ranker.calculate_news_adjustment(injured) == pytest.approx(-15.0)
+    assert ranker.calculate_news_adjustment(hype) == 0
+    assert ranker.calculate_news_adjustment(confirmed) == 0
+
+
+def test_opt_in_news_adjustment_scores_only_concrete_events_and_is_capped():
+    ranker = PlayerRanker(enable_news_adjustments=True)
+    events = sample_player_row(news_actionable_events=[
+        {
+            "event_type": "injury",
+            "injury_status": "new",
+            "expected_games_missed": 8,
+            "actionable": True,
+            "confidence": 1.0,
+            "source_quality": 1.0,
+        },
+        {
+            "event_type": "none",
+            "actionable": False,
+            "confidence": 1.0,
+            "source_quality": 1.0,
+        },
+    ])
+
+    assert ranker.calculate_news_adjustment(events) == pytest.approx(-6.0)
+
+
+def test_news_adjustment_is_not_scaled_by_age_or_depth_penalties():
+    ranker = PlayerRanker(enable_news_adjustments=True)
+    row = sample_player_row(
+        age=40,
+        projected_fantasy_points=50,
+        historical_seasons_count=1,
+        news_component=3.0,
+    )
+
+    with_news = ranker.apply_penalty_adjustments(row, 100)
+    row["news_component"] = 0.0
+    base_only = ranker.apply_penalty_adjustments(row, 97)
+    assert with_news - base_only == pytest.approx(3.0)
 
 
 def test_merge_news_features_normalizes_analyzer_output(tmp_path):
@@ -211,6 +250,13 @@ def test_merge_news_features_normalizes_analyzer_output(tmp_path):
                         "has_injury": False,
                         "has_role_change": True,
                         "all_topics": ["depth chart"],
+                        "actionable_events": [{
+                            "event_type": "role_change",
+                            "role_direction": "gained",
+                            "actionable": True,
+                            "confidence": 0.9,
+                            "source_quality": 1.0,
+                        }],
                     }
                 }
             }
@@ -228,6 +274,7 @@ def test_merge_news_features_normalizes_analyzer_output(tmp_path):
     assert player["news_headline_count"] == 2
     assert player["news_role_change_flag"] is True or player["news_role_change_flag"] == True
     assert player["news_topics"] == ["depth chart"]
+    assert player["news_actionable_events"][0]["role_direction"] == "gained"
     assert no_news["news_headline_count"] == 0
 
 
@@ -261,6 +308,7 @@ def test_export_rankings_includes_score_breakdown(tmp_path):
     player = payload["rankings"][0]
     assert payload["metadata"]["replacement_model"]["league_size"] == 10
     assert payload["metadata"]["replacement_model"]["starters"]["FLEX"] == 1
+    assert "news_analyzed_at" in payload["metadata"]
     assert set(player["score_breakdown"]) == set(ranker.score_feature_columns)
     assert sum(player["score_breakdown"].values()) == pytest.approx(player["raw_score"], abs=0.02)
     assert "news_component" in player["score_breakdown"]

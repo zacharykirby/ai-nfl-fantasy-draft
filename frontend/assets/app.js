@@ -73,10 +73,13 @@ async function api(path, options = {}) {
 }
 
 function playerRow(player) {
+  const detail = [player.position, player.team || "FA", `Bye ${player.bye_week ?? "—"}`];
+  if (!(["DST", "K"].includes(player.position))) detail.push(`Tier ${player.tier ?? "—"}`);
+  else detail.push(player.position === "DST" ? "Week 1 matchup rank" : "Season kicker rank");
   return `<div class="player-row">
     <div>
       <div class="player-name">${escapeHtml(player.player)}</div>
-      <div class="player-detail">${escapeHtml(player.position)} · ${escapeHtml(player.team || "FA")} · Bye ${player.bye_week ?? "—"} · Tier ${player.tier ?? "—"}</div>
+      <div class="player-detail">${detail.map(escapeHtml).join(" · ")}</div>
     </div>
     <div class="rank-badge">${escapeHtml(player.position)}${player.position_rank ?? "—"}</div>
   </div>`;
@@ -129,7 +132,9 @@ function render(cockpit) {
   const primary = recommendation?.primary;
   byId("primary-player").textContent = primary?.player || "Draft complete";
   byId("primary-meta").textContent = primary
-    ? `${primary.position}${primary.position_rank} · ${primary.team || "FA"} · Bye ${primary.bye_week ?? "—"} · Tier ${primary.tier} · ${Number(primary.vorp || 0).toFixed(1)} VORP`
+    ? (["DST", "K"].includes(primary.position)
+      ? `${primary.position}${primary.position_rank} · ${primary.team || "FA"} · Bye ${primary.bye_week ?? "—"} · late-round target`
+      : `${primary.position}${primary.position_rank} · ${primary.team || "FA"} · Bye ${primary.bye_week ?? "—"} · Tier ${primary.tier} · ${Number(primary.vorp || 0).toFixed(1)} VORP`)
     : "No active recommendation";
   byId("confidence").textContent = recommendation ? `${Math.round(recommendation.confidence * 100)}%` : "—";
   byId("mode").textContent = recommendation?.mode || "complete";
@@ -535,7 +540,7 @@ async function loadBoardView() {
 async function loadRosterView() {
   const result = await api(`/api/v1/sessions/${encodeURIComponent(state.session)}/roster`);
   byId("roster-title").textContent = `Team ${result.team} · ${result.players.length} selections`;
-  const positionCards = ["QB", "RB", "WR", "TE"].map((position) => {
+  const positionCards = ["QB", "RB", "WR", "TE", "DST", "K"].map((position) => {
     const need = result.needs[position];
     return `<div class="need-card ${need.open_base_slots ? "open" : ""}"><strong>${position}</strong><span>${need.rostered}/${need.base_starters} · ${need.open_base_slots} open</span></div>`;
   });
@@ -608,6 +613,7 @@ async function openPlayerDetail(playerId) {
   byId("player-detail-stats").innerHTML = stats.map(([value, label]) => `<div class="detail-stat"><strong>${escapeHtml(value)}</strong><span>${label}</span></div>`).join("");
   const evidence = player.evidence || {};
   const evidenceRows = [
+    ["Ranking basis", player.ranking_basis || "blended skill projection"],
     ["Projection", player.projection_method || "unknown"],
     ["Projection source", player.projection_source || "unknown"],
     ["Historical points", evidence.weighted_historical_points ?? "—"],

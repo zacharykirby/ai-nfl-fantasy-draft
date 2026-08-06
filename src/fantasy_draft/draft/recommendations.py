@@ -10,8 +10,9 @@ from fantasy_draft.draft.session import BOARD_POSITIONS, DraftSession, next_pick
 
 RECOMMENDATION_SCHEMA_VERSION = "1.0"
 MODES = ("safe", "balanced", "upside")
-DEFAULT_STARTERS = {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1}
+DEFAULT_STARTERS = {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1, "DST": 1, "K": 1}
 FLEX_POSITIONS = ("RB", "WR", "TE")
+SPECIAL_TEAMS_POSITIONS = ("DST", "K")
 
 
 def tier_number(value: Any) -> int:
@@ -151,6 +152,8 @@ class DraftRecommendationEngine:
             "TE": 1 if starters["TE"] and bench_size >= 6 else 0,
             "RB": max(1, math.ceil(bench_size * 0.5)) if starters["RB"] else 0,
             "WR": max(1, bench_size // 2) if starters["WR"] else 0,
+            "DST": 0,
+            "K": 0,
         }
         needs: Dict[str, Dict[str, Any]] = {}
         for position in BOARD_POSITIONS:
@@ -385,7 +388,10 @@ class DraftRecommendationEngine:
         position_rank = int(player.get("position_rank") or 999)
         projection = self._projection(player)
         replacement = replacement_levels[position]
-        league_vorp = projection - float(replacement["baseline_points"])
+        league_vorp = (
+            0.0 if position in SPECIAL_TEAMS_POSITIONS
+            else projection - float(replacement["baseline_points"])
+        )
         tier = tier_number(player.get("tier"))
         flags = {str(flag).casefold() for flag in player.get("flags", [])}
         risk = player.get("risk", {})
@@ -401,12 +407,26 @@ class DraftRecommendationEngine:
             "vorp_value": league_vorp * weights["vorp"],
             "tier_value": max(0.0, 6.0 - tier) * 8.0 * weights["tier"],
             "roster_need": float(needs[position]["score_adjustment"]),
-            "tier_scarcity": 12.0 if tiers[position]["tier_drop_imminent"] and tier == tiers[position]["best_tier"] else 0.0,
-            "position_run": 4.0 if position in run["positions"] else 0.0,
+            "tier_scarcity": 12.0 if position not in SPECIAL_TEAMS_POSITIONS and tiers[position]["tier_drop_imminent"] and tier == tiers[position]["best_tier"] else 0.0,
+            "position_run": 4.0 if position not in SPECIAL_TEAMS_POSITIONS and position in run["positions"] else 0.0,
             "source_confidence": -10.0 if player.get("projection_method") == "adp_estimate" else 0.0,
             "risk_adjustment": 0.0,
             "upside_adjustment": 0.0,
+            "late_round_timing": 0.0,
         }
+
+        current_round = int(math.ceil(self.session.current_pick / self.session.league_size))
+        if position in SPECIAL_TEAMS_POSITIONS and self.session.rounds < 4:
+            # Tiny simulations do not model a conventional fantasy roster and
+            # should not spend half their draft on special teams.
+            components["late_round_timing"] = -250.0
+        elif position == "DST":
+            components["late_round_timing"] = (
+                200.0 if current_round == max(1, self.session.rounds - 1) else
+                50.0 if current_round == self.session.rounds else -250.0
+            )
+        elif position == "K":
+            components["late_round_timing"] = 200.0 if current_round == self.session.rounds else -250.0
 
         is_injured = bool(risk.get("injury_flag"))
         risk_level = str(risk.get("level", "unknown")).casefold()
@@ -434,10 +454,13 @@ class DraftRecommendationEngine:
         if survival is not None and survival <= 0.25:
             components["will_not_survive"] = 9.0
 
-        reasons = [
-            "{}{} on the position board".format(position, position_rank),
-            "Tier {} with {:.1f} league-adjusted VORP".format(tier, league_vorp),
-        ]
+        reasons = ["{}{} on the position board".format(position, position_rank)]
+        if position in SPECIAL_TEAMS_POSITIONS:
+            reasons.append(
+                "late-round timing rule; special teams are excluded from skill-position VORP"
+            )
+        else:
+            reasons.append("Tier {} with {:.1f} league-adjusted VORP".format(tier, league_vorp))
         if needs[position]["needed"]:
             reasons.append("fills an open {} starter slot".format(position))
         elif needs[position]["need_level"] == "flex":
@@ -486,7 +509,10 @@ class DraftRecommendationEngine:
                 player, mode, needs, tiers, run, next_user_pick, replacement_levels
             )
             replacement = replacement_levels[player["position"]]
-            league_vorp = self._projection(player) - float(replacement["baseline_points"])
+            league_vorp = (
+                None if player["position"] in SPECIAL_TEAMS_POSITIONS
+                else self._projection(player) - float(replacement["baseline_points"])
+            )
             wait = self.wait_assessment(
                 player, next_user_pick, tier_survival_cache=tier_survival_cache
             )
@@ -499,7 +525,7 @@ class DraftRecommendationEngine:
                 "overall_rank": player.get("overall_rank"),
                 "tier": tier_number(player.get("tier")),
                 "projected_points": player.get("projected_points"),
-                "vorp": round(league_vorp, 3),
+                "vorp": None if league_vorp is None else round(league_vorp, 3),
                 "source_vorp": player.get("vorp"),
                 "replacement_rank": replacement["replacement_rank"],
                 "replacement_points": replacement["baseline_points"],

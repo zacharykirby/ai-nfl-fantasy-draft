@@ -58,6 +58,18 @@ def make_session(tmp_path, user_team=1):
             player("Tight End Two", "TE", 35, 2, 10, tier=2),
             player("Tight End Reserve", "TE", 99, 3, -20, tier=3),
         ],
+        "DST": [{
+            **player("Test Defense D/ST", "DST", 220, 1, 0, tier=1),
+            "overall_rank": None,
+            "projected_points": 8.0,
+            "vorp": None,
+        }],
+        "K": [{
+            **player("Test Kicker", "K", 221, 1, 0, tier=1),
+            "overall_rank": None,
+            "projected_points": 150.0,
+            "vorp": None,
+        }],
     }
     board = {
         "schema_version": "1.0",
@@ -65,7 +77,7 @@ def make_session(tmp_path, user_team=1):
         "health": {"status": "ready"},
         "league": {
             "scoring": "half_ppr",
-            "starters": {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1},
+            "starters": {"QB": 1, "RB": 2, "WR": 2, "TE": 1, "FLEX": 1, "DST": 1, "K": 1},
             "bench_size": 4,
         },
         "roles": roles,
@@ -153,6 +165,25 @@ def test_recommendation_has_auditable_contract_and_signals(tmp_path):
     assert result["primary"]["reasons"]
     assert result["signals"]["roster_needs"]["RB"]["needed"] is True
     assert result["generated_for"]["is_user_pick"] is True
+
+
+def test_special_teams_wait_until_the_last_two_rounds(tmp_path):
+    session = make_session(tmp_path)
+    engine = DraftRecommendationEngine(session)
+
+    assert engine.recommend("balanced")["primary"]["position"] not in {"DST", "K"}
+
+    for name in (
+        "Safe Runner", "Receiver One", "Elite QB", "Receiver Two", "Tight End One", "Runner Three"
+    ):
+        session.draft(name)
+    assert session.current_pick == 7  # Round 4 in a two-team draft.
+    assert DraftRecommendationEngine(session).recommend("balanced")["primary"]["position"] == "DST"
+
+    session.draft("Test Defense D/ST")
+    session.draft("Receiver Three")
+    assert session.current_pick == 9  # Final round.
+    assert DraftRecommendationEngine(session).recommend("balanced")["primary"]["position"] == "K"
 
 
 def test_safe_and_upside_modes_treat_risk_differently(tmp_path):

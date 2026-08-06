@@ -12,7 +12,7 @@ def test_cockpit_snapshot_composes_domain_state(web_draft):
     assert snapshot["session"]["picks_until_user"] == 0
     assert snapshot["recent_picks"][0]["player"] == "Jahmyr Gibbs"
     assert snapshot["recommendation"]["primary"]["player"] != "Jahmyr Gibbs"
-    assert set(snapshot["top_available_by_position"]) == {"QB", "RB", "WR", "TE"}
+    assert set(snapshot["top_available_by_position"]) == {"QB", "RB", "WR", "TE", "DST", "K"}
     assert snapshot["health"]["autosave"] == "ok"
     assert "autosave_path" not in snapshot["health"]
 
@@ -38,5 +38,5 @@ def test_search_result_count_is_bounded_by_requested_limit(web_draft):
 
 def test_available_rejects_unknown_position(web_draft):
     with pytest.raises(ValueError, match="position must be"):
-        DraftCockpitService(web_draft["session"]).available("K")
+        DraftCockpitService(web_draft["session"]).available("P")
 

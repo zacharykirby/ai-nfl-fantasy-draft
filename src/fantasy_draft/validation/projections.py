@@ -13,7 +13,7 @@ REQUIRED_COLUMNS = {
     "rank", "name", "position", "team", "bye_week",
     "projected_fantasy_points", "tier", "adp", "projection_method", "team_conflict", "source",
 }
-MINIMUM_POSITION_COUNTS = {"QB": 20, "RB": 40, "WR": 50, "TE": 15}
+MINIMUM_POSITION_COUNTS = {"QB": 20, "RB": 40, "WR": 50, "TE": 15, "K": 10, "DST": 10}
 
 
 def _issue(severity: str, code: str, message: str, **details: Any) -> Dict[str, Any]:
